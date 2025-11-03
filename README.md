@@ -1,22 +1,28 @@
 # Final Project!
 
-This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
 
-## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
+## Project planning: Design Doc
 
 ### Design Doc
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
 - What motivates your project?
+- The goal of this project is to create a way to procedurally generate strawberry plants with artist-friendly tweakable parameters within Houdini. Perhaps there is a scene that takes place in a garden store, or a scene that takes place in a field of strawberries, and where the character is peering between the bushes - then a 3D artist might need a way to place many strawberry plants that all look different in terms of the placement of leaves, number of flowers and strawberries, yet all strawberry plants are in the same stage of ripeness in the early summer - the perfect time for strawberry picking. 
 
 #### Goal
 - What do you intend to achieve with this project?
+- The intent of this project is to create a tool that is user-friendly to generate various naturalistic-looking strawberry plants. 
 
 #### Inspiration/reference:
 - You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
 - Include in your design doc links to and images of your reference material.
+- Here are some reference photos:
+
+  
+- Some reference papers that describe the structure of strawberry plants:
+- [Strawberry Plant Structure and Growth Habit ](http://www.hort.cornell.edu/expo/proceedings/2012/Berries/Berry%20Plant%20Structure%20Poling.pdf)
+- [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
 
 #### Specification:
 - Outline the main features of your project.
