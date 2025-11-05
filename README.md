@@ -40,6 +40,14 @@ As fans of music, cool math games, and procedural terrain generation, we decided
 - Finally, Unreal Game logic also connects a little to the audio analysis, so they can communicate about what song is played, the current time, etc.
 
 #### Timeline:
-- **Milestone 1:** A basic MVP, which is an infinite runner with randomized holes, and possibly the background color changing by the music, so we have some basic logic connected to the analysis.
-- **Milestone 2:** Adding the music to the level generation, which is the hardest part. Polishing everything. Adding UI features to load songs, change music, etc.
-- **Final Submissions:** Full polished game with powerups that influence music behavior.
+- **Milestone 1 (11/12):** A basic MVP, which is an infinite runner with randomized holes, and possibly the background color changing by the music, so we have some basic logic connected to the analysis.
+  * Setting up base Unreal Engine game logic (Dan).
+  * Setting up base music analysis with outputs (Avi). 
+- **Milestone 2 (11/24):** Adding the music to the level generation, which is the hardest part. Polishing everything. Adding UI features to load songs, change music, etc.
+  * Music driven noise (Avi)
+  * Unreal UI with added logic (Dan)
+  * Polish (Avi and Dan)
+- **Final Submissions (12/1):** Full polished game with powerups that influence music behavior.
+  * Powerups (Dan and Avi)
+  * Polish (Avi and Dan)
+  * Funkier ideas (Dan and Avi and Dan)
