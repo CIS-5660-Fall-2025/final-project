@@ -1,3 +1,59 @@
+# Design Document
+
+## Introduction
+We were inspired by the game Townscaper to create a procedurally generated, stylized environment where a player can explore and walk around in.
+
+## Goal
+The goal of this project is to procedurally generate a beautiful, explorable environment that combines algorithmic generation with aesthetic design. We want to use procedural rules to not only build geometry, but also be visually appealing and cohesive.
+
+Specifically, we will:
+- Generate a stylized terrain with water and elevation variation
+- Populate it with procedurally generated buildings using wave function collapse 
+- Allow the player to explore the scene in first person
+
+## Inspiration/Reference
+- Townscaper
+<img width="1005" height="1007" alt="Screen Shot 2025-03-23 at 5 16 27 PM" src="https://github.com/user-attachments/assets/9d601148-04c8-40ec-992c-75c783f7448d" />
+- [Infinite procedurally generated city with the Wave Function Collapse algorithm | Marian's Blog](https://marian42.de/article/wfc/)
+
+
+## Specification
+- Engine: Unity
+- Camera: First-person exploration
+- Programming Languages: C#
+- Features:
+  - Procedural terrain and water generation
+  - Procedural building generation
+  - Stylization
+  - First-Person Controls
+
+## Techniques
+- Perlin Noise
+- Wave Function Collapse
+  - https://www.boristhebrave.com/2020/04/13/wave-function-collapse-explained/
+  - https://www.boristhebrave.com/2021/06/06/driven-wavefunctioncollapse/
+  - https://www.boristhebrave.com/2021/10/26/model-synthesis-and-modifying-in-blocks/ 
+  - https://www.boristhebrave.com/2021/10/31/constraint-based-tile-generators/ 
+- Stylization
+  - https://github.com/jyguan18/hw02-stylization
+
+## Design
+<img width="1379" height="755" alt="Screen Shot 2025-11-05 at 2 52 37 PM" src="https://github.com/user-attachments/assets/089118cc-045f-4f36-b161-b7bf1e022c20" />
+
+
+## Timeline
+
+| |Griffin|Jackie|Deadline|
+|--|--|--|--|
+|**Milestone 1**|- Gather assets<br>- Wave Function Collapse for a flat plane|- Setup Github<br>- Gather assets<br>- Terrain Generation|Nov 12, 2025|
+|**Milestone 2**|- First-Person Camera<br>- Adapt wave function collapse to the generated terrain|- Stylization (Post-Process Effects)<br>- Water Shading|Nov 24, 2025|
+|**Final**|- Final Tweaks<br>- Tune movement + collision|- Final Tweaks<br>- Tune colors, textures, etc.|Dec 1, 2025|
+
+
+<br>
+
+
+
 # Final Project!
 
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
