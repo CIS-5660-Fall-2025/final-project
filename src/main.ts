@@ -11,6 +11,21 @@ function main(): void
 {
     // Create Stats overlay
     const stats = createStats();
+    
+    // WebGL setup
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const gl = canvas.getContext('webgl2') as WebGL2RenderingContext;
+    
+    if (!gl)
+    {
+      alert('WebGL 2 not supported!');
+      return;
+    }
+    
+    setGL(gl);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     // Scene manager handles all mesh construction
     const scene = new SceneManager();
@@ -23,18 +38,6 @@ function main(): void
 
     // Initial load
     scene.loadScene();
-
-    // WebGL setup
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    const gl = canvas.getContext('webgl2') as WebGL2RenderingContext;
-
-    if (!gl)
-    {
-        alert('WebGL 2 not supported!');
-        return;
-    }
-
-    setGL(gl);
 
     const camera = new Camera(
         vec3.fromValues(0, 16, 4),
@@ -68,6 +71,8 @@ function main(): void
             ],
             vec4.fromValues(ui.colorR, ui.colorG, ui.colorB, 1.0)
         );
+
+        renderer.renderGrid(camera);
 
         stats.end();
         requestAnimationFrame(tick);

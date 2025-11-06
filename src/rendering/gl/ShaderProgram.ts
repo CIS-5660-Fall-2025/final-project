@@ -1,6 +1,6 @@
-import {vec4, mat4} from 'gl-matrix';
+import { vec2, vec3, vec4, mat2, mat3, mat4 } from 'gl-matrix';
 import Drawable from './Drawable';
-import {gl} from '../../globals';
+import { gl } from '../../globals';
 
 var activeProgram: WebGLProgram = null;
 
@@ -31,6 +31,8 @@ class ShaderProgram {
   unifColor: WebGLUniformLocation;
   unifTime: WebGLUniformLocation;
 
+  private uniformLocations: Map<string, WebGLUniformLocation> = new Map();
+
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
 
@@ -45,11 +47,11 @@ class ShaderProgram {
     this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
-    this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
+    this.unifModel = gl.getUniformLocation(this.prog, "u_Model");
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
-    this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
-    this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
-    this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
+    this.unifViewProj = gl.getUniformLocation(this.prog, "u_ViewProj");
+    this.unifColor = gl.getUniformLocation(this.prog, "u_Color");
+    this.unifTime = gl.getUniformLocation(this.prog, "u_Time");
   }
 
   use() {
@@ -87,11 +89,60 @@ class ShaderProgram {
     }
   }
 
-  setTime(time:number) {
+  setTime(time: number) {
     this.use();
     if (this.unifTime !== -1) {
       gl.uniform1f(this.unifTime, time);
     }
+  }
+
+  private getUniformLocation(name: string): WebGLUniformLocation {
+    let loc = this.uniformLocations.get(name);
+    if (!loc) {
+      loc = gl.getUniformLocation(this.prog, name);
+      if (!loc) throw new Error(`Uniform '${name}' not found`);
+      this.uniformLocations.set(name, loc);
+    }
+    return loc;
+  }
+
+  // Floats
+  setUniformFloat(name: string, v: number) {
+    this.use();
+    gl.uniform1f(this.getUniformLocation(name), v);
+  }
+
+  // Integers
+  setUniformInt(name: string, v: number) {
+    this.use();
+    gl.uniform1i(this.getUniformLocation(name), v);
+  }
+
+  // Vectors
+  setUniformVec2(name: string, v: vec2) {
+    this.use();
+    gl.uniform2fv(this.getUniformLocation(name), v);
+  }
+
+  setUniformVec3(name: string, v: vec3) {
+    this.use();
+    gl.uniform3fv(this.getUniformLocation(name), v);
+  }
+
+  setUniformVec4(name: string, v: vec4) {
+    this.use();
+    gl.uniform4fv(this.getUniformLocation(name), v);
+  }
+
+  // Matrices
+  setUniformMat3(name: string, m: mat3) {
+    this.use();
+    gl.uniformMatrix3fv(this.getUniformLocation(name), false, m);
+  }
+
+  setUniformMat4(name: string, m: mat4) {
+    this.use();
+    gl.uniformMatrix4fv(this.getUniformLocation(name), false, m);
   }
 
   draw(d: Drawable) {
