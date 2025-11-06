@@ -15,9 +15,9 @@ I plan to create a sculpting tool using marching cubes and WebGPU.  I'm motivate
 I intend to create a simple sculpting tool in WebGPU that can be used on the web.
 
 #### Inspiration/reference:
-[This Terraforming video by Sebastion Lague][https://www.youtube.com/watch?v=vTMEdHcKgM4]
-[This Marching Squares Article by Jamie Wong][https://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/]
-[Astroneer][http://store.steampowered.com/app/361420/ASTRONEER/], a game that makes heavy use of terraforming.
+[This Terraforming video by Sebastion Lague](https://www.youtube.com/watch?v=vTMEdHcKgM4)
+[This Marching Squares Article by Jamie Wong](https://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/)
+[Astroneer](http://store.steampowered.com/app/361420/ASTRONEER/), a game that makes heavy use of terraforming.
 
 #### Specification:
 I plan on the project featuring a draw brush that allows for the creation of geometry as well as a subtract brush that deletes geometry.  I hope to have different types of brushes as well.  I may also allow the user to use different visual materials.
