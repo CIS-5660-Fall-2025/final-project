@@ -73,15 +73,15 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 16, 4), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
   gl.enable(gl.DEPTH_TEST);
 
   const lambert = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/trig-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/worley-frag.glsl')),
+    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
 
   // This function will be called every frame
@@ -100,8 +100,6 @@ function main() {
     lambert.setTime(getElapsedTime());
 
     renderer.render(camera, lambert, [
-      // icosphere,
-      // square,
        hex
     ], vec4.fromValues(controls.colorR, controls.colorG, controls.colorB, 1));
     stats.end();
