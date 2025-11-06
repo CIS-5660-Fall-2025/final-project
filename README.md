@@ -9,28 +9,45 @@ Before submitting your first milestone, _you must get your project idea and scop
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
-- What motivates your project?
+What motivates your project?
+- To furthur extend a project that I have worked on, allowing it to have more meaningful levels and be filled with 3D objects.
 
 #### Goal
-- What do you intend to achieve with this project?
+What do you intend to achieve with this project?
+- Create an algorithm to procedurally generate meaningful grid-based map that coherent with existing game mechanics, then spawn 3D objects on each tile.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+- [Wave Function Collapse](https://github.com/mxgmn/WaveFunctionCollapse)
 
 #### Specification:
-- Outline the main features of your project.
+Outline the main features of your project
+
+- An algorithm that generates the map
+- The ability to spawn designated objects on each tile
+- Allowing the objects to despawn and respawn following changes to the tile type in-game 
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
-
+- Approach 1: Wave Function Collapse
+  - First hand craft a few maps to showcase meaningful map definition, then feed them into the algorithm to produce map of similar and larger sizes.
+  - The Algorithm will be implemented as described in the wave function collapse github.
+- Approach 2: L-System-like spreading
+  - Given a board with set size, player spawn location, and player's target exit, starts from the spawn point and "grow" one tile in all directions each step until the entire board is filled.
+  - The new tiles generated each step depends on the two closest tiles around it, following a set of rules with possibilities.
+ 
+    
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img height="350" src="/0.png">
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+- Week 1
+  - Barebone of the algorithm that generates "something", may not be meaningful yet.
+- Week 2
+  - Tune the generation rules so that the output fits the game mechanics more.
+- Week 3
+  - Finalize the algorithm tuning, start adding objects to the generated map.
+- Week 4
+  - Final polish for the visual output.
 
-Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
