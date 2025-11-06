@@ -25,12 +25,6 @@ class ShaderProgram {
   attrNor: number;
   attrCol: number;
 
-  unifModel: WebGLUniformLocation;
-  unifModelInvTr: WebGLUniformLocation;
-  unifViewProj: WebGLUniformLocation;
-  unifColor: WebGLUniformLocation;
-  unifTime: WebGLUniformLocation;
-
   private uniformLocations: Map<string, WebGLUniformLocation> = new Map();
 
   constructor(shaders: Array<Shader>) {
@@ -47,52 +41,12 @@ class ShaderProgram {
     this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
-    this.unifModel = gl.getUniformLocation(this.prog, "u_Model");
-    this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
-    this.unifViewProj = gl.getUniformLocation(this.prog, "u_ViewProj");
-    this.unifColor = gl.getUniformLocation(this.prog, "u_Color");
-    this.unifTime = gl.getUniformLocation(this.prog, "u_Time");
   }
 
   use() {
     if (activeProgram !== this.prog) {
       gl.useProgram(this.prog);
       activeProgram = this.prog;
-    }
-  }
-
-  setModelMatrix(model: mat4) {
-    this.use();
-    if (this.unifModel !== -1) {
-      gl.uniformMatrix4fv(this.unifModel, false, model);
-    }
-
-    if (this.unifModelInvTr !== -1) {
-      let modelinvtr: mat4 = mat4.create();
-      mat4.transpose(modelinvtr, model);
-      mat4.invert(modelinvtr, modelinvtr);
-      gl.uniformMatrix4fv(this.unifModelInvTr, false, modelinvtr);
-    }
-  }
-
-  setViewProjMatrix(vp: mat4) {
-    this.use();
-    if (this.unifViewProj !== -1) {
-      gl.uniformMatrix4fv(this.unifViewProj, false, vp);
-    }
-  }
-
-  setGeometryColor(color: vec4) {
-    this.use();
-    if (this.unifColor !== -1) {
-      gl.uniform4fv(this.unifColor, color);
-    }
-  }
-
-  setTime(time: number) {
-    this.use();
-    if (this.unifTime !== -1) {
-      gl.uniform1f(this.unifTime, time);
     }
   }
 

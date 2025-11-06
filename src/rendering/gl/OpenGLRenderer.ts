@@ -39,11 +39,19 @@ class OpenGLRenderer {
     let viewProj = mat4.create();
     let color = colorParam;
 
+    // Model matrix and inv model
     mat4.identity(model);
+    let modelinvtr = mat4.create();
+    mat4.transpose(modelinvtr, model);
+    mat4.invert(modelinvtr, modelinvtr);
+
+    // ViewProj
     mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
-    prog.setModelMatrix(model);
-    prog.setViewProjMatrix(viewProj);
-    prog.setGeometryColor(color);
+
+    prog.setUniformMat4("u_Model", model);
+    prog.setUniformMat4("u_ModelInvTr", modelinvtr);
+    prog.setUniformMat4("u_ViewProj", viewProj);
+    prog.setUniformVec4("u_Color", color);
 
     for (let drawable of drawables) {
       prog.draw(drawable);
@@ -58,12 +66,11 @@ class OpenGLRenderer {
     mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
     mat4.multiply(mvp, viewProj, model);
 
-
     this.gridShader.setUniformMat4("u_MVP", mvp);
 
     this.gridShader.setUniformVec3("u_GridColor", vec3.fromValues(1,1,1));
     this.gridShader.setUniformFloat("u_GridSpacing", 1.0);
-    this.gridShader.setUniformFloat("u_LineWidth", 0.01);
+    this.gridShader.setUniformFloat("u_LineWidth", 0.001);
 
     this.gridShader.draw(this.plane);
   }

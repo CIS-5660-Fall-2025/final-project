@@ -61,8 +61,8 @@ function main(): void
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
 
-        lambert.setTime((Date.now() / 1000.0));
-
+        //lambert.setUniformFloat("u_Time", (Date.now() / 1000.0));
+        
         renderer.render(
             camera,
             lambert,
