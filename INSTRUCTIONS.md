@@ -9,46 +9,28 @@ Before submitting your first milestone, _you must get your project idea and scop
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
-What motivates your project?
-
-Wings look cool, but can be difficult to model individually due to their high number of different feathers and layers. These underlying patterns though lend themselves towards a procedural approach both in generating varius skeletal structures and feather groups, as well as varius sizes and styles of feathers themselves. 
+- What motivates your project?
 
 #### Goal
-What do you intend to achieve with this project?
-
-In Houdini create an HDA that given a few high level parameters (species/preset, wingspan, spread, etc) creates a semi-realistic procedurally generated bird wing. Additional goals include rendering and displaying specific results from the HDA, as well as potentially adding rigging or simulation effects.
+- What do you intend to achieve with this project?
 
 #### Inspiration/reference:
 - You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
 - Include in your design doc links to and images of your reference material.
 
-* [Avian Report: Ornithology and Bird Biology](https://avianreport.com/ornithology-bird-biology/)
-* [Everything You Need To Know About Feathers](https://academy.allaboutbirds.org/feathers-article/)
-* [The Form and Motion of Real Birds: Morphology of Aves](https://falconsongstudios.com/bird-anatomy)
-* [Birdify: Wing Shapes](https://www.birdfy.com/blogs/blogs/types-of-bird-wings-everything-you-need-to-know?srsltid=AfmBOooqPglGS5LFMCmoPbHOaWTLjkM7Vb7iix4vRPwi86O1jhLUzl7k)
-* [How To Draw Wings](https://www.clipstudio.net/how-to-draw/archives/168451)
+#### Specification:
+- Outline the main features of your project.
 
-#### Specification and Techniques:
-Outline the main features of your project.
-What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+#### Techniques:
+- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
 
-* Parameters and models for feathers - likely a mix of houdini and blender
-* Wing skeleton generator
-* Feather rows and individual feather placement and orientation modules
-* Featured presets and renders with shading and uvs
-* Stretch: Rigging/animation
-
+#### Design:
+- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
 
 #### Timeline:
-Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
-
-* Milestone 1: Create a base houdini generator able to produce a simple wing, look into rigging underlying skeletal structure
-* Milesone 2: Iterate and refine the generator to function better and develop set presets of settings that look good and demonstrate various types of wings.
-* Final: Develop presets into proper renders and scenes/turntables showcasing the generators results
-
+- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
 
 Submit your Design doc as usual via pull request against this repository.
-
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
