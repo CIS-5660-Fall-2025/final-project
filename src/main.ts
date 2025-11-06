@@ -16,8 +16,8 @@ const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
   colorR: 1,
-  colorG: 0,
-  colorB: 0
+  colorG: 1,
+  colorB: 1
 };
 
 let icosphere: Icosphere;
