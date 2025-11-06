@@ -4,6 +4,7 @@ import * as DAT from 'dat.gui';
 import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
+import Hex from './geometry/Hex';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -22,6 +23,7 @@ const controls = {
 let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
+let hex: Hex;
 let prevTesselations: number = 5;
 
 const startTime: number = Date.now() / 1000.0;
@@ -37,6 +39,8 @@ function loadScene() {
   square.create();
   cube = new Cube(vec3.fromValues(0,0,0), 1);
   cube.create();
+  hex = new Hex();
+  hex.create();
 }
 
 function main() {
@@ -98,7 +102,7 @@ function main() {
     renderer.render(camera, lambert, [
       // icosphere,
       // square,
-       cube
+       hex
     ], vec4.fromValues(controls.colorR, controls.colorG, controls.colorB, 1));
     stats.end();
 
