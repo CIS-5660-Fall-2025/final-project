@@ -1,0 +1,65 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CopyFromTexture
+#pragma kernel Upsample2x
+#pragma kernel FlowRouting
+#pragma kernel ErosionStep
+#pragma kernel ThermalStep
+#pragma kernel DepositStep
+#pragma kernel Retargeting
+#pragma kernel Breaching
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture2D<float> _InHeightTex;
+Texture2D<float> _InHeightRT;
+RWTexture2D<float> _OutHeightRT;
+
+[numthreads(8, 8, 1)]
+void CopyFromTexture(uint3 id : SV_DispatchThreadID)
+{
+    uint2 uv = id.xy;
+    float h = _InHeightTex.Load(int3(uv, 0));
+    _OutHeightRT[uv] = h;
+}
+
+[numthreads(8, 8, 1)]
+void Upsample2x(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void FlowRouting(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void ErosionStep(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void ThermalStep(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void DepositStep(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void Retargeting(uint3 id : SV_DispatchThreadID)
+{
+    
+}
+
+[numthreads(8, 8, 1)]
+void Breaching(uint3 id : SV_DispatchThreadID)
+{
+    
+}
