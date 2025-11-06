@@ -1,13 +1,4 @@
-# Final Project!
-
-This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
-
-## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
-
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
-
 #### Introduction
 This project presents a post-apocalyptic environment in a game level built in Unreal Engine, where the player stands on physically simulated water that reacts in real time to movement and interaction. Surrounding environment includes procedurally generated buildings and ruins. Together, the project demonstrates the integration of real-time physics, particle system and procedural generation to build a visually appealing game scene.
 
@@ -20,8 +11,9 @@ The motivation is the ink water effect of the fighting scene in Black Myth: Wuko
 
 Instead of the ink water, we decided to make an oily surface. 
 ![](img/design2.jpg)
+[Found on Game Dev Stack Exchange](https://gamedev.stackexchange.com/questions/64613/rendering-oily-polluted-water)
 ![](img/design3.jpg)
-[concept art by Sean Bodley](https://seanbodley.artstation.com/projects/mq2xaa)
+[Concept Art by Sean Bodley](https://seanbodley.artstation.com/projects/mq2xaa)
 
 Visual concepts for scene construction:
 | <img src="img/design4.jpeg" height=250> | <img src="img/design5.jpg" height=250> |
@@ -44,18 +36,19 @@ There are many tutorials online, and here's some of them that might be useful:
 [PROJECT TITAN BUILDING TOOL](https://www.sidefx.com/tutorials/project-titan-building-tool/)
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img src="img/design6.PNG" width=500>
 
 #### Timeline:
 
 | Timeline | Team Goal | McKenna | Joanne |
 | ----------- | ----------- | ----------- | ----------- |
-| Nov 5 - Nov 12 | A basic Unreal game level, Houdini to Unreal pipeline setup | WIP | Grid2D setup and basic fluid physics |
-| Nov 12 - Nov 19 | Finish the scene layout with basic buildings, add the water surface in the level that can be interacted with the character | WIP | Make the fluid interactable | 
-| Nov 19 - Nov 26 | All models are done, basic materials applied | WIP | Refine fluid physics, start to work on oily water surface shading | 
-| Nov 26 - Dec 1 | A complete game level with nice shading | WIP | Refinement | 
+| Nov 5 - Nov 12 | A basic Unreal game level, Houdini to Unreal pipeline setup | Set up Houdini to Unreal pipeline & Begin asset creation | Grid2D setup and basic fluid physics |
+| Nov 12 - Nov 19 | Finish the scene layout with basic buildings, add the water surface in the level that can be interacted with the character | Finish asset creation & Create procedural buildings using assets | Make the fluid interactable | 
+| Nov 19 - Nov 26 | All models are done, basic materials applied | Add vegetation, destruction, etc. to buildings for wasteland effect | Refine fluid physics, start to work on oily water surface shading | 
+| Nov 26 - Dec 1 | A complete game level with nice shading | Implement particle system for ash/smoke/other if all other parts are working correctly | Refinement | 
 
 Submit your Design doc as usual via pull request against this repository.
+
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
