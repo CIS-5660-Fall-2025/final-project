@@ -1,3 +1,31 @@
+# Design Doc
+
+## Goal
+I want to continue detailing my gothic building, and create a cool interior environment for it.
+
+## Inspiration/References:
+![1.jpg](1.jpg)
+![2.jpg](2.jpg)
+![3.jpg](3.jpg)
+
+## Specifications:
+Some features I would like to recreate from the concept art:
+- Procedural Staircase
+- Vegetation (flowers, veins)
+- butterfly flocking animation (if I have time)
+- lighting scenario
+- Book shelves
+- (maybe) character statues
+I also want to add in an idea I had from before. The building will be in 2 parts. Bottom floor is going to be bookshelves underneath the staircase. Then above it are the pretty windows.
+
+## Techniques:
+- Lot of procedural modeling
+- curve based vegetation tool
+- procedural flocking animation
+
+## Design:
+Seems quite straight forward so I don't think there's a need for diagrams.
+
 # Final Project!
 
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
