@@ -65,8 +65,6 @@ class OpenGLRenderer {
     this.gridShader.setUniformFloat("u_GridSpacing", 1.0);
     this.gridShader.setUniformFloat("u_LineWidth", 0.01);
 
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     this.gridShader.draw(this.plane);
   }
 };
