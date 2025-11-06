@@ -10,19 +10,24 @@ Start off by forking this repository. In your README, write a design doc to outl
 
 #### Introduction
 - What motivates your project?
+
 Convenient, fast texturing/stylization (since texturing in e.g. Blender isn't that good) 
 
 #### Goal
 - What do you intend to achieve with this project?
+
 2D (+ 3D?) to brushstroke engine
 
 #### Inspiration/reference:
 - You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
 - Include in your design doc links to and images of your reference material.
+
 https://download.blender.org/archive/gallery/blender-splash-screens/blender-2-90/
+
 <img width="1004" height="502" alt="blender-2-90-picture" src="https://github.com/user-attachments/assets/85f3b1f9-e501-4647-9036-9003644c1ef1" />
 
 https://www.furaffinity.net/view/62291064/
+
 ![495478413-a63eeb38-4575-4685-9c02-b2c9ece77e7e](https://github.com/user-attachments/assets/902f654d-a3af-48c0-867b-6ab5297a5bdf)
 
 #### Specification:
@@ -40,10 +45,12 @@ https://www.furaffinity.net/view/62291064/
 
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+
 Gaussian splatting optimization https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/
 
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+
 <img width="1230" height="738" alt="image" src="https://github.com/user-attachments/assets/e54ce621-9834-4693-a05c-85c101a71fa2" />
 
 
