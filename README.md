@@ -5,10 +5,10 @@ Team members: Zixiao Wang, Tianhong Zhou
 ## Design Doc
 
 #### Introduction
-High-resolution, hydrologically consistent terrains are expensive to author by hand and slow to simulate faithfully at full resolution. [Terrain Amplification using Multi-scale Erosion](https://hal.science/hal-04565030/document) (SIGGRAPH 2024) proposes a fast pipeline that amplifies a coarse DEM into a detailed terrain across scales while keeping drainage networks realistic. We will reproduce that pipeline in Unity (Compute Shaders) and extend it with material-aware erosion (e.g., rock vs. soil vs. snow/ice) so results feel more geographic and controllable for artists.
+High-resolution, hydrologically consistent terrains are expensive to author by hand and slow to simulate at full resolution. [Terrain Amplification using Multi-scale Erosion](https://hal.science/hal-04565030/document) (SIGGRAPH 2024) proposes a fast pipeline that amplifies a coarse DEM into a detailed terrain across scales while keeping drainage networks realistic. We will reproduce that pipeline in Unity (Compute Shaders) and extend it with material-aware erosion (e.g., rock vs. soil vs. snow/ice) so results feel more geographic and controllable for artists.
 
 #### Goal
-1. Faithful reproduction of the paper's multi-scale amplification pipeline: upsample -> stream-power erosion -> thermal relaxation -> deposition -> ridge/peak retargeting -> multi-scale partial breaching.
+1. Reproduction of the paper's multi-scale amplification pipeline: upsample -> stream-power erosion -> thermal relaxation -> deposition -> ridge/peak retargeting -> multi-scale partial breaching.
 
 2. Authoring tool in Unity: real-time controls (sliders/brush), visual debugging layers (slope, drainage area, hardness, sediment), and one-click export of heightmap/normal/albedo.
 
@@ -53,7 +53,7 @@ Material-aware extensions (beyond paper)
   - ......
 
 #### Techniques:
-- Platform: Unity. We will implement the pipeline with HLSL Compute Shaders, RenderTextures (RFloat/RGHalf), and CommandBuffers in a ping-pong schedule, leveraging the Unity Editor for live parameter tuning, debug overlays, and export of height/normal/splat maps.
+- Platform: Unity. We will implement the pipeline with HLSL Compute Shaders, RenderTextures (RFloat/RGHalf), and CommandBuffers in a ping-pong schedule, using Unity for live parameter tuning, debug overlays, and export of height/normal/splat maps.
 - Algorithm: Follow the algorithm in [Terrain Amplification using Multi-scale Erosion](https://hal.science/hal-04565030/document).
 
 #### Design:
