@@ -1,5 +1,3 @@
-// Vertex & Fragment shaders for instanced 'seaweed blade' ribbons.
-// WebGL2, no dependencies.
 
 export const vs = `#version 300 es
 precision highp float;
