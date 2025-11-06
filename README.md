@@ -9,26 +9,51 @@ Before submitting your first milestone, _you must get your project idea and scop
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
-- What motivates your project?
+This project presents a post-apocalyptic environment in a game level built in Unreal Engine, where the player stands on physically simulated water that reacts in real time to movement and interaction. Surrounding environment includes procedurally generated buildings and ruins. Together, the project demonstrates the integration of real-time physics, particle system and procedural generation to build a visually appealing game scene.
 
 #### Goal
-- What do you intend to achieve with this project?
+To create an immersive **Unreal Engine game level** that demonstrates **real-time fluid simulation**, **procedural environment generation**, and **realistic visual effects** in a post-apocalyptic setting.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+The motivation is the ink water effect of the fighting scene in Black Myth: Wukong.
+![](img/design1.gif)
+
+Instead of the ink water, we decided to make an oily surface. 
+![](img/design2.jpg)
+![](img/design3.jpg)
+[concept art by Sean Bodley](https://seanbodley.artstation.com/projects/mq2xaa)
+
+Visual concepts for scene construction:
+| <img src="img/design4.jpeg" height=250> | <img src="img/design5.jpg" height=250> |
+| ----------- | ----------- |
 
 #### Specification:
-- Outline the main features of your project.
+- Custom-built wasteland city scene from scratch
+- Fluid simulation implemented using the Niagara system
+- Oily surface shading on the water
+- Procedurally generated buildings and objects for scene construction
+- Additional effects such as falling ash and volumetric smoke if time permits
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+- **Fluid sim:** Niagara Grid2D
+- **Procedural generation:** Houdini->Unreal using Houdini Engine
+- **Falling ash / other interactive objects:** Niagara particles
+
+There are many tutorials online, and here's some of them that might be useful:  
+[Exploring Unreal Engine 5 Niagara Simulation Stages and Grid2D Collection](https://www.youtube.com/watch?v=PCA5jQwFvug)  
+[PROJECT TITAN BUILDING TOOL](https://www.sidefx.com/tutorials/project-titan-building-tool/)
 
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+
+| Timeline | McKenna | Joanne |
+| ----------- | ----------- | ----------- |
+| Nov 5 - Nov 12 | WIP | WIP |
+| Nov 12 - Nov 19 | WIP | WIP |
+| Nov 19 - Nov 26 | WIP | WIP |
+| Nov 26 - Dec 1 | WIP | WIP |
 
 Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/12)
