@@ -48,12 +48,12 @@ There are many tutorials online, and here's some of them that might be useful:
 
 #### Timeline:
 
-| Timeline | McKenna | Joanne |
-| ----------- | ----------- | ----------- |
-| Nov 5 - Nov 12 | WIP | WIP |
-| Nov 12 - Nov 19 | WIP | WIP |
-| Nov 19 - Nov 26 | WIP | WIP |
-| Nov 26 - Dec 1 | WIP | WIP |
+| Timeline | Team Goal | McKenna | Joanne |
+| ----------- | ----------- | ----------- | ----------- |
+| Nov 5 - Nov 12 | A basic Unreal game level, Houdini to Unreal pipeline setup | WIP | Grid2D setup and basic fluid physics |
+| Nov 12 - Nov 19 | Finish the scene layout with basic buildings, add the water surface in the level that can be interacted with the character | WIP | Make the fluid interactable | 
+| Nov 19 - Nov 26 | All models are done, basic materials applied | WIP | Refine fluid physics, start to work on oily water surface shading | 
+| Nov 26 - Dec 1 | A complete game level with nice shading | WIP | Refinement | 
 
 Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/12)
