@@ -9,26 +9,30 @@ Before submitting your first milestone, _you must get your project idea and scop
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
-- What motivates your project?
+I plan to create a sculpting tool using marching cubes and WebGPU.  I'm motivated to explore marching cubes in a sculpting context and create a fun tool.
 
 #### Goal
-- What do you intend to achieve with this project?
+I intend to create a simple sculpting tool in WebGPU that can be used on the web.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+[This Terraforming video by Sebastion Lague][https://www.youtube.com/watch?v=vTMEdHcKgM4]
+[This Marching Squares Article by Jamie Wong][https://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/]
+[Astroneer][http://store.steampowered.com/app/361420/ASTRONEER/], a game that makes heavy use of terraforming.
 
 #### Specification:
-- Outline the main features of your project.
+I plan on the project featuring a draw brush that allows for the creation of geometry as well as a subtract brush that deletes geometry.  I hope to have different types of brushes as well.  I may also allow the user to use different visual materials.
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+I will almost definitely use marching cubes, but I may use other techniques that I'm not currently aware of.
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img width="484" height="553" alt="image" src="https://github.com/user-attachments/assets/6f7b39cf-6aac-40d7-b936-06c56b3efd62" />
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+- Week 1: Setup WebGPU, Research Terraforming/Sculpting, Implement Basic Marching Cubes
+- Week 2: Finish/fix implementation if necessary, add basic sculpting
+- Week 3: Troubleshoot, add UI and a few different brushes
+- Week 4: Polish, troubleshoot, test building, and potentially add different visual materials
 
 Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/12)
