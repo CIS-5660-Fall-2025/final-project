@@ -7,7 +7,7 @@ HexDungeon is a WebGL-based dungeon layout builder using Wave-Function Collapse 
 The goal is to build a foundational map builder to serve as the basis for a future game project in WebGL. The idea is to build the supporting systems for a hex tile, turn-based dungeon crawler with procedurally generated levels.
 
 #### Inspiration/reference:
-[Hex WFC Demo on YouTube](https://www.youtube.com/watch?v=XJCmQUnVAsE)
+[Hex WFC Demo on YouTube](https://www.youtube.com/watch?v=XJCmQUnVAsE) 
 
 | ![](img/hexmini_in.png)|
 |--------|
