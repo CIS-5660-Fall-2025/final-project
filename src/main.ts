@@ -60,18 +60,15 @@ function main(): void
         camera.update();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
-
-        //lambert.setUniformFloat("u_Time", (Date.now() / 1000.0));
         
         renderer.render(
             camera,
             lambert,
-            [
-                scene.hex
-            ],
+            [],
             vec4.fromValues(ui.colorR, ui.colorG, ui.colorB, 1.0)
         );
 
+        scene.drawTiles(lambert, camera);
         renderer.renderGrid(camera);
 
         stats.end();
