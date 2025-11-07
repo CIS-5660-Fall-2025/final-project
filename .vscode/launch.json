@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "Launch with Chrome Canary",
+            "request": "launch",
+            "url": "http://localhost:5660/",
+            "runtimeExecutable": "canary",
+            "userDataDir": true
+        }
+    ]
+}
