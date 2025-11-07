@@ -1,10 +1,14 @@
 #include <webgpu/webgpu.h>
+#ifdef WEBGPU_BACKEND_WGPU
+#include <webgpu/wgpu.h>
+#endif
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 #include <iostream>
 #include <assert.h>
 #include <vector>
+#include <GLFW/glfw3.h>
 
 WGPUAdapter requestAdapterSync(WGPUInstance instance, WGPURequestAdapterOptions const* options) {
     // A simple structure holding the local information shared with the
@@ -131,6 +135,66 @@ void inspectDevice(WGPUDevice device) {
     }
 }
 
+void commandBufferTest(WGPUQueue &queue, WGPUDevice &device) {
+    WGPUCommandEncoderDescriptor encoderDesc = {};
+    encoderDesc.nextInChain = nullptr;
+    encoderDesc.label = "Command encoder/creator";
+    WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &encoderDesc);
+
+    // Create a command that does a nothing task
+    wgpuCommandEncoderInsertDebugMarker(encoder, "task 1");
+    wgpuCommandEncoderInsertDebugMarker(encoder, "task 2");
+
+    // Generate Command Buffer
+    WGPUCommandBufferDescriptor cmdBufferDescriptor = {};
+    cmdBufferDescriptor.nextInChain = nullptr;
+    cmdBufferDescriptor.label = "Command buffer";
+    WGPUCommandBuffer cmd = wgpuCommandEncoderFinish(encoder, &cmdBufferDescriptor);
+    wgpuCommandEncoderRelease(encoder);
+
+    // With the command buffer, we can submit command queue
+    std::cout << "Submitting command..." << std::endl;
+    wgpuQueueSubmit(queue, 1, &cmd);
+    wgpuCommandBufferRelease(cmd);
+    std::cout << "Command submitted" << std::endl;
+
+    for (int i = 0 ; i < 5 ; ++i) {
+        std::cout << "Tick/Poll device..." << std::endl;
+    #if defined(WEBGPU_BACKEND_DAWN)
+        wgpuDeviceTick(device);
+    #elif defined(WEBGPU_BACKEND_WGPU)
+        wgpuDevicePoll(device, false, nullptr);
+    #elif defined(WEBGPU_BACKEND_EMSCRIPTEN)
+        emscripten_sleep(100);
+    #endif
+    }
+}
+
+void glfwMainLoop() {
+    if(!glfwInit()) {
+        std::cerr << "Couldn't initialize GLFW!!!" << std::endl;
+        return;
+    }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Tell GLFW not to think about API since it wouldn't know WebGPU anyways
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disallow resizing since it causes crash for now
+    GLFWwindow *window = glfwCreateWindow(640, 480, "Learn WebGPU!!", nullptr, nullptr);
+    if(!window) {
+        std::cerr << "Couldn't open GLFW window!!" << std::endl;
+        glfwTerminate();
+        return;
+    }
+
+    // A main loop like this won't work with Emscripten cuz the main loop is handled by the browser
+    while (!glfwWindowShouldClose(window)) {
+        // Check user events here
+        glfwPollEvents(); // Process events
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
 int main(int, char**) {
     WGPUInstanceDescriptor desc = {};
     desc.nextInChain = nullptr;
@@ -235,8 +299,18 @@ int main(int, char**) {
 
     inspectDevice(device);
 
+    // Queue and Command Buffer
+    WGPUQueue queue = wgpuDeviceGetQueue(device);
+    auto onQueueWorkDone = [](WGPUQueueWorkDoneStatus status, void *) {
+        std::cout << "Queued work finished with status: " << status << std::endl;
+        };
+    wgpuQueueOnSubmittedWorkDone(queue, onQueueWorkDone, nullptr /* pUserData */);
+    commandBufferTest(queue, device);
+
+    wgpuQueueRelease(queue);
     wgpuDeviceRelease(device);
     
-    
+    glfwMainLoop();
+
     return 0;
 }
