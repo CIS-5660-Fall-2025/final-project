@@ -28,6 +28,10 @@ else()
     target_compile_options(App PRIVATE -Wall -Wextra -pedantic)
 endif()
 
+# Include directories to define targets
+add_subdirectory(webgpu)
+add_subdirectory(glfw3webgpu)
+
 if (NOT EMSCRIPTEN)
     # Add the 'glfw' directory, which contains the definition of a 'glfw' target
     add_subdirectory(glfw)
@@ -39,10 +43,7 @@ else()
 endif()
 # In both cases, we can now link to the 'glfw' target
 # Now add 'glfw' target as a dependency of our App like we did with webgpu
-target_link_libraries(App PRIVATE webgpu glfw)
-
-# Include webgpu directory to define the 'webgpu' target
-add_subdirectory(webgpu)
+target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu)
 
 # Make sure that the .dll file our binary depends on at runtime is copied next to the binary.  Unnecessary for Dawn
 target_copy_webgpu_binaries(App)
