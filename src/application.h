@@ -17,7 +17,10 @@ class Application {
 
     private:
     
+    std::pair<WGPUSurfaceTexture, WGPUTextureView> GetNextSurfaceViewData();
+    
     GLFWwindow *window;
     WGPUDevice device;
     WGPUQueue queue;
+    WGPUSurface surface;
 };

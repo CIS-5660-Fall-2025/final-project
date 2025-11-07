@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <glfw3webgpu.h>
 
 // Almost identical to inspect adapter; I think the device is like what we use/our interface and the adapter is reality
 void inspectDevice(WGPUDevice device) {
@@ -201,6 +202,7 @@ WGPUDevice requestDeviceSync(WGPUAdapter adapter, WGPUDeviceDescriptor const* de
 }
 
 bool Application::Initialize() {
+    // Get instance
     WGPUInstanceDescriptor desc = {};
     desc.nextInChain = nullptr;
 
@@ -231,13 +233,34 @@ bool Application::Initialize() {
     }
     std::cout << "WGPU instance: " << instance << std::endl;
 
+    // Create GLFW Window
+    if(!glfwInit()) {
+        std::cerr << "Couldn't initialize GLFW!!!" << std::endl;
+        return false;
+    }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Tell GLFW not to think about API since it wouldn't know WebGPU anyways
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disallow resizing since it causes crash for now
+    window = glfwCreateWindow(640, 480, "Learn WebGPU!!", nullptr, nullptr);
+    if(!window) {
+        std::cerr << "Couldn't open GLFW window!!" << std::endl;
+        glfwTerminate();
+        return false;
+    }
+
+    // Create surface
+    surface = glfwGetWGPUSurface(instance, window);
+
+    // Get adapter
     std::cout << "Requesting Device Adapter to determine capabilities..." << std::endl;
     WGPURequestAdapterOptions adapterOpts = {};
     adapterOpts.nextInChain = nullptr;
+    adapterOpts.compatibleSurface = surface;
     WGPUAdapter adapter = requestAdapterSync(instance, &adapterOpts);
     wgpuInstanceRelease(instance); // Don't need instance now that we have adapter
     inspectAdapter(adapter);
 
+    // Get device
     std::cout << "Requesting device..." << std::endl;
     WGPUDeviceDescriptor deviceDesc = {};
     deviceDesc.nextInChain = nullptr;
@@ -254,7 +277,6 @@ bool Application::Initialize() {
         };
     device = requestDeviceSync(adapter, &deviceDesc);
     std::cout << "Got device: " << device << std::endl;
-    wgpuAdapterRelease(adapter); // No need for adapter when we have device
     auto onDeviceError = [](WGPUErrorType type, char const* message, void* /* pUserData */) {
         // Putting breakpoints in this error callback is useful..
         // But in Dawn, the callback will be called when the device 'ticks', less informative
@@ -273,25 +295,32 @@ bool Application::Initialize() {
         };
     wgpuQueueOnSubmittedWorkDone(queue, onQueueWorkDone, nullptr /* pUserData */);
 
-    // Create GLFW Window
-    if(!glfwInit()) {
-        std::cerr << "Couldn't initialize GLFW!!!" << std::endl;
-        return false;
-    }
+    // Configure surface
+    WGPUSurfaceConfiguration config = {};
+    config.nextInChain = nullptr;
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Tell GLFW not to think about API since it wouldn't know WebGPU anyways
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disallow resizing since it causes crash for now
-    window = glfwCreateWindow(640, 480, "Learn WebGPU!!", nullptr, nullptr);
-    if(!window) {
-        std::cerr << "Couldn't open GLFW window!!" << std::endl;
-        glfwTerminate();
-        return false;
-    }
+    config.width = 640;
+    config.height = 480;
+    WGPUTextureFormat surfaceFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
+    config.format = surfaceFormat; // RGBA and channel size chosen by adapter
+    config.viewFormatCount = 0;
+    config.viewFormats = nullptr;
+    config.usage = WGPUTextureUsage_RenderAttachment; // Has to know what it'll be used for
+    config.device = device;
+    config.presentMode = WGPUPresentMode_Fifo; // How do we do the swap chain?  We have a regular queue here instead of just 2 that we swap
+    config.alphaMode = WGPUCompositeAlphaMode_Auto; // How are textures composited onto OS window, could be used for transparent windows
+
+    wgpuSurfaceConfigure(surface, &config);
+
+    wgpuAdapterRelease(adapter);
 
     return true;
 }
 
 void Application::Terminate() {
+    wgpuSurfaceUnconfigure(surface);
+    wgpuSurfaceRelease(surface);
+    
     glfwDestroyWindow(window);
     glfwTerminate();
     
@@ -300,9 +329,54 @@ void Application::Terminate() {
 }
 
 void Application::MainLoop() {
+    auto pair = GetNextSurfaceViewData();
+    auto surfaceTexture = pair.first; auto targetView = pair.second;
+    if(!targetView) return;
+
+    // At end of frame
+    wgpuTextureViewRelease(targetView);
+    #ifndef __EMSCRIPTEN__ // We use a different way with Emscripten
+    wgpuSurfacePresent(surface);
+    #endif
+
+    #ifdef WEBGPU_BACKEND_WGPU
+    wgpuTextureRelease(surfaceTexture.texture);
+    #endif // WEBGPU_BACKEND_WGPU (GetNextSurfaceViewData())
+
     glfwPollEvents(); // Process input events
 }
 
 bool Application::IsRunning() {
     return !glfwWindowShouldClose(window);
+}
+
+std::pair<WGPUSurfaceTexture, WGPUTextureView> Application::GetNextSurfaceViewData() {
+    // Surface texture contains actual texture as well as additional info (status)
+    WGPUSurfaceTexture surfaceTexture;
+    wgpuSurfaceGetCurrentTexture(surface, &surfaceTexture);
+    if(surfaceTexture.status != WGPUSurfaceGetCurrentTextureStatus_Success) {
+        return {surfaceTexture, nullptr};
+    }
+
+    // Texture view could represent a sub-part of the texture or it in a different format..
+    // For now we're using the given boiler plate
+    WGPUTextureViewDescriptor viewDescriptor;
+    viewDescriptor.nextInChain = nullptr;
+    viewDescriptor.label = "Surface texture view";
+    viewDescriptor.format = wgpuTextureGetFormat(surfaceTexture.texture);
+    viewDescriptor.dimension = WGPUTextureViewDimension_2D;
+    viewDescriptor.baseMipLevel = 0;
+    viewDescriptor.mipLevelCount = 1;
+    viewDescriptor.baseArrayLayer = 0;
+    viewDescriptor.arrayLayerCount = 1;
+    viewDescriptor.aspect = WGPUTextureAspect_All;
+    WGPUTextureView targetView = wgpuTextureCreateView(surfaceTexture.texture, &viewDescriptor);
+
+    #ifndef WEBGPU_BACKEND_WGPU
+    // We no longer need the texture, only its view which contains its own reference to texture
+    // with wgpu-native, surface textures must be release after the call to wgpuSurfacePresent
+    wgpuTextureRelease(surfaceTexture.texture);
+    #endif // WEBGPU_BACKEND_WGPU
+
+    return {surfaceTexture, targetView};
 }
