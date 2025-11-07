@@ -1,13 +1,19 @@
-add_executable(App main.cpp)
-# Add 'webgpu' target as dependency of our App
-target_link_libraries(App PRIVATE webgpu)
-
 cmake_minimum_required(VERSION 3.0...3.25)
+
 project(
     LearnWebGPU # name of the project, which will also be the name of the visual studio solution if you use it
     VERSION 4.2.0 # any version number
     LANGUAGES CXX C # programming languages used by the project
 )
+
+set(SOURCE_FILES
+	main.cpp
+	application.cpp)
+
+add_executable(App ${SOURCE_FILES})
+
+# Add 'webgpu' target as dependency of our App
+target_link_libraries(App PRIVATE webgpu)
 
 set_target_properties(App PROPERTIES
     CXX_STANDARD 17
