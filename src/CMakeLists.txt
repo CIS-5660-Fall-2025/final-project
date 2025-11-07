@@ -22,6 +22,19 @@ else()
     target_compile_options(App PRIVATE -Wall -Wextra -pedantic)
 endif()
 
+if (NOT EMSCRIPTEN)
+    # Add the 'glfw' directory, which contains the definition of a 'glfw' target
+    add_subdirectory(glfw)
+else()
+    # Create a mock 'glfw' target that just sets the `-sUSE_GLFW=3` link option:
+    # Because Emscripten already supports glfw
+    add_library(glfw INTERFACE)
+    target_link_options(glfw INTERFACE -sUSE_GLFW=3)
+endif()
+# In both cases, we can now link to the 'glfw' target
+# Now add 'glfw' target as a dependency of our App like we did with webgpu
+target_link_libraries(App PRIVATE webgpu glfw)
+
 # Include webgpu directory to define the 'webgpu' target
 add_subdirectory(webgpu)
 
@@ -33,3 +46,4 @@ if (EMSCRIPTEN)
 	set_target_properties(App PROPERTIES SUFFIX ".html")
 	target_link_options(App PRIVATE -sASYNCIFY)
 endif()
+
