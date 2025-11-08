@@ -4,29 +4,29 @@
 ## Project planning: Design Doc
 
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
-
 #### Introduction
-- What motivates your project?
-- The goal of this project is to create a way to procedurally generate strawberry plants with artist-friendly tweakable parameters within Houdini. Perhaps there is a scene that takes place in a garden store, or a scene that takes place in a field of strawberries, and where the character is peering between the bushes - then a 3D artist might need a way to place many strawberry plants that all look different in terms of the placement of leaves, number of flowers and strawberries, yet all strawberry plants are in the same stage of ripeness in the early summer - the perfect time for strawberry picking. 
+
+I want to take this project as an opportunity to make artist-facing tools in Houdini - adjusting parameters to make an asset or a part of a scene appear naturalistic yet easily controllable without the artist having to make a model from scratch and duplicating and varying the object multiple times. Thus, I choose to make procedural strawberry plants in Houdini that allow artists to tweak parameters like strawberry size, ratio of strawberry to flowering to leaves, amount of growth, etc.
+
 
 #### Goal
-- What do you intend to achieve with this project?
-- The intent of this project is to create a tool that is user-friendly to generate various naturalistic-looking strawberry plants. 
+
+The goal of this project is to create a way to procedurally generate strawberry plants with artist-friendly tweakable parameters within Houdini. Perhaps there is a scene that takes place in a garden store, or a scene that takes place in a field of strawberries, and where the character is peering between the bushes - then a 3D artist might need a way to place many strawberry plants that all look different in terms of the placement of leaves, number of flowers and strawberries, yet all strawberry plants are in the same stage of ripeness in the early summer - the perfect time for strawberry picking. Being able to reduce the number of ways to create a strawberry plant to its bare essential attributes for production, such as amount of growth, number of strawberries, etc, will allow artists to easily generate lots of strawberry plants as needed, as teh game or film sees fit.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
 - Here are some reference photos:
 
+  <img width=500 ref="https://www.theseedcollection.com.au/assets/images/A%20strawberry%20plant%20with%20fruit.jpg"></img>
+  <img width=500 ref="https://www.tnnursery.net/cdn/shop/articles/8338a51a986d27bfb4457e28b5d3c6ac.jpg?v=1742056840&width=500"></img>
+  <img width=500 ref="https://i.ebayimg.com/images/g/U~0AAOSwuj1e5Llg/s-l1600.jpg"></img>
   
-- Some reference papers that describe the structure of strawberry plants:
-- [Strawberry Plant Structure and Growth Habit ](http://www.hort.cornell.edu/expo/proceedings/2012/Berries/Berry%20Plant%20Structure%20Poling.pdf)
-- [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
+- Here are some reeadings I came across that break down the structure of strawberry plants:
+  - [Strawberry Plant Structure and Growth Habit ](http://www.hort.cornell.edu/expo/proceedings/2012/Berries/Berry%20Plant%20Structure%20Poling.pdf)
+  - [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
 
 #### Specification:
-- Outline the main features of your project.
-
+- The main features will be adjusting 
+  
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
 
@@ -37,6 +37,7 @@ Start off by forking this repository. In your README, write a design doc to outl
 - Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
 
 Submit your Design doc as usual via pull request against this repository.
+
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
