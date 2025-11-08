@@ -43,6 +43,9 @@ The goal of this project is to create a way to procedurally generate strawberry 
 
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img width="1380" height="672" alt="Screenshot 2025-11-07 at 10 03 11 PM" src="https://github.com/user-attachments/assets/1faf5e89-1ccc-48e9-834a-3145365c2cc6" />
+
+(Please imagine an actual procedurally generated strawberry is in its place)
 
 #### Timeline:
 The plan
