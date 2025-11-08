@@ -25,10 +25,16 @@ The goal of this project is to create a way to procedurally generate strawberry 
   - [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
 
 #### Specification:
-- The main features will be adjusting 
+- The main features will be adjusting are 
   
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+- We will use L systems to create the stem structure of the strawberries
+- Follow this tutorial to make the strawberry leaves : https://www.youtube.com/watch?v=s5RwLhmLzHM
+  - The strawberry leaves will also contain adjustable parameters for leaf size/age
+- Use four models of strawberries in various stages of their lives temporarily, then procedurally generate strawberries later on
+  - Tutorial to potentially follow : https://www.youtube.com/watch?v=o2lqjgt4RwU
+- Procedurally generate flowers in Houdini as well, following a similar workflow as the Jellyfish lab
 
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
