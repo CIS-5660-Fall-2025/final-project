@@ -61,8 +61,8 @@ Material-aware extensions (beyond paper)
 
 #### Timeline:
 - Week1: Paper reproduction
-  - Zixiao Wang: U, F, E in compute kernels & R in post-stage kernels.
-  - Tianhong Zhou: Basic setup & T, D in compute kernels & B in post-stage kernels.
+  - Zixiao Wang: T, D in compute kernels & R in post-stage kernels.
+  - Tianhong Zhou: Basic setup & U, F, E in compute kernels & B in post-stage kernels.
 - Week2: Material extensions
   - Zixiao Wang: Material system: material map authoring/IO (rock/soil/snow), per-material LUTs for (n, m, ke, talus, kc, kd).
   - Tianhong Zhou: Material-aware erosion wiring: read material at runtime, blend parameters.

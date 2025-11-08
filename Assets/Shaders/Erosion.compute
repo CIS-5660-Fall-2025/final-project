@@ -22,10 +22,65 @@ void CopyFromTexture(uint3 id : SV_DispatchThreadID)
     _OutHeightRT[uv] = h;
 }
 
+float CubicCatmullRom(float A, float B, float C, float D, float t)
+{
+    float a0 = -0.5 * A + 1.5 * B - 1.5 * C + 0.5 * D;
+    float a1 = 1.0 * A - 2.5 * B + 2.0 * C - 0.5 * D;
+    float a2 = -0.5 * A + 0.5 * C;
+    float a3 = B;
+
+    return ((a0 * t + a1) * t + a2) * t + a3;
+}
+
+float SampleHeightClamped(int x, int y, uint w, uint h)
+{
+    x = clamp(x, 0, (int) w - 1);
+    y = clamp(y, 0, (int) h - 1);
+    return _InHeightRT.Load(int3(x, y, 0));
+}
+
 [numthreads(8, 8, 1)]
 void Upsample2x(uint3 id : SV_DispatchThreadID)
 {
+    uint2 dstXY = id.xy;
     
+    uint dstW, dstH;
+    _OutHeightRT.GetDimensions(dstW, dstH);
+    if (dstXY.x >= dstW || dstXY.y >= dstH)
+        return;
+    
+    uint srcW, srcH;
+    _InHeightRT.GetDimensions(srcW, srcH);
+
+    float2 srcSize = float2(srcW, srcH);
+    float2 dstSize = float2(dstW, dstH);
+    float2 dstIdx = float2(dstXY);
+    
+    float2 srcIdx = dstIdx * (srcSize - 1.0) / (dstSize - 1.0);
+
+    float2 srcFloor = floor(srcIdx);
+    float2 t = srcIdx - srcFloor; 
+
+    int ix = (int) srcFloor.x;
+    int iy = (int) srcFloor.y;
+    
+    float rowVal[4];
+
+    for (int j = -1; j <= 2; ++j)
+    {
+        int y = iy + j;
+
+        float v0 = SampleHeightClamped(ix - 1, y, srcW, srcH);
+        float v1 = SampleHeightClamped(ix, y, srcW, srcH);
+        float v2 = SampleHeightClamped(ix + 1, y, srcW, srcH);
+        float v3 = SampleHeightClamped(ix + 2, y, srcW, srcH);
+
+        rowVal[j + 1] = CubicCatmullRom(v0, v1, v2, v3, t.x);
+    }
+    
+    float h = CubicCatmullRom(rowVal[0], rowVal[1], rowVal[2], rowVal[3], t.y);
+
+    _OutHeightRT[dstXY] = h;
 }
 
 [numthreads(8, 8, 1)]

@@ -70,17 +70,20 @@ public class GpuTerrainPipeline : MonoBehaviour
         kBreach = erosionCS.FindKernel("Breaching");
     }
 
+    RenderTexture CreateRT(int w, int h)
+    {
+        var desc = new RenderTextureDescriptor(w, h, RenderTextureFormat.RFloat, 0);
+        desc.enableRandomWrite = true;
+        var rt = new RenderTexture(desc);
+        rt.Create();
+        return rt;
+    }
+
     void CreateRTs(int w, int h)
     {
-        var descT = new RenderTextureDescriptor(w, h, RenderTextureFormat.RFloat, 0);
-        descT.enableRandomWrite = true;
-
-        heightRT = new RenderTexture(descT); heightRT.Create();
-        tempRT = new RenderTexture(descT); tempRT.Create();
-
-        var descA = new RenderTextureDescriptor(w, h, RenderTextureFormat.RFloat, 0);
-        descA.enableRandomWrite = true;
-        areaRT = new RenderTexture(descA); areaRT.Create();
+        heightRT = CreateRT(w, h); 
+        tempRT = CreateRT(w, h);
+        areaRT = CreateRT(w, h);
     }
 
     void CopyTextureToRT(Texture2D src, RenderTexture dst)
@@ -111,53 +114,63 @@ public class GpuTerrainPipeline : MonoBehaviour
                 int newH = h * 2;
 
                 RenderTexture coarseT = T;
-                RecreateRTs(ref T, ref tmp, ref areaRT, newW, newH);
+                RenderTexture oldTmp = tmp;
+                RenderTexture oldArea = areaRT;
+
+                T = CreateRT(newW, newH);
+                tmp = CreateRT(newW, newH);
+                areaRT = CreateRT(newW, newH);
 
                 Upsample2x(coarseT, T);
+
                 coarseT.Release();
+                if (oldTmp != null) oldTmp.Release();
+                if (oldArea != null) oldArea.Release();
 
                 w = newW;
                 h = newH;
             }
 
-            // E(T)
-            for (int i = 0; i < L.erosionSteps; i++)
-            {
-                FlowRoutingOnce(T, areaRT);
-                ErodeOnce(T, areaRT, tmp);
-                Swap(ref T, ref tmp);
-            }
+            //// E(T)
+            //for (int i = 0; i < L.erosionSteps; i++)
+            //{
+            //    FlowRoutingOnce(T, areaRT);
+            //    ErodeOnce(T, areaRT, tmp);
+            //    Swap(ref T, ref tmp);
+            //}
 
-            // T(T)
-            for (int i = 0; i < L.thermalSteps; i++)
-            {
-                ThermalOnce(T, tmp);
-                Swap(ref T, ref tmp);
-            }
+            //// T(T)
+            //for (int i = 0; i < L.thermalSteps; i++)
+            //{
+            //    ThermalOnce(T, tmp);
+            //    Swap(ref T, ref tmp);
+            //}
 
-            // D(T)
-            for (int i = 0; i < L.depositionSteps; i++)
-            {
-                FlowRoutingOnce(T, areaRT); 
-                DepositOnce(T, areaRT, tmp);
-                Swap(ref T, ref tmp);
-            }
+            //// D(T)
+            //for (int i = 0; i < L.depositionSteps; i++)
+            //{
+            //    FlowRoutingOnce(T, areaRT); 
+            //    DepositOnce(T, areaRT, tmp);
+            //    Swap(ref T, ref tmp);
+            //}
         }
 
-        // R(T)
-        DiffuseRetarget(T, tmp);
-        Swap(ref T, ref tmp);
+        //// R(T)
+        //DiffuseRetarget(T, tmp);
+        //Swap(ref T, ref tmp);
 
-        // B(T)
-        MultiBreaching(T, tmp);
-        Swap(ref T, ref tmp);
+        //// B(T)
+        //MultiBreaching(T, tmp);
+        //Swap(ref T, ref tmp);
 
         heightRT = T;
     }
 
     void Upsample2x(RenderTexture height, RenderTexture dst)
     {
-
+        erosionCS.SetTexture(kUpsample2x, "_InHeightRT", height);
+        erosionCS.SetTexture(kUpsample2x, "_OutHeightRT", dst);
+        DispatchFor(dst, kUpsample2x);
     }
 
     void FlowRoutingOnce(RenderTexture height, RenderTexture outArea)
@@ -195,22 +208,6 @@ public class GpuTerrainPipeline : MonoBehaviour
         int gx = (rt.width + 7) / 8;
         int gy = (rt.height + 7) / 8;
         erosionCS.Dispatch(kernel, gx, gy, 1);
-    }
-
-    void RecreateRTs(ref RenderTexture T, ref RenderTexture tmp, ref RenderTexture area, int w, int h)
-    {
-        if (T != null) T.Release();
-        if (tmp != null) tmp.Release();
-        if (area != null) area.Release();
-
-        var descT = new RenderTextureDescriptor(w, h, RenderTextureFormat.RFloat, 0);
-        descT.enableRandomWrite = true;
-        T = new RenderTexture(descT); T.Create();
-        tmp = new RenderTexture(descT); tmp.Create();
-
-        var descA = new RenderTextureDescriptor(w, h, RenderTextureFormat.RFloat, 0);
-        descA.enableRandomWrite = true;
-        area = new RenderTexture(descA); area.Create();
     }
 
     static void Swap(ref RenderTexture a, ref RenderTexture b)
