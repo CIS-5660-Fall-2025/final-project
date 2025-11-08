@@ -15,11 +15,11 @@ The goal of this project is to create a way to procedurally generate strawberry 
 
 #### Inspiration/reference:
 - Here are some reference photos:
+![A strawberry plant with fruit](https://github.com/user-attachments/assets/9d17e283-43bd-40cb-b8db-8c48b5fa30c2)
+![s-l1600](https://github.com/user-attachments/assets/7f9ba88f-1034-4659-b1fb-9bfa3ea11673)
+![8338a51a986d27bfb4457e28b5d3c6ac](https://github.com/user-attachments/assets/f5ffcbcc-6892-40de-8b2b-f20649cf48c4)
 
-  <img width=500 ref="https://www.theseedcollection.com.au/assets/images/A%20strawberry%20plant%20with%20fruit.jpg"></img>
-  <img width=500 ref="https://www.tnnursery.net/cdn/shop/articles/8338a51a986d27bfb4457e28b5d3c6ac.jpg?v=1742056840&width=500"></img>
-  <img width=500 ref="https://i.ebayimg.com/images/g/U~0AAOSwuj1e5Llg/s-l1600.jpg"></img>
-  
+
 - Here are some reeadings I came across that break down the structure of strawberry plants:
   - [Strawberry Plant Structure and Growth Habit ](http://www.hort.cornell.edu/expo/proceedings/2012/Berries/Berry%20Plant%20Structure%20Poling.pdf)
   - [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
