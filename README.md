@@ -25,7 +25,12 @@ The goal of this project is to create a way to procedurally generate strawberry 
   - [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
 
 #### Specification:
-- The main features will be adjusting are 
+- The user can generate a strawberry plant with the following parameters:
+    - How much/how little growth of plant (small, sparse plant, or large, bushy plant)
+    - Number of strawberries in the plant
+    - Number of leaf nodes
+    - Number of flowers
+    - Ripeness of strawberries scale
   
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
@@ -40,10 +45,15 @@ The goal of this project is to create a way to procedurally generate strawberry 
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
-
-Submit your Design doc as usual via pull request against this repository.
-
+The plan
+- 11/5 - 11/12:
+   - Create a workable L-system node for the stems, with dummy leaves and strawberry models that can populate on the tip of the stems by adjusting the UI parameters
+   - Create the UI
+- 11/12 - 11/24:
+   - Create the leaves, the strawberries, and the flowers procedurally, and make sure they attach and orient correctly onto the plant. Make sure that the amount of strawberries, leaves, and flowers are easily adjustable 
+- 11/26 - 12/1
+   - FInishing touches - anything that needs to be fixed, make a demo-reel and also applying materials and lighting to a custom scene with the strawberries, last-minute UI changes
+     
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
