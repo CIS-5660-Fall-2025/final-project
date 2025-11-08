@@ -6,6 +6,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+#include <utility>
 
 class Application {
     public:

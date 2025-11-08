@@ -329,9 +329,50 @@ void Application::Terminate() {
 }
 
 void Application::MainLoop() {
+    glfwPollEvents(); // Process input events
+
     auto pair = GetNextSurfaceViewData();
     auto surfaceTexture = pair.first; auto targetView = pair.second;
     if(!targetView) return;
+
+    // Create command encoder to create draw call command
+    WGPUCommandEncoderDescriptor encoderDesc = {};
+    encoderDesc.nextInChain = nullptr;
+    encoderDesc.label = "Command encoder";
+    WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &encoderDesc);
+
+    // Create render pass color attachment
+    WGPURenderPassDescriptor renderPassDesc = {};
+    renderPassDesc.nextInChain = nullptr;
+    WGPURenderPassColorAttachment renderPassColorAttachment = {}; // Only 1 color attach for now
+    renderPassColorAttachment.view = targetView;
+    renderPassColorAttachment.resolveTarget = nullptr;
+    renderPassColorAttachment.loadOp = WGPULoadOp_Clear; // What to do before executing render pass
+    renderPassColorAttachment.storeOp = WGPUStoreOp_Store; // What to do after executing render pass
+    renderPassColorAttachment.clearValue = WGPUColor{0.1, 1.0, 0.5, 1.0 };
+    #ifndef WEBGPU_BACKEND_WGPU
+    renderPassColorAttachment.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED; // No depth buffer
+    #endif
+    renderPassDesc.depthStencilAttachment = nullptr;
+    renderPassDesc.timestampWrites = nullptr;
+
+    renderPassDesc.colorAttachmentCount = 1;
+    renderPassDesc.colorAttachments = &renderPassColorAttachment; // Array
+
+    WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
+    wgpuRenderPassEncoderEnd(renderPass);
+    wgpuRenderPassEncoderRelease(renderPass);
+
+    // Create draw command
+    WGPUCommandBufferDescriptor cmdBufferDescriptor = {};
+    cmdBufferDescriptor.nextInChain = nullptr;
+    cmdBufferDescriptor.label = "Command buffer";
+    WGPUCommandBuffer command = wgpuCommandEncoderFinish(encoder, &cmdBufferDescriptor);
+    wgpuCommandEncoderRelease(encoder);
+
+    // Queue draw command
+    wgpuQueueSubmit(queue, 1, &command);
+    wgpuCommandBufferRelease(command);
 
     // At end of frame
     wgpuTextureViewRelease(targetView);
@@ -342,8 +383,6 @@ void Application::MainLoop() {
     #ifdef WEBGPU_BACKEND_WGPU
     wgpuTextureRelease(surfaceTexture.texture);
     #endif // WEBGPU_BACKEND_WGPU (GetNextSurfaceViewData())
-
-    glfwPollEvents(); // Process input events
 }
 
 bool Application::IsRunning() {
@@ -351,6 +390,7 @@ bool Application::IsRunning() {
 }
 
 std::pair<WGPUSurfaceTexture, WGPUTextureView> Application::GetNextSurfaceViewData() {
+    // Get next surface texture
     // Surface texture contains actual texture as well as additional info (status)
     WGPUSurfaceTexture surfaceTexture;
     wgpuSurfaceGetCurrentTexture(surface, &surfaceTexture);
@@ -358,6 +398,7 @@ std::pair<WGPUSurfaceTexture, WGPUTextureView> Application::GetNextSurfaceViewDa
         return {surfaceTexture, nullptr};
     }
 
+    // Create surface texture view
     // Texture view could represent a sub-part of the texture or it in a different format..
     // For now we're using the given boiler plate
     WGPUTextureViewDescriptor viewDescriptor;
@@ -372,6 +413,7 @@ std::pair<WGPUSurfaceTexture, WGPUTextureView> Application::GetNextSurfaceViewDa
     viewDescriptor.aspect = WGPUTextureAspect_All;
     WGPUTextureView targetView = wgpuTextureCreateView(surfaceTexture.texture, &viewDescriptor);
 
+    // Release texture
     #ifndef WEBGPU_BACKEND_WGPU
     // We no longer need the texture, only its view which contains its own reference to texture
     // with wgpu-native, surface textures must be release after the call to wgpuSurfacePresent
