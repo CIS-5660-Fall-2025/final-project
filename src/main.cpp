@@ -1,3 +1,4 @@
+// This must be defined EXACTLY ONCE, no more no less
 #define WEBGPU_CPP_IMPLEMENTATION
 
 #include <iostream>
