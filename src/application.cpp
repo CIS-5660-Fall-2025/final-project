@@ -302,7 +302,7 @@ bool Application::Initialize() {
 
     config.width = 640;
     config.height = 480;
-    WGPUTextureFormat surfaceFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
+    surfaceFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
     config.format = surfaceFormat; // RGBA and channel size chosen by adapter
     config.viewFormatCount = 0;
     config.viewFormats = nullptr;
@@ -315,10 +315,14 @@ bool Application::Initialize() {
 
     wgpuAdapterRelease(adapter);
 
+    InitializeRenderPipeline();
+
     return true;
 }
 
 void Application::Terminate() {
+    pipeline.release();
+
     wgpuSurfaceUnconfigure(surface);
     wgpuSurfaceRelease(surface);
     
@@ -330,8 +334,98 @@ void Application::Terminate() {
 }
 
 void Application::InitializeRenderPipeline() {
+    const char* shaderSource = R"(
+@vertex
+fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> @builtin(position) vec4f {
+	var p = vec2f(0.0, 0.0);
+	if (in_vertex_index == 0u) {
+		p = vec2f(-0.5, -0.5);
+	} else if (in_vertex_index == 1u) {
+		p = vec2f(0.5, -0.5);
+	} else {
+		p = vec2f(0.0, 0.5);
+	}
+	return vec4f(p, 0.0, 1.0);
+}
+
+@fragment
+fn fs_main() -> @location(0) vec4f {
+	return vec4f(0.0, 0.4, 1.0, 1.0);
+}
+)";
+
     RenderPipelineDescriptor pipelineDesc;
-    RenderPipeline pipeline = device.createRenderPipeline(pipelineDesc);
+
+    // [...] Create Shader Module
+    ShaderModuleDescriptor shaderDesc;
+    #ifdef WEBGPU_BACKEND_WGPU
+    shaderDesc.hintCount = 0;
+    shaderDesc.hints = nullptr;
+    #endif
+    ShaderModuleWGSLDescriptor shaderCodeDesc;
+    shaderCodeDesc.chain.next = nullptr;
+    shaderCodeDesc.chain.sType = SType::ShaderModuleWGSLDescriptor; // It'll use this for casting
+    shaderCodeDesc.code = shaderSource;
+    shaderDesc.nextInChain = &shaderCodeDesc.chain; // Can later become a WGSLDescriptor again using the sType
+    ShaderModule shaderModule = device.createShaderModule(shaderDesc);
+
+
+    // [...] Describe vertex pipeline state
+        // [...] Describe vertex buffers
+        pipelineDesc.vertex.bufferCount = 0;
+        pipelineDesc.vertex.buffers = nullptr;
+        // [...] Describe vertex shader
+        pipelineDesc.vertex.module = shaderModule;
+        pipelineDesc.vertex.entryPoint = "vs_main";
+        pipelineDesc.vertex.constantCount = 0;
+        pipelineDesc.vertex.constants = nullptr;
+    // [...] Describe primitive pipeline state
+    pipelineDesc.primitive.topology = PrimitiveTopology::TriangleList; // Interpret as triangles
+    pipelineDesc.primitive.stripIndexFormat = IndexFormat::Undefined;
+    pipelineDesc.primitive.frontFace = FrontFace::CCW; // What counts as front face?
+    pipelineDesc.primitive.cullMode = CullMode::None; // Well ^ don't matter for now cuz we're not culling
+    // [...] Describe fragment pipeline state
+    FragmentState fragmentState;
+    fragmentState.module = shaderModule;
+    fragmentState.entryPoint = "fs_main";
+    fragmentState.constantCount = 0;
+    fragmentState.constants = nullptr;
+    // [...] Configure blending stage here!
+    BlendState blendState;
+    // [...] Configure Color Blending which takes form 'col = SourceFactor * src (VariableOperation) DstFactor * dst
+    // Src is what we're drawing and Dst is what already exists so Src is on top of Dst
+    blendState.color.srcFactor = BlendFactor::SrcAlpha;
+    blendState.color.dstFactor = BlendFactor::OneMinusSrcAlpha;
+    blendState.color.operation = BlendOperation::Add;
+    // [...] Configure Alpha Blending, we'll just make it always 1 for now
+    blendState.alpha.srcFactor = BlendFactor::Zero;
+    blendState.alpha.dstFactor = BlendFactor::One;
+    blendState.alpha.operation = BlendOperation::Add;
+
+    ColorTargetState colorTarget;
+    colorTarget.format = surfaceFormat;
+    colorTarget.blend = &blendState;
+    colorTarget.writeMask = ColorWriteMask::All; // Could write to a subset of color channels
+
+    // Only 1 color attachment so only 1 target color
+    fragmentState.targetCount = 1;
+    fragmentState.targets = &colorTarget;
+
+    pipelineDesc.fragment = &fragmentState; // Nullable since fragment state is optional
+    // [...] Describe stencil/depth pipeline state
+    pipelineDesc.depthStencil = nullptr; // Configure ZBuffer test
+    // [...] Describe multi-sampling state
+    // You can have multiple fragments per pixel and avg the result into a pixel
+    pipelineDesc.multisample.count = 1; // But we won't do multisampling
+    pipelineDesc.multisample.mask = ~0u; // All bits on
+    pipelineDesc.multisample.alphaToCoverageEnabled = false; // Irrelevant for now
+    // [...] Describe pipeline layout
+    pipelineDesc.layout = nullptr; // Would be important for accessing input and output resources (buffers/textures)
+        // nullptr asks backend to figure out layout
+    
+    pipeline = device.createRenderPipeline(pipelineDesc);
+
+    shaderModule.release();
 
 }
 
@@ -342,15 +436,13 @@ void Application::MainLoop() {
     if(!targetView) return;
 
     // Create command encoder to create draw call command
-    WGPUCommandEncoderDescriptor encoderDesc = {};
-    encoderDesc.nextInChain = nullptr;
+    CommandEncoderDescriptor encoderDesc = {};
     encoderDesc.label = "Command encoder";
-    WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &encoderDesc);
+    CommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &encoderDesc);
 
     // Create render pass color attachment
-    WGPURenderPassDescriptor renderPassDesc = {};
-    renderPassDesc.nextInChain = nullptr;
-    WGPURenderPassColorAttachment renderPassColorAttachment = {}; // Only 1 color attach for now
+    RenderPassDescriptor renderPassDesc = {};
+    RenderPassColorAttachment renderPassColorAttachment = {}; // Only 1 color attach for now
     renderPassColorAttachment.view = targetView;
     renderPassColorAttachment.resolveTarget = nullptr;
     renderPassColorAttachment.loadOp = WGPULoadOp_Clear; // What to do before executing render pass
@@ -359,36 +451,36 @@ void Application::MainLoop() {
     #ifndef WEBGPU_BACKEND_WGPU
     renderPassColorAttachment.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED; // No depth buffer
     #endif
+
     renderPassDesc.depthStencilAttachment = nullptr;
     renderPassDesc.timestampWrites = nullptr;
-
     renderPassDesc.colorAttachmentCount = 1;
     renderPassDesc.colorAttachments = &renderPassColorAttachment; // Array
 
-    WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
-    wgpuRenderPassEncoderEnd(renderPass);
-    wgpuRenderPassEncoderRelease(renderPass);
+    RenderPassEncoder renderPass = encoder.beginRenderPass(renderPassDesc);
+
+    // What to draw here
+    renderPass.setPipeline(pipeline);
+    renderPass.draw(3, 1, 0, 0);
+
+    renderPass.end();
+    renderPass.release();
 
     // Create draw command
-    WGPUCommandBufferDescriptor cmdBufferDescriptor = {};
-    cmdBufferDescriptor.nextInChain = nullptr;
+    CommandBufferDescriptor cmdBufferDescriptor = {};
     cmdBufferDescriptor.label = "Command buffer";
-    WGPUCommandBuffer command = wgpuCommandEncoderFinish(encoder, &cmdBufferDescriptor);
-    wgpuCommandEncoderRelease(encoder);
+    CommandBuffer command = encoder.finish(cmdBufferDescriptor);
+    encoder.release();
 
     // Queue draw command
-    wgpuQueueSubmit(queue, 1, &command);
-    wgpuCommandBufferRelease(command);
+    queue.submit(1, &command);
+    command.release();
 
     // At end of frame
-    wgpuTextureViewRelease(targetView);
+    targetView.release();
     #ifndef __EMSCRIPTEN__ // We use a different way with Emscripten
-    wgpuSurfacePresent(surface);
+    surface.present();
     #endif
-
-    #ifdef WEBGPU_BACKEND_WGPU
-    wgpuTextureRelease(surfaceTexture.texture);
-    #endif // WEBGPU_BACKEND_WGPU (GetNextSurfaceViewData())
 }
 
 bool Application::IsRunning() {

@@ -14,7 +14,7 @@ using namespace wgpu;
 class Application {
     public:
     
-    inline Application() : device(nullptr), queue(nullptr), surface(nullptr) {}
+    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr) {}
     bool Initialize(); // Was initialization succesful?
     void Terminate();
     void MainLoop(); // Draw frame and handle events
@@ -29,4 +29,6 @@ class Application {
     Device device;
     Queue queue;
     Surface surface;
+    TextureFormat surfaceFormat = TextureFormat::Undefined;
+    RenderPipeline pipeline;
 };
