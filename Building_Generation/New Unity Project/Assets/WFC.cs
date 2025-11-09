@@ -10,7 +10,8 @@ public class WFC : MonoBehaviour
     
     int iteration;
     Cell[,] grid;
-
+    bool genRunning;
+    int delayCounter;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,13 +30,23 @@ public class WFC : MonoBehaviour
                 grid[x,y].possibleTiles = new List<Tile>(tileTypes);
             }
         }
+        genRunning = true;
+        delayCounter = 0;
+        Random.InitState(1);
     }
 
+    
     // Update is called once per frame
     void Update()
     {
-        runStep();
-        // Debug.Log(runStep());
+        if (genRunning) {
+        // if (genRunning && (++delayCounter % 60 == 0)) {
+            Debug.Log(iteration);
+            if (!runStep()) {
+                genRunning = false;
+                Debug.Log("done");
+            }
+        }
     }
 
     bool runStep() {
@@ -66,7 +77,7 @@ public class WFC : MonoBehaviour
             Instantiate(chosenTile, targetPos, Quaternion.identity);
 
             // TODO propagate; probably helper function in this class is best way?
-            propagate(targetCoords.x, targetCoords.y, true); // TODO 
+            propagate(targetCoords.x, targetCoords.y, true);
             return true;
         }
         
@@ -79,17 +90,21 @@ public class WFC : MonoBehaviour
         // is that it?
 
         // TODO I don't think is correct yet but need to experiment
-
-        if (grid[x,y].possibleTiles.Count <= 1) {
-            // TODO might need to make sure never get 0 case
-            return;
-        }
         
         bool possibilitiesUpdated = false;
         if (start) {
             possibilitiesUpdated = true;
         } else {
-            foreach(Tile t in grid[x,y].possibleTiles) {
+            if (grid[x,y].possibleTiles.Count <= 1) {
+                // TODO might need to make sure never get 0 case
+                return;
+            // } else if (grid[x,y].possibleTiles.Count <= 0) {
+            //     Debug.Log("Zero case " + x + " " + y);
+            //     return;
+            }
+            // foreach(Tile t in grid[x,y].possibleTiles) {
+            for (int i = grid[x,y].possibleTiles.Count - 1; i >= 0; --i) {
+                Tile t = grid[x,y].possibleTiles[i];
                 if (x < mapDimensions.x - 1) {
                     bool validNeighbor = false;
                     // if the x+1,y cell is able to contain a tile that is a potential neighbor to this tile, it's fine
@@ -101,69 +116,75 @@ public class WFC : MonoBehaviour
                         }
                     }
                     if (!validNeighbor) {
-                        grid[x,y].possibleTiles.Remove(t);
+                        grid[x,y].possibleTiles.RemoveAt(i);
                         possibilitiesUpdated = true;
-                        break;
+                        continue;
                     }
                 }
 
                 if (x > 0) {
                     bool validNeighbor = false;
-                    // if the x+1,y cell is able to contain a tile that is a potential neighbor to this tile, it's fine
                     foreach(Tile n in t.neighborsXNeg) {
-                        // TODO I don't recall if contains works the way I want for how objects work in Unity/C#, will need to test
                         if (grid[x-1,y].possibleTiles.Contains(n)) {
                             validNeighbor = true;
                             break;
                         }
                     }
                     if (!validNeighbor) {
-                        grid[x,y].possibleTiles.Remove(t);
+                        grid[x,y].possibleTiles.RemoveAt(i);
                         possibilitiesUpdated = true;
-                        break;
+                        continue;
                     }
                 }
 
                 if (y < mapDimensions.y - 1) {
                     bool validNeighbor = false;
-                    // if the x+1,y cell is able to contain a tile that is a potential neighbor to this tile, it's fine
                     foreach(Tile n in t.neighborsZPos) {
-                        // TODO I don't recall if contains works the way I want for how objects work in Unity/C#, will need to test
                         if (grid[x,y+1].possibleTiles.Contains(n)) {
                             validNeighbor = true;
                             break;
                         }
                     }
                     if (!validNeighbor) {
-                        grid[x,y].possibleTiles.Remove(t);
+                        grid[x,y].possibleTiles.RemoveAt(i);
                         possibilitiesUpdated = true;
-                        break;
+                        continue;
                     }
                 }
 
                 if (y > 0) {
                     bool validNeighbor = false;
-                    // if the x+1,y cell is able to contain a tile that is a potential neighbor to this tile, it's fine
                     foreach(Tile n in t.neighborsZNeg) {
-                        // TODO I don't recall if contains works the way I want for how objects work in Unity/C#, will need to test
                         if (grid[x,y-1].possibleTiles.Contains(n)) {
                             validNeighbor = true;
                             break;
                         }
                     }
                     if (!validNeighbor) {
-                        grid[x,y].possibleTiles.Remove(t);
+                        grid[x,y].possibleTiles.RemoveAt(i);
                         possibilitiesUpdated = true;
-                        break;
+                        continue;
                     }
                 }
             }
+
+            if (possibilitiesUpdated && grid[x,y].possibleTiles.Count == 1) {
+                Tile chosenTile = grid[x,y].possibleTiles[0];
+                Vector3 targetPos = new Vector3(x,0,y);
+                Instantiate(chosenTile, targetPos, Quaternion.identity);
+                
+            }
         }
+        
         if (possibilitiesUpdated) {
-            propagate(x+1,y,false);
-            propagate(x-1,y,false);
-            propagate(x,y+1,false);
-            propagate(x,y-1,false);
+            if (x < mapDimensions.x - 1)
+                propagate(x+1,y,false);
+            if (x > 0)
+                propagate(x-1,y,false);
+            if (y < mapDimensions.y - 1)
+                propagate(x,y+1,false);
+            if (y > 0)
+                propagate(x,y-1,false);
         }
     }
 }
