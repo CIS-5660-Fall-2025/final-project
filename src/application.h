@@ -1,16 +1,20 @@
+
+#include <webgpu/webgpu.hpp>
+
 #include <GLFW/glfw3.h>
-#include <webgpu/webgpu.h>
-#ifdef WEBGPU_BACKEND_WGPU
-#include <webgpu/wgpu.h>
-#endif
+#include <glfw3webgpu.h>
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 #include <utility>
 
+using namespace wgpu;
+
 class Application {
     public:
     
+    inline Application() : device(nullptr), queue(nullptr), surface(nullptr) {}
     bool Initialize(); // Was initialization succesful?
     void Terminate();
     void MainLoop(); // Draw frame and handle events
@@ -18,10 +22,11 @@ class Application {
 
     private:
     
-    std::pair<WGPUSurfaceTexture, WGPUTextureView> GetNextSurfaceViewData();
+    std::pair<SurfaceTexture, TextureView> GetNextSurfaceViewData();
+    void InitializeRenderPipeline();
     
     GLFWwindow *window;
-    WGPUDevice device;
-    WGPUQueue queue;
-    WGPUSurface surface;
+    Device device;
+    Queue queue;
+    Surface surface;
 };

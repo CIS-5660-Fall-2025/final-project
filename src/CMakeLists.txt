@@ -6,14 +6,30 @@ project(
     LANGUAGES CXX C # programming languages used by the project
 )
 
+if (NOT EMSCRIPTEN)
+    # Add the 'glfw' directory, which contains the definition of a 'glfw' target
+    add_subdirectory(glfw)
+else()
+    # Create a mock 'glfw' target that just sets the `-sUSE_GLFW=3` link option:
+    # Because Emscripten already supports glfw
+    add_library(glfw INTERFACE)
+    target_link_options(glfw INTERFACE -sUSE_GLFW=3)
+endif()
+
+# Include directories to define targets
+add_subdirectory(webgpu)
+add_subdirectory(glfw3webgpu)
+
 set(SOURCE_FILES
 	main.cpp
 	application.cpp)
 
 add_executable(App ${SOURCE_FILES})
 
-# Add 'webgpu' target as dependency of our App
-target_link_libraries(App PRIVATE webgpu)
+target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu)
+
+# Make sure that the .dll file our binary depends on at runtime is copied next to the binary.  Unnecessary for Dawn
+target_copy_webgpu_binaries(App)
 
 set_target_properties(App PROPERTIES
     CXX_STANDARD 17
@@ -27,26 +43,6 @@ if (MSVC)
 else()
     target_compile_options(App PRIVATE -Wall -Wextra -pedantic)
 endif()
-
-# Include directories to define targets
-add_subdirectory(webgpu)
-add_subdirectory(glfw3webgpu)
-
-if (NOT EMSCRIPTEN)
-    # Add the 'glfw' directory, which contains the definition of a 'glfw' target
-    add_subdirectory(glfw)
-else()
-    # Create a mock 'glfw' target that just sets the `-sUSE_GLFW=3` link option:
-    # Because Emscripten already supports glfw
-    add_library(glfw INTERFACE)
-    target_link_options(glfw INTERFACE -sUSE_GLFW=3)
-endif()
-# In both cases, we can now link to the 'glfw' target
-# Now add 'glfw' target as a dependency of our App like we did with webgpu
-target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu)
-
-# Make sure that the .dll file our binary depends on at runtime is copied next to the binary.  Unnecessary for Dawn
-target_copy_webgpu_binaries(App)
 
 # Options specific to Emscripten (for putting on web)
 if (EMSCRIPTEN)

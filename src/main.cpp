@@ -1,9 +1,11 @@
+#define WEBGPU_CPP_IMPLEMENTATION
+
 #include <iostream>
 #include <vector>
 #include "application.h"
 
 int main(int, char**) {
-    Application app = Application();
+    Application app;
 
     if(!app.Initialize()) {
         return 1;

@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
-#include <glfw3webgpu.h>
+
+using namespace wgpu;
 
 // Almost identical to inspect adapter; I think the device is like what we use/our interface and the adapter is reality
 void inspectDevice(WGPUDevice device) {
@@ -328,11 +329,16 @@ void Application::Terminate() {
     wgpuDeviceRelease(device);
 }
 
+void Application::InitializeRenderPipeline() {
+    RenderPipelineDescriptor pipelineDesc;
+    RenderPipeline pipeline = device.createRenderPipeline(pipelineDesc);
+
+}
+
 void Application::MainLoop() {
     glfwPollEvents(); // Process input events
 
-    auto pair = GetNextSurfaceViewData();
-    auto surfaceTexture = pair.first; auto targetView = pair.second;
+    auto [surfaceTexture, targetView] = GetNextSurfaceViewData();
     if(!targetView) return;
 
     // Create command encoder to create draw call command
@@ -389,7 +395,7 @@ bool Application::IsRunning() {
     return !glfwWindowShouldClose(window);
 }
 
-std::pair<WGPUSurfaceTexture, WGPUTextureView> Application::GetNextSurfaceViewData() {
+std::pair<SurfaceTexture, TextureView> Application::GetNextSurfaceViewData() {
     // Get next surface texture
     // Surface texture contains actual texture as well as additional info (status)
     WGPUSurfaceTexture surfaceTexture;
