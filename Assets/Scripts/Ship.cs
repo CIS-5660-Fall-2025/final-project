@@ -9,6 +9,7 @@ public class Ship : MonoBehaviour
 
     [SerializeField] private float currentRudder;
     [SerializeField] private float currentForce;
+    [Header("Adjustable Settings")]
     public float turnSpeed, maxTurn, turnResistance;
     public float maxSpeed, maxForce, accelSpeed;
     
@@ -36,7 +37,7 @@ public class Ship : MonoBehaviour
             currentRudder += turnSpeed * Time.deltaTime;
         }
         shipModel.localEulerAngles = new Vector3(0, 0, currentRudder / 2 * Mathf.Clamp01(rb.velocity.magnitude));
-        Debug.Log(rb.velocity.magnitude);
+        //Debug.Log(rb.velocity.magnitude);
     }
 
     void FixedUpdate()
@@ -71,7 +72,7 @@ public class Ship : MonoBehaviour
         if (increase) {
             currentForce = Mathf.Min(currentForce + accelSpeed * Time.deltaTime, maxForce);
         } else {
-            currentForce = Mathf.Max(currentForce - accelSpeed * Time.deltaTime, 0);
+            currentForce = Mathf.Max(currentForce - accelSpeed * Time.deltaTime, 0.5f);
         }
     }
 

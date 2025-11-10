@@ -17,7 +17,7 @@ public class PlayerTurret : Turret
 
         TurnTurret();
 
-        turret.eulerAngles += cTurretTurn * Time.deltaTime * Vector3.up;
+        turret.localEulerAngles += cTurretTurn * Time.deltaTime * Vector3.up;
     }
     
     public bool FireGuns() {

@@ -65,9 +65,3 @@ public class Player : MonoBehaviour, IDamagable
     }
 }
 
-public interface IDamagable
-{
-    int Health { get; set;}
-    void InflictDamage(int dmg);
-
-}

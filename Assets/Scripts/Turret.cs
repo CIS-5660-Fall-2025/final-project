@@ -8,10 +8,18 @@ public abstract class Turret : MonoBehaviour
     [SerializeField] Transform targetTransform;
     [SerializeField] protected Transform turretBase, turret;
     [SerializeField] Transform firePoint;
-    public bool FrontBlocked, BackBlocked;
-    public float ReloadTime, reloadTimer;
-    public float TurretSpeed, cTurretTurn;
-    public int damage, bulletSpeed;
+    [Header("Constraints")]
+    public bool FrontBlocked;
+    public bool BackBlocked;
+    [Header("Reload")]
+    public float ReloadTime;
+    public float reloadTimer;
+    [Header("Turning")]
+    public float TurretSpeed;
+    public float cTurretTurn;
+    [Header("Projectile Settings")]
+    public int damage;
+    public int bulletSpeed;
     
 
     protected bool CheckAngle() {

@@ -13,7 +13,7 @@ public class CameraMover : MonoBehaviour
     {
         followTransform.position = targetTranform.position;
         offset = transform.position - targetTranform.position;
-        offsetMultiplier = 1;
+        offsetMultiplier = 0.75f;
         velocity = Vector3.zero;
     }
 
