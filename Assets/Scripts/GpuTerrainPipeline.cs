@@ -60,15 +60,23 @@ public class GpuTerrainPipeline : MonoBehaviour
     [Range(1.0f, 5.0f)]
     public float flowP = 1.3f;
 
+    [Header("Thermal Parameters")]
+    [Range(20f, 50f)]
+    public float talus = 30f;
+    [Range(0.1f, 2.0f)]
+    public float thermalDT = 1.0f;
+
+    [Header("Deposition Parameters")]
+    [Range(0.1f, 5.0f)]
+    public float depositionStrength = 1.0f;
+    [Range(1.0f, 5.0f)]
+    public float rainIntensity = 2.6f;
+
     void Start()
     {
         if (!inputHeight) { Debug.LogError("Missing input height"); return; }
         if (!erosionCS) { Debug.LogError("Missing Erosion.compute"); return; }
         if (!targetTerrain) { Debug.LogError("Missing Terrain"); return; }
-        if (levels == null || levels.Length == 0)
-        {
-            levels = new[] { new LevelSchedule { erosionSteps = 0, thermalSteps = 0, depositionSteps = 0 } };
-        }
 
         InitKernels();
         InitRenderTextures();
@@ -77,7 +85,8 @@ public class GpuTerrainPipeline : MonoBehaviour
         RunMultiscalePipeline();
 
         // Update Terrain
-        UpdateTerrainFromRT(heightRTs[levels.Length - 1], targetTerrain, terrainSizeXZ, terrainMaxHeight);
+        int rt = Mathf.Max(0, levels.Length - 1);
+        UpdateTerrainFromRT(heightRTs[rt], targetTerrain, terrainSizeXZ, terrainMaxHeight);
     }
 
     void InitKernels()
@@ -130,11 +139,19 @@ public class GpuTerrainPipeline : MonoBehaviour
             h *= 2;
         }
 
+        if (levels.Length == 0)
+        {
+            if (!heightRTs.ContainsKey(0))
+                heightRTs[0] = CreateRT(w, h);
+        }
+
         CopyTextureToRT(inputHeight, heightRTs[0]);
     }
 
     void RunMultiscalePipeline()
     {
+        if (levels.Length == 0) return;
+
         Debug.Log($"Starting multi-scale pipeline with {levels.Length} levels");
 
         for (int level = 0; level < levels.Length; level++)
@@ -165,22 +182,22 @@ public class GpuTerrainPipeline : MonoBehaviour
                 Swap(ref height, ref temp);
             }
 
-            //// T: Thermal relaxation steps
-            //Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
-            //for (int i = 0; i < schedule.thermalSteps; i++)
-            //{
-            //    ThermalOnce(height, temp);
-            //    Swap(ref height, ref temp);
-            //}
+            // T: Thermal relaxation steps
+            Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
+            for (int i = 0; i < schedule.thermalSteps; i++)
+            {
+                ThermalOnce(height, temp);
+                Swap(ref height, ref temp);
+            }
 
-            //// D: Deposition steps
-            //Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
-            //for (int i = 0; i < schedule.depositionSteps; i++)
-            //{
-            //    FlowRoutingOnce(height, stream);
-            //    DepositOnce(height, stream, sediment, temp);
-            //    Swap(ref height, ref temp);
-            //}
+            // D: Deposition steps
+            Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
+            for (int i = 0; i < schedule.depositionSteps; i++)
+            {
+                FlowRoutingOnce(height, stream);
+                DepositOnce(height, stream, sediment, temp);
+                Swap(ref height, ref temp);
+            }
 
             // Store result back
             heightRTs[level] = height;
@@ -200,16 +217,16 @@ public class GpuTerrainPipeline : MonoBehaviour
         //    heightRTs[levels.Length - 1] = finalHeight;
         //}
 
-        // B: Multi-scale partial breaching
-        if (levels.Length > 0)
-        {
-            Debug.Log("Breaching to remove pits");
-            RenderTexture finalHeight = heightRTs[levels.Length - 1];
-            RenderTexture finalTemp = tempRTs[levels.Length - 1];
-            MultiBreaching(finalHeight, finalTemp);
-            Swap(ref finalHeight, ref finalTemp);
-            heightRTs[levels.Length - 1] = finalHeight;
-        }
+        //// B: Multi-scale partial breaching
+        //if (levels.Length > 0)
+        //{
+        //    Debug.Log("Breaching to remove pits");
+        //    RenderTexture finalHeight = heightRTs[levels.Length - 1];
+        //    RenderTexture finalTemp = tempRTs[levels.Length - 1];
+        //    MultiBreaching(finalHeight, finalTemp);
+        //    Swap(ref finalHeight, ref finalTemp);
+        //    heightRTs[levels.Length - 1] = finalHeight;
+        //}
 
         Debug.Log("Multi-scale pipeline complete");
     }
@@ -242,16 +259,16 @@ public class GpuTerrainPipeline : MonoBehaviour
 
     void ThermalOnce(RenderTexture height, RenderTexture dst)
     {
-        SetCommonUniforms();
+        SetCommonUniforms(height);
         SetThermalUniforms();
         erosionCS.SetTexture(kThermal, "_InHeightRT", height);
         erosionCS.SetTexture(kThermal, "_TempRT", dst);
         DispatchFor(height, kThermal);
     }
 
-    void DepositOnce(RenderTexture height, RenderTexture outArea, RenderTexture dst)
+    void DepositOnce(RenderTexture height, RenderTexture stream, RenderTexture sediment, RenderTexture dst)
     {
-        SetCommonUniforms();
+        SetCommonUniforms(height);
         SetDepositionUniforms();
         erosionCS.SetTexture(kDeposit, "_InHeightRT", height);
         erosionCS.SetTexture(kDeposit, "_StreamRT", stream);
@@ -262,7 +279,7 @@ public class GpuTerrainPipeline : MonoBehaviour
 
     void DiffuseRetarget(RenderTexture height, RenderTexture dst)
     {
-        SetCommonUniforms();
+        SetCommonUniforms(height);
         erosionCS.SetTexture(kRetarget, "_InHeightRT", height);
         erosionCS.SetTexture(kRetarget, "_TempRT", dst);
         DispatchFor(height, kRetarget);
@@ -293,6 +310,19 @@ public class GpuTerrainPipeline : MonoBehaviour
         erosionCS.SetFloat("_ErosionPSA", erosionPSA);
         erosionCS.SetFloat("_ErosionPSL", erosionPSL);
         erosionCS.SetFloat("_ErosionDT", erosionDT);
+        erosionCS.SetFloat("_FlowP", flowP);
+    }
+
+    void SetThermalUniforms()
+    {
+        erosionCS.SetFloat("_Talus", talus);
+        erosionCS.SetFloat("_ThermalDT", thermalDT);
+    }
+
+    void SetDepositionUniforms()
+    {
+        erosionCS.SetFloat("_DepositionStrength", depositionStrength);
+        erosionCS.SetFloat("_RainIntensity", rainIntensity);
         erosionCS.SetFloat("_FlowP", flowP);
     }
 

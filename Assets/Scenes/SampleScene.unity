@@ -414,19 +414,17 @@ MonoBehaviour:
   baseResolution: 256
   levels:
   - erosionSteps: 200
-    thermalSteps: 200
-    depositionSteps: 200
-  - erosionSteps: 200
-    thermalSteps: 200
-    depositionSteps: 200
-  - erosionSteps: 200
-    thermalSteps: 200
-    depositionSteps: 200
+    thermalSteps: 2000
+    depositionSteps: 10
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2
   erosionDT: 1
   flowP: 1.3
+  talus: 30
+  thermalDT: 1
+  depositionStrength: 1
+  rainIntensity: 2.6
 --- !u!4 &822826622
 Transform:
   m_ObjectHideFlags: 0
