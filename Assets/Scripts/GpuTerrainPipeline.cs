@@ -242,17 +242,30 @@ public class GpuTerrainPipeline : MonoBehaviour
 
     void ThermalOnce(RenderTexture height, RenderTexture dst)
     {
-
+        SetCommonUniforms();
+        SetThermalUniforms();
+        erosionCS.SetTexture(kThermal, "_InHeightRT", height);
+        erosionCS.SetTexture(kThermal, "_TempRT", dst);
+        DispatchFor(height, kThermal);
     }
 
     void DepositOnce(RenderTexture height, RenderTexture outArea, RenderTexture dst)
     {
-
+        SetCommonUniforms();
+        SetDepositionUniforms();
+        erosionCS.SetTexture(kDeposit, "_InHeightRT", height);
+        erosionCS.SetTexture(kDeposit, "_StreamRT", stream);
+        erosionCS.SetTexture(kDeposit, "_SedimentRT", sediment);
+        erosionCS.SetTexture(kDeposit, "_OutHeightRT", dst);
+        DispatchFor(height, kDeposit);
     }
 
     void DiffuseRetarget(RenderTexture height, RenderTexture dst)
     {
-
+        SetCommonUniforms();
+        erosionCS.SetTexture(kRetarget, "_InHeightRT", height);
+        erosionCS.SetTexture(kRetarget, "_TempRT", dst);
+        DispatchFor(height, kRetarget);
     }
 
     void MultiBreaching(RenderTexture height, RenderTexture dst)
