@@ -32,7 +32,7 @@ public class WFC : MonoBehaviour
         }
         genRunning = true;
         delayCounter = 0;
-        Random.InitState(1);
+        // Random.InitState(1);
     }
 
     
