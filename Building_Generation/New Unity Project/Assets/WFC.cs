@@ -12,33 +12,44 @@ public class WFC : MonoBehaviour
     Cell[,] grid;
     bool genRunning;
     int delayCounter;
+
+    List<Tile> spawnedTiles;
     // Start is called before the first frame update
     void Start()
     {
+        spawnedTiles = new List<Tile>();
         iteration = 0;
-        // Instantiate(tileTypes[0]);
-        // Instantiate(tileTypes[0],new Vector3(2.0f, 2.0f, 2.0f), Quaternion.identity);
-        // Cell defaultCell = new Cell();
-        // defaultCell.possibleTiles = new List<Tile>(tileTypes);
-        grid = new Cell[mapDimensions.x, mapDimensions.y];
-
-        for (int y = 0; y < mapDimensions.y; ++y) {
-            for (int x = 0; x < mapDimensions.x; ++x) {
-                // Instantiate(tileTypes[Random.Range(0,tileTypes.Length)], new Vector3(x * cellWidth, 0.0f, y * cellWidth), Quaternion.identity);
-                
-                grid[x,y] = new Cell();
-                grid[x,y].possibleTiles = new List<Tile>(tileTypes);
-            }
-        }
+        resetGrid();
         genRunning = true;
         delayCounter = 0;
         // Random.InitState(1);
     }
 
+    void resetGrid() {
+        grid = new Cell[mapDimensions.x, mapDimensions.y];
+        for (int i = spawnedTiles.Count - 1; i >= 0; --i) {
+            // Tile curTile = spawnedTiles[i];
+            Destroy(spawnedTiles[i].gameObject);
+            spawnedTiles.RemoveAt(i);
+        }
+        for (int y = 0; y < mapDimensions.y; ++y) {
+            for (int x = 0; x < mapDimensions.x; ++x) {
+                
+                grid[x,y] = new Cell();
+                grid[x,y].possibleTiles = new List<Tile>(tileTypes);
+            }
+        }
+
+    }
     
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R)){
+            iteration = 0;
+            resetGrid();
+            genRunning = true;
+        }
         if (genRunning) {
         // if (genRunning && (++delayCounter % 60 == 0)) {
             Debug.Log(iteration);
@@ -74,8 +85,7 @@ public class WFC : MonoBehaviour
             Tile chosenTile = targetCell.possibleTiles[targetTileIdx];
             targetCell.possibleTiles = new List<Tile>{chosenTile};
             Vector3 targetPos = new Vector3(targetCoords.x,0,targetCoords.y);
-            Instantiate(chosenTile, targetPos, Quaternion.identity);
-
+            spawnedTiles.Add(Instantiate(chosenTile, targetPos, Quaternion.identity));
             // TODO propagate; probably helper function in this class is best way?
             propagate(targetCoords.x, targetCoords.y, true);
             return true;
@@ -171,7 +181,7 @@ public class WFC : MonoBehaviour
             if (possibilitiesUpdated && grid[x,y].possibleTiles.Count == 1) {
                 Tile chosenTile = grid[x,y].possibleTiles[0];
                 Vector3 targetPos = new Vector3(x,0,y);
-                Instantiate(chosenTile, targetPos, Quaternion.identity);
+                spawnedTiles.Add(Instantiate(chosenTile, targetPos, Quaternion.identity));
                 
             }
         }
