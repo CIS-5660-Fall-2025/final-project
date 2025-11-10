@@ -22,7 +22,8 @@ add_subdirectory(glfw3webgpu)
 
 set(SOURCE_FILES
 	main.cpp
-	application.cpp)
+	application.cpp
+	webgpu_utils.cpp)
 
 add_executable(App ${SOURCE_FILES})
 

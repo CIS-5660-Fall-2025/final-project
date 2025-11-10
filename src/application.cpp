@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include "webgpu_utils.h"
 
 using namespace wgpu;
 
@@ -317,6 +318,62 @@ bool Application::Initialize() {
 
     InitializeRenderPipeline();
 
+    // [...] Create a first buffer
+    BufferDescriptor bufferDesc;
+    bufferDesc.label = "GPU Side Data Buffer";
+    // CopyDst is copying to GPU, CopySrc is copying to CPU
+    bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::CopySrc;
+    bufferDesc.size = 16;
+    bufferDesc.mappedAtCreation = false; // Buffer also stored on CPU and synced with GPU
+    Buffer buf1 = device.createBuffer(bufferDesc);
+    // [...] Create a second buffer
+    // Reuse Desc
+    bufferDesc.label = "Output buffer";
+    bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::MapRead;
+    Buffer buf2 = device.createBuffer(bufferDesc);
+    // [...] Write input data
+    std::vector<uint8_t> numbers(16); // 16 1-byte integers, 16 bytes
+    for(uint8_t i=0; i<16; ++i) numbers[i] = i;
+    queue.writeBuffer(buf1, 0, numbers.data(), numbers.size()); // Write into buf1
+    // When this func returns, writing may not be complete but we'll have already created a CPU-side copy
+    //   of the numbers data so we can free up the memory from the address we passed
+    // Commands in the queue after writeBuffer op won't execute before data transfer finishes
+    // [...] Encode and submit the buffer to buffer copy
+    CommandEncoder encoder = device.createCommandEncoder(Default);
+    encoder.copyBufferToBuffer(buf1, 0, buf2, 0, 16); // the 0 after each buf is the byte offset
+    CommandBuffer cmd = encoder.finish(Default);
+    encoder.release();
+    queue.submit(1, &cmd);
+    cmd.release();
+    // [...] Read buffer data back
+    
+    auto onBuf2Mapped = [](WGPUBufferMapAsyncStatus status, void *userData) {
+        auto *context = static_cast<std::pair<Buffer, bool>*>(userData);
+        context->second = true;
+        std::cout << "Buffer 2 mapped with status" << status << std::endl;
+        if(status != BufferMapAsyncStatus::Success) return;
+
+        uint8_t *bufferData = (uint8_t*) context->first.getConstMappedRange(0, 16);
+
+        std::cout << "bufferData = [";
+        for (int i = 0; i < 16; ++i) {
+            if (i > 0) std::cout << ", ";
+            std::cout << (int)bufferData[i];
+        }
+        std::cout << "]" << std::endl;
+
+        context->first.unmap();
+    };
+    std::pair<Buffer, bool> context = {buf2, false};
+    wgpuBufferMapAsync(buf2, MapMode::Read, 0, 16, onBuf2Mapped, &context);
+    while(!context.second) {
+        wgpuPollEvents(device, true);
+    }
+
+
+    // [...] Release buffers
+    buf1.release(); buf2.release();
+
     return true;
 }
 
@@ -438,7 +495,7 @@ void Application::MainLoop() {
     // Create command encoder to create draw call command
     CommandEncoderDescriptor encoderDesc = {};
     encoderDesc.label = "Command encoder";
-    CommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &encoderDesc);
+    CommandEncoder encoder = device.createCommandEncoder(encoderDesc);
 
     // Create render pass color attachment
     RenderPassDescriptor renderPassDesc = {};
