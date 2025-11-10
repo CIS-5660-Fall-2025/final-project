@@ -6,6 +6,7 @@
 #include "webgpu_utils.h"
 
 using namespace wgpu;
+using namespace std;
 
 // Almost identical to inspect adapter; I think the device is like what we use/our interface and the adapter is reality
 void inspectDevice(WGPUDevice device) {
@@ -268,7 +269,6 @@ bool Application::Initialize() {
     deviceDesc.nextInChain = nullptr;
     deviceDesc.label = "My Device"; // anything works here, that's your call
     deviceDesc.requiredFeatureCount = 0; // we do not require any specific feature
-    deviceDesc.requiredLimits = nullptr; // we do not require any specific limit
     deviceDesc.defaultQueue.nextInChain = nullptr;
     deviceDesc.defaultQueue.label = "The default queue";
     // A function that is invoked whenever the device stops being available.
@@ -277,6 +277,8 @@ bool Application::Initialize() {
         if (message) std::cout << " (" << message << ")";
         std::cout << std::endl;
         };
+    RequiredLimits limits = GetRequiredLimits(adapter);
+    deviceDesc.requiredLimits = nullptr; //&limits; // Require at least these capabilities
     device = requestDeviceSync(adapter, &deviceDesc);
     std::cout << "Got device: " << device << std::endl;
     auto onDeviceError = [](WGPUErrorType type, char const* message, void* /* pUserData */) {
@@ -370,14 +372,17 @@ bool Application::Initialize() {
         wgpuPollEvents(device, true);
     }
 
-
     // [...] Release buffers
     buf1.release(); buf2.release();
+
+    InitializeBuffers();
 
     return true;
 }
 
 void Application::Terminate() {
+    vertexBuffer.release();
+
     pipeline.release();
 
     wgpuSurfaceUnconfigure(surface);
@@ -393,16 +398,8 @@ void Application::Terminate() {
 void Application::InitializeRenderPipeline() {
     const char* shaderSource = R"(
 @vertex
-fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> @builtin(position) vec4f {
-	var p = vec2f(0.0, 0.0);
-	if (in_vertex_index == 0u) {
-		p = vec2f(-0.5, -0.5);
-	} else if (in_vertex_index == 1u) {
-		p = vec2f(0.5, -0.5);
-	} else {
-		p = vec2f(0.0, 0.5);
-	}
-	return vec4f(p, 0.0, 1.0);
+fn vs_main(@location(0) inVertexPosition: vec2f) -> @builtin(position) vec4f {
+	return vec4f(inVertexPosition, 0.0, 1.0);
 }
 
 @fragment
@@ -479,6 +476,24 @@ fn fs_main() -> @location(0) vec4f {
     // [...] Describe pipeline layout
     pipelineDesc.layout = nullptr; // Would be important for accessing input and output resources (buffers/textures)
         // nullptr asks backend to figure out layout
+
+
+    // [...] Describe Vertex Layout
+    VertexBufferLayout vertexBufferLayout;
+
+    VertexAttribute positionAttrib;
+    positionAttrib.shaderLocation = 0;
+    positionAttrib.format = VertexFormat::Float32x2;
+    positionAttrib.offset = 0;
+
+    vertexBufferLayout.attributeCount = 1;
+    vertexBufferLayout.attributes = &positionAttrib;
+
+    vertexBufferLayout.arrayStride = 2 * sizeof(float);
+    vertexBufferLayout.stepMode = VertexStepMode::Vertex; // Eahc new val is a new vertex
+
+    pipelineDesc.vertex.bufferCount = 1;
+    pipelineDesc.vertex.buffers = &vertexBufferLayout;
     
     pipeline = device.createRenderPipeline(pipelineDesc);
 
@@ -518,6 +533,7 @@ void Application::MainLoop() {
 
     // What to draw here
     renderPass.setPipeline(pipeline);
+    renderPass.setVertexBuffer(0, vertexBuffer, 0, vertexBuffer.getSize());
     renderPass.draw(3, 1, 0, 0);
 
     renderPass.end();
@@ -576,4 +592,37 @@ std::pair<SurfaceTexture, TextureView> Application::GetNextSurfaceViewData() {
     #endif // WEBGPU_BACKEND_WGPU
 
     return {surfaceTexture, targetView};
+}
+
+RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
+    SupportedLimits supportedLimits;
+    adapter.getLimits(&supportedLimits);
+
+    RequiredLimits requiredLimits = Default;
+    requiredLimits.limits.minStorageBufferOffsetAlignment = 32;
+    requiredLimits.limits.maxVertexAttributes = 1; // Require a max of 1
+    requiredLimits.limits.maxVertexBuffers = 1;
+    requiredLimits.limits.maxBufferSize = 6 * 2 * sizeof(float);
+    requiredLimits.limits.maxVertexBufferArrayStride = 2 * sizeof(float);
+    // We can only draw 2 triangles with these limits..
+
+    return requiredLimits;
+}
+
+void Application::InitializeBuffers() {
+    vector<float> positions = {
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.0, 0.5
+    };
+
+    vertexCount = 3;
+
+    BufferDescriptor bufferDesc;
+    bufferDesc.size = positions.size() * sizeof(float);
+    bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Vertex;
+    bufferDesc.mappedAtCreation = false;
+    vertexBuffer = device.createBuffer(bufferDesc);
+
+    queue.writeBuffer(vertexBuffer, 0, positions.data(), bufferDesc.size);
 }

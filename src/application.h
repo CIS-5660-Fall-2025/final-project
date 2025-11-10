@@ -16,7 +16,7 @@ using namespace wgpu;
 class Application {
     public:
     
-    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr) {}
+    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr), vertexBuffer(nullptr) {}
     bool Initialize(); // Was initialization succesful?
     void Terminate();
     void MainLoop(); // Draw frame and handle events
@@ -26,6 +26,7 @@ class Application {
     
     std::pair<SurfaceTexture, TextureView> GetNextSurfaceViewData();
     void InitializeRenderPipeline();
+    RequiredLimits GetRequiredLimits(Adapter adapter) const;
     
     GLFWwindow *window;
     Device device;
@@ -33,4 +34,8 @@ class Application {
     Surface surface;
     TextureFormat surfaceFormat = TextureFormat::Undefined;
     RenderPipeline pipeline;
+
+    void InitializeBuffers();
+    Buffer vertexBuffer;
+    uint32_t vertexCount;
 };
