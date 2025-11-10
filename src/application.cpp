@@ -397,14 +397,27 @@ void Application::Terminate() {
 
 void Application::InitializeRenderPipeline() {
     const char* shaderSource = R"(
+struct VertexInput {
+	@location(0) position: vec2f,
+	@location(1) color: vec3f
+};
+
+struct VertexOutput {
+	@builtin(position) position: vec4f,
+	@location(0) color: vec3f
+};
+
 @vertex
-fn vs_main(@location(0) inVertexPosition: vec2f) -> @builtin(position) vec4f {
-	return vec4f(inVertexPosition, 0.0, 1.0);
+fn vs_main(vIn: VertexInput) -> VertexOutput {
+	var out: VertexOutput;
+	out.position = vec4f(vIn.position, 0.0, 1.0);
+	out.color = vIn.color;
+	return out;
 }
 
 @fragment
-fn fs_main() -> @location(0) vec4f {
-	return vec4f(0.0, 0.4, 1.0, 1.0);
+fn fs_main(in: VertexOutput) -> @location(0) vec4f {
+	return vec4(in.color, 1.0);
 }
 )";
 
@@ -481,16 +494,22 @@ fn fs_main() -> @location(0) vec4f {
     // [...] Describe Vertex Layout
     VertexBufferLayout vertexBufferLayout;
 
-    VertexAttribute positionAttrib;
-    positionAttrib.shaderLocation = 0;
-    positionAttrib.format = VertexFormat::Float32x2;
-    positionAttrib.offset = 0;
+    vector<VertexAttribute> vertexAttribs(2);
 
-    vertexBufferLayout.attributeCount = 1;
-    vertexBufferLayout.attributes = &positionAttrib;
+    vertexAttribs[0].shaderLocation = 0;
+    vertexAttribs[0].format = VertexFormat::Float32x2;
+    vertexAttribs[0].offset = 0;
 
-    vertexBufferLayout.arrayStride = 2 * sizeof(float);
-    vertexBufferLayout.stepMode = VertexStepMode::Vertex; // Eahc new val is a new vertex
+    vertexAttribs[1].shaderLocation = 1;
+    vertexAttribs[1].format = VertexFormat::Float32x3;
+    vertexAttribs[1].offset = 2 * sizeof(float);
+    
+
+    vertexBufferLayout.attributeCount = 2;
+    vertexBufferLayout.attributes = vertexAttribs.data();
+
+    vertexBufferLayout.arrayStride = 5 * sizeof(float);
+    vertexBufferLayout.stepMode = VertexStepMode::Vertex; // Each new val is a new vertex
 
     pipelineDesc.vertex.bufferCount = 1;
     pipelineDesc.vertex.buffers = &vertexBufferLayout;
@@ -600,10 +619,11 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
 
     RequiredLimits requiredLimits = Default;
     requiredLimits.limits.minStorageBufferOffsetAlignment = 32;
-    requiredLimits.limits.maxVertexAttributes = 1; // Require a max of 1
+    requiredLimits.limits.maxVertexAttributes = 2; // Require a max of 1
     requiredLimits.limits.maxVertexBuffers = 1;
-    requiredLimits.limits.maxBufferSize = 6 * 2 * sizeof(float);
-    requiredLimits.limits.maxVertexBufferArrayStride = 2 * sizeof(float);
+    requiredLimits.limits.maxBufferSize = 6 * 5 * sizeof(float);
+    requiredLimits.limits.maxVertexBufferArrayStride = 5 * sizeof(float);
+    requiredLimits.limits.maxInterStageShaderComponents = 3;
     // We can only draw 2 triangles with these limits..
 
     return requiredLimits;
@@ -611,16 +631,16 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
 
 void Application::InitializeBuffers() {
     vector<float> positions = {
-        -0.5f, -0.5f,
-        0.5f, -0.5f,
-        0.0f, 0.5f,
+        -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f,  0.0f, 0.0f, 1.0f,
         
-        -0.9f, -0.9f,
-        -0.7f, -0.9f,
-        -0.85f,-0.7f
+        -0.9f, -0.9f,  1.0f, 0.0f, 0.0f,
+        -0.7f, -0.9f,  0.0f, 1.0f, 0.0f,
+        -0.85f,-0.7f,  0.0f, 0.0f, 1.0f
     };
 
-    vertexCount = static_cast<uint32_t>(positions.size())/2;
+    vertexCount = static_cast<uint32_t>(positions.size())/5;
 
     BufferDescriptor bufferDesc;
     bufferDesc.size = positions.size() * sizeof(float);
