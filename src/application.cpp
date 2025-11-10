@@ -534,7 +534,7 @@ void Application::MainLoop() {
     // What to draw here
     renderPass.setPipeline(pipeline);
     renderPass.setVertexBuffer(0, vertexBuffer, 0, vertexBuffer.getSize());
-    renderPass.draw(3, 1, 0, 0);
+    renderPass.draw(6, 2, 0, 0);
 
     renderPass.end();
     renderPass.release();
@@ -611,12 +611,16 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
 
 void Application::InitializeBuffers() {
     vector<float> positions = {
-        -0.5, -0.5,
-        0.5, -0.5,
-        0.0, 0.5
+        -0.5f, -0.5f,
+        0.5f, -0.5f,
+        0.0f, 0.5f,
+        
+        -0.9f, -0.9f,
+        -0.7f, -0.9f,
+        -0.85f,-0.7f
     };
 
-    vertexCount = 3;
+    vertexCount = static_cast<uint32_t>(positions.size())/2;
 
     BufferDescriptor bufferDesc;
     bufferDesc.size = positions.size() * sizeof(float);
