@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3043703093951654749}
   - component: {fileID: 1488931007390143059}
   - component: {fileID: 1103135083581733172}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Torpedo
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 204100940251247758}
   - component: {fileID: 7726536433718512965}
   - component: {fileID: 4178543671413748513}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
