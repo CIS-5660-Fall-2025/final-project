@@ -506,7 +506,7 @@ MonoBehaviour:
   erosionCS: {fileID: 7200000, guid: f03bb276a36b8dc47909477c28e5996a, type: 3}
   baseResolution: 256
   levels:
-  - erosionSteps: 20
+  - erosionSteps: 2000
     thermalSteps: 600
     depositionSteps: 0
   erosionK: 0.0005

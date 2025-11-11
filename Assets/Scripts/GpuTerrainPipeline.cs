@@ -3,6 +3,7 @@ using UnityEngine.Rendering;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Collections;
+using System.Text;
 
 public class GpuTerrainPipeline : MonoBehaviour
 {
@@ -62,6 +63,8 @@ public class GpuTerrainPipeline : MonoBehaviour
     public float erosionDT = 1.0f;
     //[Range(1.0f, 5.0f)]
     public float flowP = 1.3f;
+    //[Range(1.0f, 5.0f)]
+    public float rainIntensity = 2.6f;
 
     [Header("Thermal Parameters")]
     //[Range(20f, 50f)]
@@ -72,8 +75,6 @@ public class GpuTerrainPipeline : MonoBehaviour
     [Header("Deposition Parameters")]
     //[Range(0.1f, 5.0f)]
     public float depositionStrength = 1.0f;
-    //[Range(1.0f, 5.0f)]
-    public float rainIntensity = 2.6f;
 
     RenderTexture _origHeightAtFinal;
 
@@ -215,6 +216,7 @@ public class GpuTerrainPipeline : MonoBehaviour
                 Swap(ref stream, ref temp);
                 ErodeOnce(height, stream, temp);
                 Swap(ref height, ref temp);
+                PrintRTValues(height, "height");
             }
 
             //// T: Thermal relaxation steps
@@ -234,11 +236,11 @@ public class GpuTerrainPipeline : MonoBehaviour
             //    Swap(ref height, ref temp);
             //}
 
-            //// Store result back
-            //heightRTs[level] = height;
-            //streamRTs[level] = stream;
-            //sedimentRTs[level] = sediment;
-            //tempRTs[level] = temp;
+            // Store result back
+            heightRTs[level] = height;
+            streamRTs[level] = stream;
+            sedimentRTs[level] = sediment;
+            tempRTs[level] = temp;
         }
 
         //if (levels.Length > 0)
@@ -287,6 +289,7 @@ public class GpuTerrainPipeline : MonoBehaviour
     void FlowRoutingOnce(RenderTexture height, RenderTexture stream, RenderTexture dst)
     {
         SetCommonUniforms(height);
+        SetErosionUniforms();
         erosionCS.SetTexture(kFlowRouting, "_InHeightRT", height);
         erosionCS.SetTexture(kFlowRouting, "_StreamRT", stream);
         erosionCS.SetTexture(kFlowRouting, "_OutStreamRT", dst);
@@ -392,6 +395,7 @@ public class GpuTerrainPipeline : MonoBehaviour
         erosionCS.SetFloat("_ErosionPSL", erosionPSL);
         erosionCS.SetFloat("_ErosionDT", erosionDT);
         erosionCS.SetFloat("_FlowP", flowP);
+        erosionCS.SetFloat("_RainIntensity", rainIntensity);
     }
 
     void SetThermalUniforms()
@@ -493,5 +497,57 @@ public class GpuTerrainPipeline : MonoBehaviour
 
         Debug.Log($"Saved height PNG to: {path}");
         Destroy(tex);
+    }
+
+    void PrintRTValues(RenderTexture rt, string name = "RT", int sampleStep = 32)
+    {
+        if (rt == null)
+        {
+            Debug.LogError($"[RTDebug] {name} is null.");
+            return;
+        }
+
+        AsyncGPUReadback.Request(rt, 0, TextureFormat.RFloat, req =>
+        {
+            if (req.hasError)
+            {
+                Debug.LogError($"[RTDebug] GPU readback failed for {name}");
+                return;
+            }
+
+            var data = req.GetData<float>();
+            int w = rt.width;
+            int h = rt.height;
+
+            float minH = float.MaxValue;
+            float maxH = float.MinValue;
+            double sum = 0.0;
+
+            int count = w * h;
+            for (int i = 0; i < count; i++)
+            {
+                float v = data[i];
+                if (v < minH) minH = v;
+                if (v > maxH) maxH = v;
+                sum += v;
+            }
+            float avg = (float)(sum / count);
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"[RTDebug] {name} ({w}x{h})  min={minH:F4}, max={maxH:F4}, avg={avg:F4}");
+            sb.AppendLine("Sampled values:");
+            for (int y = 0; y < h; y += sampleStep)
+            {
+                sb.Append($"Row {y:D3}: ");
+                for (int x = 0; x < w; x += sampleStep)
+                {
+                    float v = data[y * w + x];
+                    sb.Append($"{v:F3} ");
+                }
+                sb.AppendLine();
+            }
+
+            Debug.Log(sb.ToString());
+        });
     }
 }
