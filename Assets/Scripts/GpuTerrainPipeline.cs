@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
+using System.IO;
+using Unity.Collections;
 
 public class GpuTerrainPipeline : MonoBehaviour
 {
@@ -26,6 +28,7 @@ public class GpuTerrainPipeline : MonoBehaviour
     int kDeposit;
     int kRetarget;
     int kBreach;
+    int kClear;
 
     [System.Serializable]
     public struct LevelSchedule
@@ -49,27 +52,27 @@ public class GpuTerrainPipeline : MonoBehaviour
     private Dictionary<int, RenderTexture> tempRTs = new Dictionary<int, RenderTexture>();
 
     [Header("Erosion Parameters")]
-    [Range(0.0001f, 0.001f)]
+    //[Range(0.0001f, 0.001f)]
     public float erosionK = 0.0005f;
-    [Range(0.5f, 1.5f)]
+    //[Range(0.5f, 1.5f)]
     public float erosionPSA = 0.8f;
-    [Range(1.0f, 3.0f)]
+    //[Range(1.0f, 3.0f)]
     public float erosionPSL = 2.0f;
-    [Range(0.1f, 5.0f)]
+    //[Range(0.1f, 5.0f)]
     public float erosionDT = 1.0f;
-    [Range(1.0f, 5.0f)]
+    //[Range(1.0f, 5.0f)]
     public float flowP = 1.3f;
 
     [Header("Thermal Parameters")]
-    [Range(20f, 50f)]
+    //[Range(20f, 50f)]
     public float talus = 30f;
-    [Range(0.1f, 2.0f)]
+    //[Range(0.1f, 2.0f)]
     public float thermalDT = 1.0f;
 
     [Header("Deposition Parameters")]
-    [Range(0.1f, 5.0f)]
+    //[Range(0.1f, 5.0f)]
     public float depositionStrength = 1.0f;
-    [Range(1.0f, 5.0f)]
+    //[Range(1.0f, 5.0f)]
     public float rainIntensity = 2.6f;
 
     void Start()
@@ -77,6 +80,8 @@ public class GpuTerrainPipeline : MonoBehaviour
         if (!inputHeight) { Debug.LogError("Missing input height"); return; }
         if (!erosionCS) { Debug.LogError("Missing Erosion.compute"); return; }
         if (!targetTerrain) { Debug.LogError("Missing Terrain"); return; }
+
+        targetTerrain.terrainData = Instantiate(targetTerrain.terrainData);
 
         InitKernels();
         InitRenderTextures();
@@ -165,6 +170,9 @@ public class GpuTerrainPipeline : MonoBehaviour
 
             var schedule = levels[level];
 
+            ClearRT(stream);
+            ClearRT(temp);
+
             // U: Upsample if not first level
             if (level > 0)
             {
@@ -177,33 +185,34 @@ public class GpuTerrainPipeline : MonoBehaviour
             Debug.Log($"  Erosion: {schedule.erosionSteps} steps");
             for (int i = 0; i < schedule.erosionSteps; i++)
             {
-                FlowRoutingOnce(height, stream);
+                FlowRoutingOnce(height, stream, temp);
+                Swap(ref stream, ref temp);
                 ErodeOnce(height, stream, temp);
                 Swap(ref height, ref temp);
             }
 
-            // T: Thermal relaxation steps
-            Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
-            for (int i = 0; i < schedule.thermalSteps; i++)
-            {
-                ThermalOnce(height, temp);
-                Swap(ref height, ref temp);
-            }
+            //// T: Thermal relaxation steps
+            //Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
+            //for (int i = 0; i < schedule.thermalSteps; i++)
+            //{
+            //    ThermalOnce(height, temp);
+            //    Swap(ref height, ref temp);
+            //}
 
-            // D: Deposition steps
-            Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
-            for (int i = 0; i < schedule.depositionSteps; i++)
-            {
-                FlowRoutingOnce(height, stream);
-                DepositOnce(height, stream, sediment, temp);
-                Swap(ref height, ref temp);
-            }
+            //// D: Deposition steps
+            //Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
+            //for (int i = 0; i < schedule.depositionSteps; i++)
+            //{
+            //    FlowRoutingOnce(height, stream);
+            //    DepositOnce(height, stream, sediment, temp);
+            //    Swap(ref height, ref temp);
+            //}
 
-            // Store result back
-            heightRTs[level] = height;
-            streamRTs[level] = stream;
-            sedimentRTs[level] = sediment;
-            tempRTs[level] = temp;
+            //// Store result back
+            //heightRTs[level] = height;
+            //streamRTs[level] = stream;
+            //sedimentRTs[level] = sediment;
+            //tempRTs[level] = temp;
         }
 
         //// R: Ridge/peak retargeting (after all levels)
@@ -231,6 +240,13 @@ public class GpuTerrainPipeline : MonoBehaviour
         Debug.Log("Multi-scale pipeline complete");
     }
 
+    void ClearRT(RenderTexture rt)
+    {
+        SetCommonUniforms(rt);
+        erosionCS.SetTexture(kClear, "_RTToClear", rt);
+        DispatchFor(rt, kClear);
+    }
+
     void Upsample2x(RenderTexture src, RenderTexture dst)
     {
         SetCommonUniforms(src);
@@ -239,11 +255,12 @@ public class GpuTerrainPipeline : MonoBehaviour
         DispatchFor(dst, kUpsample2x);
     }
 
-    void FlowRoutingOnce(RenderTexture height, RenderTexture stream)
+    void FlowRoutingOnce(RenderTexture height, RenderTexture stream, RenderTexture dst)
     {
         SetCommonUniforms(height);
         erosionCS.SetTexture(kFlowRouting, "_InHeightRT", height);
         erosionCS.SetTexture(kFlowRouting, "_StreamRT", stream);
+        erosionCS.SetTexture(kFlowRouting, "_OutStreamRT", dst);
         DispatchFor(height, kFlowRouting);
     }
 
@@ -302,6 +319,7 @@ public class GpuTerrainPipeline : MonoBehaviour
         erosionCS.SetInt("_Width", rt.width);
         erosionCS.SetInt("_Height", rt.height);
         erosionCS.SetFloat("_CellSize", 1.0f);
+        erosionCS.SetFloat("_MaxHeight", terrainMaxHeight);
     }
 
     void SetErosionUniforms()
@@ -385,6 +403,32 @@ public class GpuTerrainPipeline : MonoBehaviour
 
             td.SetHeights(0, 0, heights);
             Debug.Log($"Terrain updated: RT {inputHeight.width}x{inputHeight.height} -> heights {terrainRes}x{terrainRes}");
+
+            SaveHeightPNGFromData(data, w, h, "final_height.png");
         });
+    }
+
+    void SaveHeightPNGFromData(NativeArray<float> data, int width, int height, string fileName)
+    {
+        var tex = new Texture2D(width, height, TextureFormat.RGBA32, false, true);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float h = data[y * width + x];
+                h = Mathf.Clamp01(h);            
+                Color c = new Color(h, h, h, 1); 
+                tex.SetPixel(x, y, c);
+            }
+        }
+        tex.Apply();
+
+        byte[] bytes = tex.EncodeToPNG();
+        string path = Path.Combine(Application.persistentDataPath, fileName);
+        File.WriteAllBytes(path, bytes);
+
+        Debug.Log($"Saved height PNG to: {path}");
+        Destroy(tex);
     }
 }

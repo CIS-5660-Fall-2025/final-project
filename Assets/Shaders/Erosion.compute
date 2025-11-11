@@ -7,22 +7,23 @@
 #pragma kernel DepositStep
 #pragma kernel Retargeting
 #pragma kernel Breaching
+#pragma kernel ClearRT
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 uniform float _CellSize = 1.0;
 uniform uint _Width;
 uniform uint _Height;
-
-uniform float _DepositionStrength = 1.0;
-uniform float _RainIntensity = 2.6;
+uniform float _MaxHeight;
 
 Texture2D<float> _InHeightTex;
 Texture2D<float> _InHeightRT;
 RWTexture2D<float> _OutHeightRT;
 RWTexture2D<float> _StreamRT;
+RWTexture2D<float> _OutStreamRT;
 RWTexture2D<float> _TempRT;
 RWTexture2D<float> _SedimentRT;
+RWTexture2D<float> _RTToClear;
 
 static const int2 next8[8] =
 {
@@ -40,9 +41,11 @@ uniform float _MaxStreamPower = 10000.0;
 static const float orthoDist = 1.0;
 static const float diagonalDist = 1.4142;
 
-// Thermal
 uniform float _Talus = 30.0;
 uniform float _ThermalDT = 1.0;
+
+uniform float _DepositionStrength = 1.0;
+uniform float _RainIntensity = 2.6;
 
 [numthreads(8, 8, 1)]
 void CopyFromTexture(uint3 id : SV_DispatchThreadID)
@@ -66,7 +69,7 @@ float SampleHeightClamped(int x, int y, uint w, uint h)
 {
     x = clamp(x, 0, (int) w - 1);
     y = clamp(y, 0, (int) h - 1);
-    return _InHeightRT.Load(int3(x, y, 0));
+    return _InHeightRT.Load(int3(x, y, 0)) * _MaxHeight;
 }
 
 [numthreads(8, 8, 1)]
@@ -110,12 +113,17 @@ void Upsample2x(uint3 id : SV_DispatchThreadID)
     
     float h = CubicCatmullRom(rowVal[0], rowVal[1], rowVal[2], rowVal[3], t.y);
 
-    _OutHeightRT[dstXY] = h;
+    _OutHeightRT[dstXY] = h / _MaxHeight;
 }
 
 bool IsInBounds(int2 p)
 {
     return p.x >= 0 && p.x < (int) _Width && p.y >= 0 && p.y < (int) _Height;
+}
+
+int ToIndex1D(int2 p)
+{
+    return p.y * _Width + p.x;
 }
 
 float GetSediment(int2 p)
@@ -143,7 +151,7 @@ float GetDistance(int2 a, int2 b)
 float GetHeight(int2 p)
 {
     p = GetClampedCoord(p);
-    return _InHeightRT[p];
+    return _InHeightRT[p] * _MaxHeight;
 }
 
 float GetSlope(int2 p, int2 q)
@@ -224,7 +232,7 @@ void FlowRouting(uint3 id : SV_DispatchThreadID)
     
     stream += ComputeIncomingFlow(pos);
     
-    _StreamRT[pos] = stream;
+    _OutStreamRT[pos] = stream;
 }
 
 int2 GetSteepestNeighbor(int2 p)
@@ -262,19 +270,22 @@ void ErosionStep(uint3 id : SV_DispatchThreadID)
         return;
     
     float receiverHeight = GetHeight(receiver);
-    float steepestSlope = GetSlope(receiver, pos);
+    float steepestSlope = abs(GetSlope(receiver, pos));
     
     if (steepestSlope <= 0.0)
+    {
+        _OutHeightRT[pos] = currentHeight / _MaxHeight;
         return;
+    }
     
-    float streamPower = pow(stream, _ErosionPSA) * pow(steepestSlope, _ErosionPSL);
+    float streamPower = pow(stream, _ErosionPSA) * clamp(pow(steepestSlope, _ErosionPSL), 0.0, 1.0);
     streamPower = clamp(streamPower, 0.0, _MaxStreamPower);
     streamPower *= _ErosionK;
     
     float newHeight = currentHeight - _ErosionDT * streamPower;
     newHeight = max(newHeight, receiverHeight);
     
-    _OutHeightRT[pos] = newHeight;
+    _OutHeightRT[pos] = newHeight / _MaxHeight;
 }
 
 [numthreads(8, 8, 1)]
@@ -363,7 +374,7 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
     
     sediment += 0.1 * streamCapacity;
     
-    _OutHeightRT[pos] = height;
+    _OutHeightRT[pos] = height / _MaxHeight;
     _SedimentRT[pos] = sediment;
 }
 
@@ -424,4 +435,13 @@ void Breaching(uint3 id : SV_DispatchThreadID)
     }
     
     _TempRT[pos] = height;
+}
+
+[numthreads(8, 8, 1)]
+void ClearRT(uint3 id : SV_DispatchThreadID)
+{
+    uint2 pos = id.xy;
+    if (pos.x >= _Width || pos.y >= _Height)
+        return;
+    _RTToClear[pos] = 0.0;
 }
