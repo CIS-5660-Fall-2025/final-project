@@ -8,8 +8,15 @@ public class RippleEffect : MonoBehaviour
     public int TextureSize = 768;
     public RenderTexture ObjectsRT;
     private RenderTexture CurrRT, PrevRT, TempRT;
-    public Shader RippleShader, AddShader;
-    private Material RippleMat, AddMat;
+    public Shader RippleShader, AddShader, ScrollShader;
+    private Material RippleMat, AddMat, ScrollMat;
+
+    private Vector3 prevLocation;
+    private float rippleWorldSize = 200f;
+
+
+    [SerializeField] Transform targetTranform;
+    private Vector3 offset;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,17 +26,49 @@ public class RippleEffect : MonoBehaviour
         TempRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
         RippleMat = new Material(RippleShader);
         AddMat = new Material(AddShader);
+        ScrollMat = new Material(ScrollShader);
 
         //Change the texture in the material of this object to the render texture calculated by the ripple shader.
         GetComponent<Renderer>().material.SetTexture("_RippleTex", CurrRT);
 
+        prevLocation = transform.position;
+        offset = transform.position - targetTranform.position;
         StartCoroutine(ripples());
+    }
+    void Update() {
+        transform.position = targetTranform.position + offset;
     }
 
     // Update is called once per frame
     IEnumerator ripples()
     {
+        Vector3 playerOffset;
         while (true) {
+            playerOffset = transform.position - prevLocation;
+            if (playerOffset != Vector3.zero)
+            {
+                // Convert world offset to normalized UV offset
+                Vector2 uvOffset = new Vector2(
+                    playerOffset.x / rippleWorldSize,
+                    playerOffset.z / rippleWorldSize
+                );
+
+                // Negative offset to keep ripples fixed in world space
+                Vector4 offsetVec = new Vector4(-uvOffset.x, -uvOffset.y, 0, 0);
+                ScrollMat.SetVector("_Offset", offsetVec);
+
+                // Scroll CurrRT
+                ScrollMat.SetTexture("_MainTex", CurrRT);
+                Graphics.Blit(CurrRT, TempRT, ScrollMat);
+                Graphics.Blit(TempRT, CurrRT);
+
+                // Scroll PrevRT
+                ScrollMat.SetTexture("_MainTex", PrevRT);
+                Graphics.Blit(PrevRT, TempRT, ScrollMat);
+                Graphics.Blit(TempRT, PrevRT);
+            }
+
+
             //Copy the result of blending the render textures to TempRT.
             AddMat.SetTexture("_ObjectsRT", ObjectsRT);
             AddMat.SetTexture("_CurrentRT", CurrRT);
@@ -53,6 +92,7 @@ public class RippleEffect : MonoBehaviour
             PrevRT = CurrRT;
             CurrRT = rt;
 
+            prevLocation = transform.position;
             //Wait for two frames and then execute again.
             yield return null;
             yield return null;
