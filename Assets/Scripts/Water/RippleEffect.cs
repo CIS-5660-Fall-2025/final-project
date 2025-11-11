@@ -12,7 +12,7 @@ public class RippleEffect : MonoBehaviour
     private Material RippleMat, AddMat, ScrollMat;
 
     private Vector3 prevLocation;
-    private float rippleWorldSize = 200f;
+    private float rippleWorldSize = 300f;
 
 
     [SerializeField] Transform targetTranform;
@@ -80,6 +80,8 @@ public class RippleEffect : MonoBehaviour
             //CurrRT holds the new blended one, 
             //TempRT holds original CurrRT, texture is reused in next step
 
+            yield return null;
+
             //Calculate the ripple animation using ripple shader.
             RippleMat.SetTexture("_PrevRT", PrevRT);
             RippleMat.SetTexture("_CurrentRT", CurrRT);
@@ -94,6 +96,7 @@ public class RippleEffect : MonoBehaviour
 
             prevLocation = transform.position;
             //Wait for two frames and then execute again.
+            yield return null;
             yield return null;
             yield return null;
         }
