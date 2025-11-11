@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
 using System.IO;
@@ -74,6 +74,26 @@ public class GpuTerrainPipeline : MonoBehaviour
     public float depositionStrength = 1.0f;
     //[Range(1.0f, 5.0f)]
     public float rainIntensity = 2.6f;
+
+    RenderTexture _origHeightAtFinal;
+
+    void EnsureFinalOrigRT(int w, int h)
+    {
+        if (_origHeightAtFinal != null && (_origHeightAtFinal.width != w || _origHeightAtFinal.height != h))
+        {
+            _origHeightAtFinal.Release();
+            _origHeightAtFinal = null;
+        }
+        if (_origHeightAtFinal == null)
+        {
+            _origHeightAtFinal = new RenderTexture(w, h, 0, RenderTextureFormat.RFloat);
+            _origHeightAtFinal.enableRandomWrite = true;
+            _origHeightAtFinal.filterMode = FilterMode.Bilinear;
+            _origHeightAtFinal.wrapMode = TextureWrapMode.Clamp;
+            _origHeightAtFinal.Create();
+        }
+    }
+
 
     void Start()
     {
@@ -181,6 +201,12 @@ public class GpuTerrainPipeline : MonoBehaviour
                 Debug.Log(height.width);
             }
 
+            if (level == levels.Length - 1)
+            {
+                EnsureFinalOrigRT(height.width, height.height);
+                Graphics.CopyTexture(height, _origHeightAtFinal);
+            }
+
             // E: Erosion steps
             Debug.Log($"  Erosion: {schedule.erosionSteps} steps");
             for (int i = 0; i < schedule.erosionSteps; i++)
@@ -215,27 +241,30 @@ public class GpuTerrainPipeline : MonoBehaviour
             //tempRTs[level] = temp;
         }
 
-        //// R: Ridge/peak retargeting (after all levels)
-        //if (levels.Length > 0)
-        //{
-        //    Debug.Log("Retargeting to preserve ridges");
-        //    RenderTexture finalHeight = heightRTs[levels.Length - 1];
-        //    RenderTexture finalTemp = tempRTs[levels.Length - 1];
-        //    DiffuseRetarget(finalHeight, finalTemp);
-        //    Swap(ref finalHeight, ref finalTemp);
-        //    heightRTs[levels.Length - 1] = finalHeight;
-        //}
+        if (levels.Length > 0)
+        {
+            // fetch final-level RTs
+            RenderTexture finalHeight = heightRTs[levels.Length - 1];
+            RenderTexture finalTemp = tempRTs[levels.Length - 1];
+            RenderTexture finalStream = streamRTs[levels.Length - 1];
 
-        //// B: Multi-scale partial breaching
-        //if (levels.Length > 0)
-        //{
-        //    Debug.Log("Breaching to remove pits");
-        //    RenderTexture finalHeight = heightRTs[levels.Length - 1];
-        //    RenderTexture finalTemp = tempRTs[levels.Length - 1];
-        //    MultiBreaching(finalHeight, finalTemp);
-        //    Swap(ref finalHeight, ref finalTemp);
-        //    heightRTs[levels.Length - 1] = finalHeight;
-        //}
+            // Optional: recompute flow once so stream is fresh before breaching/retargeting
+            FlowRoutingOnce(finalHeight, finalStream);
+
+            // (B) Multi-scale partial breaching (coarse->fine)
+            Debug.Log("Breaching to remove pits");
+            MultiBreaching(finalHeight, finalTemp);
+            Swap(ref finalHeight, ref finalTemp);
+
+            // (R) Diffusion-based retargeting (paper math, uses pristine original snapshot)
+            Debug.Log("Retargeting to preserve ridges");
+            DiffuseRetarget(finalHeight, _origHeightAtFinal, finalStream, finalTemp);
+            Swap(ref finalHeight, ref finalTemp);
+
+            // store back
+            heightRTs[levels.Length - 1] = finalHeight;
+            tempRTs[levels.Length - 1] = finalTemp;
+        }
 
         Debug.Log("Multi-scale pipeline complete");
     }
@@ -294,24 +323,58 @@ public class GpuTerrainPipeline : MonoBehaviour
         DispatchFor(height, kDeposit);
     }
 
-    void DiffuseRetarget(RenderTexture height, RenderTexture dst)
+    void DiffuseRetarget(RenderTexture height, RenderTexture origAtThisLevel, RenderTexture stream, RenderTexture dst)
     {
         SetCommonUniforms(height);
         erosionCS.SetTexture(kRetarget, "_InHeightRT", height);
+        erosionCS.SetTexture(kRetarget, "_OrigHeightRT", origAtThisLevel);
+        erosionCS.SetTexture(kRetarget, "_StreamRT", stream);
         erosionCS.SetTexture(kRetarget, "_TempRT", dst);
+
+        erosionCS.SetFloat("_A0", 2.0f);         // ridge/peak threshold
+        erosionCS.SetInt("_RetargetIters", 300);
+        erosionCS.SetFloat("_DiffusionLambda", 0.25f);
+
         DispatchFor(height, kRetarget);
     }
 
     void MultiBreaching(RenderTexture height, RenderTexture dst)
     {
-        for (int iter = 0; iter < 3; iter++)
+        int[] radii = new[] { 8, 4, 2, 1 };
+
+        SetCommonUniforms(height);
+        erosionCS.SetInt("_BreachIters", 12);
+        erosionCS.SetFloat("_CarveEps", 1e-3f);
+
+        foreach (int r in radii)
         {
-            SetCommonUniforms(height);
+            erosionCS.SetInt("_Radius", r);
+
+            // Pass 0: horizontal blur Δ -> dst
+            erosionCS.SetInt("_BlurPass", 0);
             erosionCS.SetTexture(kBreach, "_InHeightRT", height);
             erosionCS.SetTexture(kBreach, "_TempRT", dst);
             DispatchFor(height, kBreach);
+
+            // Pass 1: vertical blur Δ -> dst
+            erosionCS.SetInt("_BlurPass", 1);
+            erosionCS.SetTexture(kBreach, "_InHeightRT", height);
+            erosionCS.SetTexture(kBreach, "_TempRT", dst);
+            DispatchFor(height, kBreach);
+
+            // Pass 2: apply T' = T - Δ_blur -> dst
+            erosionCS.SetInt("_BlurPass", 2);
+            erosionCS.SetTexture(kBreach, "_InHeightRT", height);
+            erosionCS.SetTexture(kBreach, "_TempRT", dst);
+            DispatchFor(height, kBreach);
+
+            // Now the new terrain is in 'dst'; make it the source for the next radius
             Swap(ref height, ref dst);
         }
+
+        // Persist the final result back into your dictionaries
+        heightRTs[levels.Length - 1] = height;
+        tempRTs[levels.Length - 1] = dst;
     }
 
     void SetCommonUniforms(RenderTexture rt)
