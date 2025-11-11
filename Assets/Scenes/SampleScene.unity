@@ -617,7 +617,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 457837275}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1221,8 +1221,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 457837277}
-  - {fileID: 2078417130}
   - {fileID: 1383341298}
+  - {fileID: 2078417130}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1543947024 stripped
@@ -1271,7 +1271,7 @@ Transform:
   m_GameObject: {fileID: 2078417129}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5000005, z: -12}
   m_LocalScale: {x: 40, y: 40, z: 40}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -1397,7 +1397,7 @@ PrefabInstance:
     - target: {fileID: 1062287867716658088, guid: e61deb181e375374b9fbe8243eaf1949,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -3.6
       objectReference: {fileID: 0}
     - target: {fileID: 1062287867716658088, guid: e61deb181e375374b9fbe8243eaf1949,
         type: 3}
@@ -1439,6 +1439,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1241595188941829464, guid: e61deb181e375374b9fbe8243eaf1949,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.49
+      objectReference: {fileID: 0}
+    - target: {fileID: 1241595188941829464, guid: e61deb181e375374b9fbe8243eaf1949,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 8.12
+      objectReference: {fileID: 0}
     - target: {fileID: 5339638620209355985, guid: e61deb181e375374b9fbe8243eaf1949,
         type: 3}
       propertyPath: m_Name
@@ -1447,13 +1457,18 @@ PrefabInstance:
     - target: {fileID: 5974577662503578012, guid: e61deb181e375374b9fbe8243eaf1949,
         type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 3
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 6258799801910036744, guid: e61deb181e375374b9fbe8243eaf1949,
         type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 7235782582945667950, guid: e61deb181e375374b9fbe8243eaf1949,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.007
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

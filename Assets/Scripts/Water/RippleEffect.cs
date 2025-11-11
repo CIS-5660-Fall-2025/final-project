@@ -53,7 +53,8 @@ public class RippleEffect : MonoBehaviour
             PrevRT = CurrRT;
             CurrRT = rt;
 
-            //Wait for one frame and then execute again.
+            //Wait for two frames and then execute again.
+            yield return null;
             yield return null;
         }
     }

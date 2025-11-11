@@ -12,11 +12,13 @@ public class Player : MonoBehaviour, IDamagable
     public int Health { get; set;} = 1600;
 
     float fireDelay, torpedoFireDelay;
+    private Plane targetPlane;
 
     // Start is called before the first frame update
     void Start()
     {
         ship = GetComponent<Ship>();
+        targetPlane = new Plane(Vector3.up, Vector3.zero);
     }
 
     // Update is called once per frame
@@ -37,9 +39,8 @@ public class Player : MonoBehaviour, IDamagable
         
         //target
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(Vector3.up, Vector3.up * 0.5f);
 
-        if (plane.Raycast(ray, out float distance))
+        if (targetPlane.Raycast(ray, out float distance))
         {
             Vector3 worldPoint = ray.GetPoint(distance);
 
