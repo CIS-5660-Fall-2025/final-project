@@ -70,7 +70,9 @@ float SampleHeightClamped(int x, int y, uint w, uint h)
 {
     x = clamp(x, 0, (int) w - 1);
     y = clamp(y, 0, (int) h - 1);
-    return _InHeightRT.Load(int3(x, y, 0)) * _MaxHeight;
+    //return _InHeightRT.Load(int3(x, y, 0)) * _MaxHeight;
+    return _InHeightRT.Load(int3(x, y, 0));
+
 }
 
 [numthreads(8, 8, 1)]
@@ -114,7 +116,8 @@ void Upsample2x(uint3 id : SV_DispatchThreadID)
     
     float h = CubicCatmullRom(rowVal[0], rowVal[1], rowVal[2], rowVal[3], t.y);
 
-    _OutHeightRT[dstXY] = h / _MaxHeight;
+    //_OutHeightRT[dstXY] = h / _MaxHeight;
+    _OutHeightRT[dstXY] = h;
 }
 
 bool IsInBounds(int2 p)
@@ -152,7 +155,9 @@ float GetDistance(int2 a, int2 b)
 float GetHeight(int2 p)
 {
     p = GetClampedCoord(p);
-    return _InHeightRT[p] * _MaxHeight;
+    //return _InHeightRT[p] * _MaxHeight;
+    return _InHeightRT[p];
+
 }
 
 float GetSlope(int2 p, int2 q)
@@ -275,7 +280,8 @@ void ErosionStep(uint3 id : SV_DispatchThreadID)
     
     if (steepestSlope <= 0.0)
     {
-        _OutHeightRT[pos] = currentHeight / _MaxHeight;
+        //_OutHeightRT[pos] = currentHeight / _MaxHeight;
+        _OutHeightRT[pos] = currentHeight;
         return;
     }
     
@@ -286,7 +292,8 @@ void ErosionStep(uint3 id : SV_DispatchThreadID)
     float newHeight = currentHeight - _ErosionDT * streamPower;
     newHeight = max(newHeight, receiverHeight);
     
-    _OutHeightRT[pos] = newHeight / _MaxHeight;
+    //_OutHeightRT[pos] = newHeight / _MaxHeight;
+    _OutHeightRT[pos] = newHeight;
 }
 
 [numthreads(8, 8, 1)]
@@ -375,19 +382,16 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
     
     sediment += 0.1 * streamCapacity;
     
-    _OutHeightRT[pos] = height / _MaxHeight;
+    //_OutHeightRT[pos] = height / _MaxHeight;
+    _OutHeightRT[pos] = height;
     _SedimentRT[pos] = sediment;
 }
-
 
 float _A0; // drainage threshold to pick constraints (ridges/peaks)
 int _RetargetIters; // e.g., 200-500 (paper uses ~500)
 float _DiffusionLambda; // e.g., 0.25 (stable for 4-neighbor laplacian)
 
-
 static const int2 N4[4] = { int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1) };
-
-
 
 [numthreads(8, 8, 1)]
 void Retargeting(uint3 id : SV_DispatchThreadID)
