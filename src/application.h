@@ -16,7 +16,7 @@ using namespace wgpu;
 class Application {
     public:
     
-    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr), vertexBuffer(nullptr) {}
+    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr), vertexBuffer(nullptr), indexBuffer(nullptr) {}
     bool Initialize(); // Was initialization succesful?
     void Terminate();
     void MainLoop(); // Draw frame and handle events
@@ -37,5 +37,7 @@ class Application {
 
     void InitializeBuffers();
     Buffer vertexBuffer;
+    Buffer indexBuffer;
     uint32_t vertexCount;
+    uint32_t indexCount;
 };

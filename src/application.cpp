@@ -382,6 +382,7 @@ bool Application::Initialize() {
 
 void Application::Terminate() {
     vertexBuffer.release();
+    indexBuffer.release();
 
     pipeline.release();
 
@@ -552,8 +553,9 @@ void Application::MainLoop() {
 
     // What to draw here
     renderPass.setPipeline(pipeline);
-    renderPass.setVertexBuffer(0, vertexBuffer, 0, vertexBuffer.getSize());
-    renderPass.draw(6, 2, 0, 0);
+    renderPass.setVertexBuffer(0, vertexBuffer, 0, vertexBuffer.getSize()); // Could change geo here
+    renderPass.setIndexBuffer(indexBuffer, IndexFormat::Uint32, 0, indexBuffer.getSize());
+    renderPass.drawIndexed(indexCount, 1, 0, 0, 0);
 
     renderPass.end();
     renderPass.release();
@@ -639,14 +641,33 @@ void Application::InitializeBuffers() {
         -0.7f, -0.9f,  0.0f, 1.0f, 0.0f,
         -0.85f,-0.7f,  0.0f, 0.0f, 1.0f
     };
-
     vertexCount = static_cast<uint32_t>(positions.size())/5;
 
+    // indices must be uint16_t or uint32_t
+    vector<uint32_t> indices = {
+        0, 1, 2,
+        3, 4, 5,
+        0, 1, 5
+    };
+    indexCount = static_cast<uint32_t>(indices.size());
+
+    // Vertex Buffer
     BufferDescriptor bufferDesc;
     bufferDesc.size = positions.size() * sizeof(float);
     bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Vertex;
     bufferDesc.mappedAtCreation = false;
     vertexBuffer = device.createBuffer(bufferDesc);
-
     queue.writeBuffer(vertexBuffer, 0, positions.data(), bufferDesc.size);
+
+    // Index Buffer
+    BufferDescriptor indexBufferDesc;
+    indexBufferDesc.size = indices.size() * sizeof(uint32_t);
+    indexBufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Index;
+    indexBufferDesc.mappedAtCreation = false;
+    indexBuffer = device.createBuffer(indexBufferDesc);
+    queue.writeBuffer(indexBuffer, 0, indices.data(), indexBufferDesc.size);
+    
+    // !!! Buffers must be multiple of 4 bytes
+    // So make sure your data AND buffer is a good size
+    // Could be arbitrary data just avoid trash data
 }
