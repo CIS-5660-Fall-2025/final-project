@@ -8,9 +8,10 @@ public class Player : MonoBehaviour, IDamagable
     [SerializeField] Transform targetTransform;
     Ship ship;
     [SerializeField] PlayerTurret[] turrets;
+    [SerializeField] PlayerLauncher[] launchers;
     public int Health { get; set;} = 1600;
 
-    float fireDelay;
+    float fireDelay, torpedoFireDelay;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +22,7 @@ public class Player : MonoBehaviour, IDamagable
     // Update is called once per frame
     void Update()
     {
+        //movement
         if (Input.GetKey(KeyCode.A)) {
             ship.Turn(true);
         } else if (Input.GetKey(KeyCode.D)) {
@@ -32,7 +34,8 @@ public class Player : MonoBehaviour, IDamagable
         } else if (Input.GetKey(KeyCode.S)) {
             ship.Accelerate(false);
         }
-
+        
+        //target
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         Plane plane = new Plane(Vector3.up, Vector3.up * 0.5f);
 
@@ -44,13 +47,21 @@ public class Player : MonoBehaviour, IDamagable
             targetTransform.position = worldPoint;
         }
 
+        //firing
         fireDelay -= Time.deltaTime;
+        torpedoFireDelay -= Time.deltaTime;
         if (Input.GetMouseButton(0) && fireDelay < 0.001f) {
             fireDelay = 0.1f;
             for (int i = 0; i < turrets.Length; i++) {
                 if (turrets[i].FireGuns()) break;
             }
-        } 
+        }
+        if (Input.GetMouseButton(1) && torpedoFireDelay < 0.001f) {
+            torpedoFireDelay = 0.25f;
+            for (int i = 0; i < launchers.Length; i++) {
+                if (launchers[i].FireTorpedos()) break;
+            }
+        }
     }
 
     public void InflictDamage(int dmg) {

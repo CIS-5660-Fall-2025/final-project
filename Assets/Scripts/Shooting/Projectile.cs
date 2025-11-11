@@ -8,12 +8,7 @@ public class Projectile : MonoBehaviour
     private Rigidbody rb;
 
     private int damage;
-    private float lifetime;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
+    private float lifetime = 0;
 
     // Update is called once per frame
     void Update()
@@ -21,7 +16,9 @@ public class Projectile : MonoBehaviour
         model.forward = rb.velocity.normalized;
 
         lifetime += Time.deltaTime;
-        if (lifetime > 5) Destroy(gameObject);
+        if (lifetime > 5) {
+            BulletPool.bulletPool.Release(this);
+        }
     }
 
     void FixedUpdate() {
@@ -37,12 +34,20 @@ public class Projectile : MonoBehaviour
     }
 
     private void Destruction() {
-        Destroy(gameObject);
+        
+        BulletPool.bulletPool.Release(this);
     }
 
     public void SetValues(int dmg, Vector3 velocity) {
         rb = GetComponent<Rigidbody>();
         damage = dmg;
         rb.velocity = velocity;
+
+        //spawn particle system
+    }
+
+    public void ResetValues() {
+        lifetime = 0;
+        rb.velocity = Vector3.zero;
     }
 }

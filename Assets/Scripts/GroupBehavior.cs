@@ -13,6 +13,7 @@ public abstract class GroupBehavior : MonoBehaviour
     protected float separationWeight;
 
     protected float enemyRadius;
+    protected float neighborRadius;
     protected float separationRadius;
 
     protected Vector3 Seek(Vector3 target)
@@ -47,8 +48,15 @@ public abstract class GroupBehavior : MonoBehaviour
         foreach (IBoid other in l)
         {
             if (other == this) continue;
-            center += other.GetPosition();
-            count++;
+            Vector3 diff = transform.position - other.GetPosition();
+            diff.y = 0f;
+
+            float dist = diff.magnitude;
+            if (dist < neighborRadius && dist > 0f)
+            {
+                center += other.GetPosition();
+                count++;
+            }
         }
 
         if (count == 0) return Vector3.zero;
@@ -65,8 +73,15 @@ public abstract class GroupBehavior : MonoBehaviour
         foreach (IBoid other in l)
         {
             if (other == this) continue;
-            avgVelocity += other.GetVelocity();
-            count++;
+            Vector3 diff = transform.position - other.GetPosition();
+            diff.y = 0f;
+
+            float dist = diff.magnitude;
+            if (dist < neighborRadius && dist > 0f)
+            {
+                avgVelocity += other.GetVelocity();
+                count++;
+            }
         }
 
         if (count == 0) return Vector3.zero;

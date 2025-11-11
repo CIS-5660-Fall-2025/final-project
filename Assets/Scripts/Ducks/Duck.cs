@@ -21,6 +21,7 @@ public class Duck : GroupBehavior, IDamagable, IBoid
         separationWeight = 1.4f;
 
         enemyRadius = 16f;
+        neighborRadius = 15f;
         separationRadius = 7f;
 
         velocity = Random.insideUnitSphere;

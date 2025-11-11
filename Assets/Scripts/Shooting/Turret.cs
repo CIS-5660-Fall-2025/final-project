@@ -7,7 +7,7 @@ public abstract class Turret : MonoBehaviour
     [SerializeField] GameObject shellPrefab;
     [SerializeField] Transform targetTransform;
     [SerializeField] protected Transform turretBase, turret;
-    [SerializeField] Transform firePoint;
+    [SerializeField] protected Transform[] firePoints;
     [Header("Constraints")]
     public bool FrontBlocked;
     public bool BackBlocked;
@@ -19,7 +19,10 @@ public abstract class Turret : MonoBehaviour
     public float cTurretTurn;
     [Header("Projectile Settings")]
     public int damage;
-    public int bulletSpeed;
+    public float bulletSpeed;
+
+    protected bool freezeRotation;
+    protected int torpedosLoaded;
     
 
     protected bool CheckAngle() {
@@ -54,22 +57,70 @@ public abstract class Turret : MonoBehaviour
         }
     }
 
+    protected bool PlayerFireTorpedo(float lifespan) {
+        if (torpedosLoaded < 1 || !CheckAngle() || !CheckAim() || getDist() < 1f) return false;
+        torpedosLoaded--;
+
+        Vector3 dir = turret.forward;
+        dir.y = 0;
+        GameObject torpedo = Instantiate(shellPrefab, firePoints[torpedosLoaded].position, Quaternion.identity);
+        torpedo.transform.forward = dir.normalized;
+        torpedo.GetComponent<Torpedo>().SetValues(damage, bulletSpeed, lifespan);
+
+        return true;
+    }
+
+    protected bool EnemyFireTorpedo(float lifespan, float spread) {
+        if (reloadTimer > 0.01f || !CheckAngle() || !CheckAim() || getDist() < 1f) return false;
+        reloadTimer = 1000f;
+
+        StartCoroutine(EnemyTorpSpreadCor(lifespan, spread));
+        return true;
+    }
+
+    protected IEnumerator EnemyTorpSpreadCor(float lifespan, float spread) {
+        freezeRotation = true;
+        float increment = spread / (firePoints.Length - 1);
+
+        for (int i = 0; i < firePoints.Length; i++) {
+            
+            Vector3 dir = turret.forward;
+            dir.y = 0;
+            Vector3 offsetDir = Quaternion.Euler(0, -spread / 2 + i * increment, 0) * dir;
+            GameObject torpedo = Instantiate(shellPrefab, firePoints[i].position, Quaternion.identity);
+            torpedo.transform.forward = offsetDir.normalized;
+            torpedo.GetComponent<Torpedo>().SetValues(damage, bulletSpeed, lifespan);
+
+            yield return new WaitForSeconds(0.2f);
+        }
+        
+        reloadTimer = ReloadTime;
+        freezeRotation = false;
+    }
+
     protected bool Fire(bool offset, float offsetAmount = 1f) {
-        if (reloadTimer > 0.01f || !CheckAngle() || !CheckAim() || getDist() < 2.4f) return false;
+        if (reloadTimer > 0.01f || !CheckAngle() || !CheckAim() || getDist() < 3f) return false;
         reloadTimer = ReloadTime;
 
+        if (firePoints.Length > 1) offset = true;
+
         Vector3 targetPos = targetTransform.position;
-        if (offset) {
-            Vector3 offsetPos = Random.insideUnitSphere * offsetAmount;
-            offsetPos.y = 0;
-            targetPos += offsetPos;
+
+        for (int i = 0; i < firePoints.Length; i++) {
+            Vector3 newPos = targetPos;
+            if (offset) {
+                Vector3 offsetPos = Random.insideUnitSphere * offsetAmount;
+                offsetPos.y = 0;
+                newPos += offsetPos;
+            }
+
+            Vector3 bulletDir = Math.CalculateElevation(firePoints[i].position, newPos, 4f, bulletSpeed);
+            if (bulletDir.magnitude < 0.5f) return false;
+
+            Projectile shell = BulletPool.bulletPool.Get();
+            shell.gameObject.transform.position = firePoints[i].position;
+            shell.SetValues(damage, bulletSpeed * bulletDir);
         }
-
-        Vector3 bulletDir = Math.CalculateElevation(firePoint.position, targetPos, 4f, bulletSpeed);
-        if (bulletDir.magnitude < 0.5f) return false;
-
-        GameObject shell = Instantiate(shellPrefab, firePoint.position, Quaternion.identity);
-        shell.GetComponent<Projectile>().SetValues(damage, bulletSpeed * bulletDir);
         return true;
     }
 
