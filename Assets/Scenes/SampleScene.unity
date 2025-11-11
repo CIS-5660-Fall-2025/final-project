@@ -508,7 +508,7 @@ MonoBehaviour:
   levels:
   - erosionSteps: 3000
     thermalSteps: 0
-    depositionSteps: 100
+    depositionSteps: 200
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2
@@ -661,10 +661,7 @@ MonoBehaviour:
   terrainMaxHeight: 3000
   erosionCS: {fileID: 7200000, guid: f03bb276a36b8dc47909477c28e5996a, type: 3}
   baseResolution: 256
-  levels:
-  - erosionSteps: 3000
-    thermalSteps: 0
-    depositionSteps: 0
+  levels: []
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2

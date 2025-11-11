@@ -192,6 +192,8 @@ public class GpuTerrainPipeline : MonoBehaviour
             var schedule = levels[level];
 
             ClearRT(temp);
+            ClearRT(sediment);
+            ClearRT(stream);
 
             // U: Upsample if not first level
             if (level > 0)

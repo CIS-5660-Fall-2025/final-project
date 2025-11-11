@@ -156,7 +156,7 @@ float GetSlope(int2 p, int2 q)
 {
     if (!IsInBounds(p) || !IsInBounds(q) || (p.x == q.x && p.y == q.y))
         return 0.0;
-    float dh = GetHeight(p) - GetHeight(q); 
+    float dh = GetHeight(q) - GetHeight(p); 
     float dist = GetDistance(p, q);
     return dh / dist;
 }
@@ -167,7 +167,7 @@ void GetFlowWeights(int2 p, out float weights[8])
     for (int i = 0; i < 8; i++)
     {
         int2 q = p + next8[i];
-        float s = GetSlope(p, q); 
+        float s = GetSlope(q, p); 
         if (s > 0.0)
         {
             weights[i] = pow(s, _FlowP);
@@ -237,7 +237,7 @@ int2 GetSteepestNeighbor(int2 p)
     for (int i = 0; i < 8; i++)
     {
         int2 q = p + next8[i];
-        float s = GetSlope(p, q); 
+        float s = GetSlope(q, p); 
         if (s > bestS)
         {
             bestS = s;
