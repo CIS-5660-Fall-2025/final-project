@@ -45,8 +45,10 @@ static const float diagonalDist = 1.4142;
 uniform float _Talus = 30.0;
 uniform float _ThermalDT = 1.0;
 
+
 uniform float _DepositionStrength = 1.0;
 uniform float _RainIntensity = 2.6;
+
 
 [numthreads(8, 8, 1)]
 void CopyFromTexture(uint3 id : SV_DispatchThreadID)
@@ -155,39 +157,36 @@ float GetHeight(int2 p)
     return _InHeightRT[p] * _MaxHeight;
 }
 
-float GetSlope(int2 p, int2 q)
+float GetSlope(int2 p, int2 q)  
 {
-    if (!IsInBounds(p) || !IsInBounds(q))
+    if (!IsInBounds(p) || !IsInBounds(q) || (p.x == q.x && p.y == q.y))
         return 0.0;
-    if (p.x == q.x && p.y == q.y)
-        return 0.0;
-    
-    float dh = GetHeight(q) - GetHeight(p);
+    float dh = GetHeight(p) - GetHeight(q); 
     float dist = GetDistance(p, q);
     return dh / dist;
 }
 
 void GetFlowWeights(int2 p, out float weights[8])
 {
-    float slopeSum = 0.0;
-    
+    float sumW = 0.0;
     for (int i = 0; i < 8; i++)
     {
-        float slope = GetSlope(p + next8[i], p);
-        if (slope > 0.0)
+        int2 q = p + next8[i];
+        float s = GetSlope(p, q); 
+        if (s > 0.0)
         {
-            weights[i] = pow(abs(slope), _FlowP);
-            slopeSum += weights[i];
+            weights[i] = pow(s, _FlowP);
+            sumW += weights[i];
         }
         else
         {
             weights[i] = 0.0;
         }
     }
-    
-    slopeSum = (slopeSum < 0.00001) ? 1.0 : slopeSum;
+    if (sumW < 1e-5)
+        sumW = 1.0;
     for (int i = 0; i < 8; i++)
-        weights[i] /= slopeSum;
+        weights[i] /= sumW;
 }
 
 float GetStream(int2 p)
@@ -238,20 +237,19 @@ void FlowRouting(uint3 id : SV_DispatchThreadID)
 
 int2 GetSteepestNeighbor(int2 p)
 {
-    int2 steepest = int2(0, 0);
-    float maxSlope = 0.0;
-    
+    int2 best = int2(0, 0);
+    float bestS = 0.0;
     for (int i = 0; i < 8; i++)
     {
-        int2 neighbor = p + next8[i];
-        float slope = GetSlope(neighbor, p);
-        if (slope > maxSlope)
+        int2 q = p + next8[i];
+        float s = GetSlope(p, q); 
+        if (s > bestS)
         {
-            maxSlope = slope;
-            steepest = next8[i];
+            bestS = s;
+            best = next8[i];
         }
     }
-    return steepest;
+    return best;
 }
 
 [numthreads(8, 8, 1)]
