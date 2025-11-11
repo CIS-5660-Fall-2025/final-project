@@ -191,7 +191,6 @@ public class GpuTerrainPipeline : MonoBehaviour
 
             var schedule = levels[level];
 
-            ClearRT(stream);
             ClearRT(temp);
 
             // U: Upsample if not first level
@@ -216,25 +215,25 @@ public class GpuTerrainPipeline : MonoBehaviour
                 Swap(ref stream, ref temp);
                 ErodeOnce(height, stream, temp);
                 Swap(ref height, ref temp);
-                PrintRTValues(height, "height");
             }
 
-            //// T: Thermal relaxation steps
-            //Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
-            //for (int i = 0; i < schedule.thermalSteps; i++)
-            //{
-            //    ThermalOnce(height, temp);
-            //    Swap(ref height, ref temp);
-            //}
+            // T: Thermal relaxation steps
+            Debug.Log($"  Thermal: {schedule.thermalSteps} steps");
+            for (int i = 0; i < schedule.thermalSteps; i++)
+            {
+                ThermalOnce(height, temp);
+                Swap(ref height, ref temp);
+            }
 
-            //// D: Deposition steps
-            //Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
-            //for (int i = 0; i < schedule.depositionSteps; i++)
-            //{
-            //    FlowRoutingOnce(height, stream);
-            //    DepositOnce(height, stream, sediment, temp);
-            //    Swap(ref height, ref temp);
-            //}
+            // D: Deposition steps
+            Debug.Log($"  Deposition: {schedule.depositionSteps} steps");
+            for (int i = 0; i < schedule.depositionSteps; i++)
+            {
+                FlowRoutingOnce(height, stream, temp);
+                Swap(ref stream, ref temp);
+                DepositOnce(height, stream, sediment, temp);
+                Swap(ref height, ref temp);
+            }
 
             // Store result back
             heightRTs[level] = height;

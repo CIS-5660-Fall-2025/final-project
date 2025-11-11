@@ -315,7 +315,21 @@ void ThermalStep(uint3 id : SV_DispatchThreadID)
         height += _ThermalDT * avgChange * 0.1;
     }
     
-    _TempRT[pos] = height;
+    _TempRT[pos] = height / _MaxHeight;
+}
+
+bool CheckPit(int2 p)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        int2 q = p + next8[i];
+        if (!IsInBounds(q))
+            continue;
+        float slope = GetSlope(q, p);
+        if (slope > 0.0)
+            return false;
+    }
+    return true;
 }
 
 [numthreads(8, 8, 1)]
@@ -328,6 +342,11 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
     float height = GetHeight(pos);
     float stream = GetStream(pos);
     float sediment = GetSediment(pos);
+    
+    if (!CheckPit(pos))
+    {
+        sediment = 0.0;
+    }
     
     float incomingSediment = 0.0;
     for (int i = 0; i < 8; i++)
@@ -364,7 +383,6 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
     sediment += 0.1 * streamCapacity;
     
     _OutHeightRT[pos] = height / _MaxHeight;
-    _OutHeightRT[pos] = height;
     _SedimentRT[pos] = sediment;
 }
 

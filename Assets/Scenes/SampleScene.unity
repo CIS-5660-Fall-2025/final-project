@@ -506,18 +506,18 @@ MonoBehaviour:
   erosionCS: {fileID: 7200000, guid: f03bb276a36b8dc47909477c28e5996a, type: 3}
   baseResolution: 256
   levels:
-  - erosionSteps: 2000
-    thermalSteps: 600
-    depositionSteps: 0
+  - erosionSteps: 3000
+    thermalSteps: 0
+    depositionSteps: 100
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2
   erosionDT: 1
   flowP: 1.3
+  rainIntensity: 2.6
   talus: 30
   thermalDT: 1
   depositionStrength: 1
-  rainIntensity: 2.6
 --- !u!4 &429945726
 Transform:
   m_ObjectHideFlags: 0
@@ -661,16 +661,19 @@ MonoBehaviour:
   terrainMaxHeight: 3000
   erosionCS: {fileID: 7200000, guid: f03bb276a36b8dc47909477c28e5996a, type: 3}
   baseResolution: 256
-  levels: []
+  levels:
+  - erosionSteps: 3000
+    thermalSteps: 0
+    depositionSteps: 0
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2
   erosionDT: 1
   flowP: 1.3
+  rainIntensity: 2.6
   talus: 30
   thermalDT: 1
   depositionStrength: 1
-  rainIntensity: 2.6
 --- !u!4 &2128481915
 Transform:
   m_ObjectHideFlags: 0
