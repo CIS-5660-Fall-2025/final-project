@@ -507,8 +507,17 @@ MonoBehaviour:
   baseResolution: 256
   levels:
   - erosionSteps: 3000
-    thermalSteps: 0
-    depositionSteps: 200
+    thermalSteps: 200
+    depositionSteps: 50
+  - erosionSteps: 3000
+    thermalSteps: 200
+    depositionSteps: 50
+  - erosionSteps: 3000
+    thermalSteps: 200
+    depositionSteps: 50
+  - erosionSteps: 3000
+    thermalSteps: 200
+    depositionSteps: 50
   erosionK: 0.0005
   erosionPSA: 0.8
   erosionPSL: 2

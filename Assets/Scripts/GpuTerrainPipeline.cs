@@ -203,11 +203,11 @@ public class GpuTerrainPipeline : MonoBehaviour
                 Debug.Log(height.width);
             }
 
-            //if (level == levels.Length - 1)
-            //{
-            //    EnsureFinalOrigRT(height.width, height.height);
-            //    Graphics.CopyTexture(height, _origHeightAtFinal);
-            //}
+            if (level == levels.Length - 1)
+            {
+                EnsureFinalOrigRT(height.width, height.height);
+                Graphics.CopyTexture(height, _origHeightAtFinal);
+            }
 
             // E: Erosion steps
             Debug.Log($"  Erosion: {schedule.erosionSteps} steps");
@@ -244,30 +244,31 @@ public class GpuTerrainPipeline : MonoBehaviour
             tempRTs[level] = temp;
         }
 
-        //if (levels.Length > 0)
-        //{
-        //    // fetch final-level RTs
-        //    RenderTexture finalHeight = heightRTs[levels.Length - 1];
-        //    RenderTexture finalTemp = tempRTs[levels.Length - 1];
-        //    RenderTexture finalStream = streamRTs[levels.Length - 1];
+        if (levels.Length > 0)
+        {
+            // fetch final-level RTs
+            RenderTexture finalHeight = heightRTs[levels.Length - 1];
+            RenderTexture finalTemp = tempRTs[levels.Length - 1];
+            RenderTexture finalStream = streamRTs[levels.Length - 1];
 
-        //    // Optional: recompute flow once so stream is fresh before breaching/retargeting
-        //    FlowRoutingOnce(finalHeight, finalStream);
+            // Optional: recompute flow once so stream is fresh before breaching/retargeting
+            FlowRoutingOnce(finalHeight, finalStream, finalTemp);
+            Swap(ref finalStream, ref finalTemp);
 
-        //    // (B) Multi-scale partial breaching (coarse->fine)
-        //    Debug.Log("Breaching to remove pits");
-        //    MultiBreaching(finalHeight, finalTemp);
-        //    Swap(ref finalHeight, ref finalTemp);
+            // (B) Multi-scale partial breaching (coarse->fine)
+            Debug.Log("Breaching to remove pits");
+            MultiBreaching(finalHeight, finalTemp);
+            Swap(ref finalHeight, ref finalTemp);
 
-        //    // (R) Diffusion-based retargeting (paper math, uses pristine original snapshot)
-        //    Debug.Log("Retargeting to preserve ridges");
-        //    DiffuseRetarget(finalHeight, _origHeightAtFinal, finalStream, finalTemp);
-        //    Swap(ref finalHeight, ref finalTemp);
+            // (R) Diffusion-based retargeting (paper math, uses pristine original snapshot)
+            Debug.Log("Retargeting to preserve ridges");
+            DiffuseRetarget(finalHeight, _origHeightAtFinal, finalStream, finalTemp);
+            Swap(ref finalHeight, ref finalTemp);
 
-        //    // store back
-        //    heightRTs[levels.Length - 1] = finalHeight;
-        //    tempRTs[levels.Length - 1] = finalTemp;
-        //}
+            // store back
+            heightRTs[levels.Length - 1] = finalHeight;
+            tempRTs[levels.Length - 1] = finalTemp;
+        }
 
         Debug.Log("Multi-scale pipeline complete");
     }

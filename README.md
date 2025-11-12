@@ -2,6 +2,20 @@
 
 Team members: Zixiao Wang, Tianhong Zhou
 
+## Milestone #1
+
+### Progress
+
+We've successfully implemented and reproduced the multi-scale hydraulic erosion algorithm described in the original paper. The core compute-shader stages, including Flow Routing, Erosion, Thermal Relaxation, Deposition, Retargeting, and Breaching, are now functional in Unity and produce results consistent with the reference implementation. We have also confirmed the correctness of our pipeline scheduling (upsampling, buffer swapping, and multi-level execution). The terrain evolution behaves as expected under controlled test parameters, and we can visualize intermediate heightmaps directly through Unity's GPU readback for debugging and validation.
+
+### Results
+
+Comparison between base height map (256 * 256) and generated height map (2048 * 2048)
+
+![](img/m1_result.png)
+
+![](img/m1_resultTexture.png)
+
 ## Design Doc
 
 #### Introduction

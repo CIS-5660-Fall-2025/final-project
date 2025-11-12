@@ -48,6 +48,23 @@ uniform float _ThermalDT = 1.0;
 
 uniform float _DepositionStrength = 1.0;
 
+float _A0;
+int _RetargetIters;
+float _DiffusionLambda;
+
+static const int2 N4[4] = { int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1) };
+
+int _BreachIters;
+float _CarveEps;
+int _Radius;
+int _BlurPass;
+
+SamplerState sampLinearClamp
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 [numthreads(8, 8, 1)]
 void CopyFromTexture(uint3 id : SV_DispatchThreadID)
@@ -387,12 +404,6 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
     _SedimentRT[pos] = sediment;
 }
 
-float _A0; // drainage threshold to pick constraints (ridges/peaks)
-int _RetargetIters;
-float _DiffusionLambda; 
-
-static const int2 N4[4] = { int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1) };
-
 [numthreads(8, 8, 1)]
 void Retargeting(uint3 id : SV_DispatchThreadID)
 {
@@ -451,20 +462,6 @@ void Retargeting(uint3 id : SV_DispatchThreadID)
 
     _TempRT[p] = hA + Et;
 }
-
-int _BreachIters; 
-float _CarveEps; 
-int _Radius; 
-int _BlurPass; 
-
-SamplerState sampLinearClamp
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-
 
 [numthreads(8, 8, 1)]
 void Breaching(uint3 id : SV_DispatchThreadID)
