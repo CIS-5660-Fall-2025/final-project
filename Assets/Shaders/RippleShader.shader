@@ -55,7 +55,7 @@ Shader "Unlit/RippleShader"
                 float p_center = tex2D(_PrevRT, uv).x;
 
                 float d = (p_down + p_up + p_left + p_right) / 2 - p_center;
-                d *= 0.96f;
+                d *= 0.99f;
                 return d;
             }
             ENDCG
