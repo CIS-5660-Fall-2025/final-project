@@ -1,5 +1,14 @@
 CIS 5660 Fall 2025 Final Project - Avi Serebrenik and Daniel Gerhardt
 
+### Progress Updates
+#### Milestone 1
+**Music Analysis:**
+It turns out that the Essentia audio analysis program is not fully supported in Windows, even though it is C++.
+After trying various methods, we found an executable that we can simply run from within UE5, which is what we currently use.
+With the .exe method, we have added music analysis of any music file as a load step, and we currently read BPM at runtime.
+
+**Level Generation:**
+
 ### Design Doc
 
 #### Introduction
