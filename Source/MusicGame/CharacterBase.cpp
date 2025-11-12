@@ -20,7 +20,15 @@ void ACharacterBase::BeginPlay()
 
 	FString songPath = Path + "/Content/Songs/WeWillRockYou.m4a";
 	FString name = "WeWillRockYou";
-	MusicAnalyzer::Analyze(songPath,name);
+	//MusicAnalyzer::Analyze(songPath,name);
+	float bpm = MusicAnalyzer::GetBPM(name);
+	const FString bpmString = FString::SanitizeFloat(bpm);
+	GEngine->AddOnScreenDebugMessage(
+		-1,                 // Key: A unique identifier for the message. -1 means no key, so it will be a new message each time.
+		5.0f,               // TimeToDisplay: How long the message will remain on screen (in seconds).
+		FColor::Red,        // DisplayColor: The color of the text.
+		bpmString // DebugMessage: The actual text to display. Use TEXT() macro for string literals.
+	);
 }
 
 // Called every frame
