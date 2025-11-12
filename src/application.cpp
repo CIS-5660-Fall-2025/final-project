@@ -4,6 +4,7 @@
 #include <vector>
 #include <assert.h>
 #include "webgpu_utils.h"
+#include "resource_manager.h"
 
 using namespace wgpu;
 using namespace std;
@@ -397,46 +398,14 @@ void Application::Terminate() {
 }
 
 void Application::InitializeRenderPipeline() {
-    const char* shaderSource = R"(
-struct VertexInput {
-	@location(0) position: vec2f,
-	@location(1) color: vec3f
-};
-
-struct VertexOutput {
-	@builtin(position) position: vec4f,
-	@location(0) color: vec3f
-};
-
-@vertex
-fn vs_main(vIn: VertexInput) -> VertexOutput {
-	var out: VertexOutput;
-	out.position = vec4f(vIn.position, 0.0, 1.0);
-	out.color = vIn.color;
-	return out;
-}
-
-@fragment
-fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-	return vec4(in.color, 1.0);
-}
-)";
 
     RenderPipelineDescriptor pipelineDesc;
 
-    // [...] Create Shader Module
-    ShaderModuleDescriptor shaderDesc;
-    #ifdef WEBGPU_BACKEND_WGPU
-    shaderDesc.hintCount = 0;
-    shaderDesc.hints = nullptr;
-    #endif
-    ShaderModuleWGSLDescriptor shaderCodeDesc;
-    shaderCodeDesc.chain.next = nullptr;
-    shaderCodeDesc.chain.sType = SType::ShaderModuleWGSLDescriptor; // It'll use this for casting
-    shaderCodeDesc.code = shaderSource;
-    shaderDesc.nextInChain = &shaderCodeDesc.chain; // Can later become a WGSLDescriptor again using the sType
-    ShaderModule shaderModule = device.createShaderModule(shaderDesc);
-
+    ShaderModule shaderModule = ResourceManager::LoadShaderModule(RESOURCE_DIR "/test_shader.wgsl", device);
+    if(shaderModule == nullptr) {
+        std::cerr << "Couldn't load shader!" << std::endl;
+        exit(1);
+    }
 
     // [...] Describe vertex pipeline state
         // [...] Describe vertex buffers

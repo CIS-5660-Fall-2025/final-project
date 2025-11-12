@@ -23,9 +23,22 @@ add_subdirectory(glfw3webgpu)
 set(SOURCE_FILES
 	main.cpp
 	application.cpp
-	webgpu_utils.cpp)
+	webgpu_utils.cpp
+	resource_manager.cpp)
 
 add_executable(App ${SOURCE_FILES})
+
+option(DEV_MODE "Development helper settings" ON)
+if(DEV_MODE)
+	target_compile_definitions(App PRIVATE
+	    RESOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/resources"
+	)
+else()
+	target_compile_definitions(App PRIVATE
+	    RESOURCE_DIR="./resources"
+	)
+endif()
+
 
 target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu)
 
@@ -49,5 +62,10 @@ endif()
 if (EMSCRIPTEN)
 	set_target_properties(App PROPERTIES SUFFIX ".html")
 	target_link_options(App PRIVATE -sASYNCIFY)
+
+	target_link_options(App PRIVATE
+    		--preload-file "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+	)
+
 endif()
 
