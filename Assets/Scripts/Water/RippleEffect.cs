@@ -12,7 +12,7 @@ public class RippleEffect : MonoBehaviour
     private Material RippleMat, AddMat, ScrollMat;
 
     private Vector3 prevLocation;
-    private float rippleWorldSize = 300f;
+    private float rippleWorldSize = 275f;
 
 
     [SerializeField] Transform targetTranform;

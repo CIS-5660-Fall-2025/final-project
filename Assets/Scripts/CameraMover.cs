@@ -23,7 +23,7 @@ public class CameraMover : MonoBehaviour
         {
             float step = 0.05f;
             offsetMultiplier -= Mathf.Sign(scrollValue) * step;
-            offsetMultiplier = Mathf.Clamp(offsetMultiplier, 0.3f, 1f);
+            offsetMultiplier = Mathf.Clamp(offsetMultiplier, 0.5f, 1f);
         }
     }
 

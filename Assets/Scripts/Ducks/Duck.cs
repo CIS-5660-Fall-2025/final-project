@@ -12,11 +12,11 @@ public class Duck : GroupBehavior, IDamagable, IBoid
     // Start is called before the first frame update
     void Start()
     {
-        moveSpeed = 2f;
+        moveSpeed = 2.5f;
 
         seekWeight = 0.8f;
-        fleeWeight = 2.0f;
-        cohesionWeight = 1f;
+        fleeWeight = 3f;
+        cohesionWeight = 1.2f;
         alignmentWeight = 0.4f;
         separationWeight = 1.4f;
 
@@ -35,7 +35,6 @@ public class Duck : GroupBehavior, IDamagable, IBoid
         Vector3 acceleration = Vector3.zero;
 
         acceleration += Seek(DuckManager.Instance.TargetPosition) * seekWeight;
-        acceleration += FleeEnemies(DuckManager.Instance.EnemyArray) * fleeWeight;
         acceleration += Cohesion(DuckManager.Instance.Ducks) * cohesionWeight;
         acceleration += Alignment(DuckManager.Instance.Ducks) * alignmentWeight;
         acceleration += Separation(DuckManager.Instance.Ducks) * separationWeight;
@@ -45,7 +44,7 @@ public class Duck : GroupBehavior, IDamagable, IBoid
 
         if (velocity.magnitude > 0.001f)
         {
-            transform.Translate(velocity * Time.deltaTime);
+            transform.Translate((velocity + FleeEnemies(DuckManager.Instance.EnemyArray) * fleeWeight) * Time.deltaTime);
             duckModel.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
         }
     }

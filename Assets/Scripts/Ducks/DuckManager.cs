@@ -8,7 +8,8 @@ public class DuckManager : MonoBehaviour
     public static DuckManager Instance;
     public List<IBoid> Ducks = new List<IBoid>();
     public List<Transform> EnemyArray = new List<Transform>();
-    public Vector3 TargetPosition = new Vector3(300, 0, 300);
+    [SerializeField] Transform[] possibleTargetPoints;
+    public Vector3 TargetPosition = new Vector3(0, 0, 0);
 
     private float healTimer = 10;
 
@@ -18,7 +19,9 @@ public class DuckManager : MonoBehaviour
     }
 
     void Start() {
-        //StartCoroutine(SetTargetAssignEnemy());
+        int randomIndex = (int) (Mathf.Clamp01(Random.value - 0.0001f) * possibleTargetPoints.Length);
+        TargetPosition = possibleTargetPoints[randomIndex].position;
+        StartCoroutine(SetTargetAssignEnemy());
     }
 
     void Update()
@@ -32,7 +35,23 @@ public class DuckManager : MonoBehaviour
     }
 
     private IEnumerator SetTargetAssignEnemy() {
-        yield return null;
+        yield return new WaitForSeconds(1);
+        while (true) {
+            Vector3 center = GetCenter();
+            if (Vector3.Distance(TargetPosition, center) < 40) {
+                int randomIndex = (int) (Mathf.Clamp01(Random.value - 0.0001f) * possibleTargetPoints.Length);
+                TargetPosition = possibleTargetPoints[randomIndex].position;
+            }
+
+            EnemyArray.Clear();
+            Collider[] hits = Physics.OverlapSphere(center, 60, (1 << 6) | (1 << 11));
+
+            foreach (Collider hit in hits)
+            {
+                EnemyArray.Add(hit.transform);
+            }
+            yield return new WaitForSeconds(8);
+        }
     }
 
     public void DuckDied(IBoid d) {
