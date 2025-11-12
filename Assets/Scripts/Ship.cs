@@ -72,7 +72,7 @@ public class Ship : MonoBehaviour
         if (increase) {
             currentForce = Mathf.Min(currentForce + accelSpeed * Time.deltaTime, maxForce);
         } else {
-            currentForce = Mathf.Max(currentForce - accelSpeed * Time.deltaTime, 0.5f);
+            currentForce = Mathf.Max(currentForce - accelSpeed * Time.deltaTime, -1.5f);
         }
     }
 

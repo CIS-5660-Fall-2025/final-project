@@ -1254,7 +1254,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 1}
+      maxColor: {r: 0.5990566, g: 0.5990566, b: 0.5990566, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -6875,9 +6875,9 @@ MonoBehaviour:
   turnSpeed: 15
   maxTurn: 20
   turnResistance: 0.8
-  maxSpeed: 10
-  maxForce: 6
-  accelSpeed: 2
+  maxSpeed: 12
+  maxForce: 7
+  accelSpeed: 3
 --- !u!54 &5149087286787182644
 Rigidbody:
   m_ObjectHideFlags: 0
