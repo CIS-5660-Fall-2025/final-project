@@ -2,20 +2,25 @@
 
 
 #include "CharacterBase.h"
+#include "MusicAnalyzer.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	FString Path = FPaths::GetPath(FPaths::GetProjectFilePath());
+
+	FString songPath = Path + "/Content/Songs/WeWillRockYou.m4a";
+	FString name = "WeWillRockYou";
+	MusicAnalyzer::Analyze(songPath,name);
 }
 
 // Called every frame
