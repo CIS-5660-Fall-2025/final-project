@@ -280,43 +280,44 @@ void ErosionStep(uint3 id : SV_DispatchThreadID)
 [numthreads(8, 8, 1)]
 void ThermalStep(uint3 id : SV_DispatchThreadID)
 {
-    int2 pos = int2(id.xy);
-    if (pos.x >= (int) _Width || pos.y >= (int) _Height)
+    const int2 p = int2(id.xy);
+    if (!IsInBounds(p))
         return;
-    
-    float talus_rad = radians(_Talus);
-    float tan_talus = tan(talus_rad);
-    
-    float height = GetHeight(pos);
-    float totalChange = 0.0;
-    int activeCount = 0;
-    
-    for (int i = 0; i < 8; i++)
+
+    const float dOrtho = _CellSize;
+    const float dDiag = _CellSize * 1.41421356;
+
+    const float s0 = tan(radians(_Talus)); 
+
+    const float hp = GetHeight(p); 
+    int alpha = 0; 
+    int beta = 0;
+
+    [unroll]
+    for (int k = 0; k < 8; ++k)
     {
-        int2 neighbor = pos + next8[i];
-        if (!IsInBounds(neighbor))
+        const int2 q = p + next8[k];
+        if (!IsInBounds(q))
             continue;
-        
-        float neighborHeight = GetHeight(neighbor);
-        float slope = GetSlope(neighbor, pos);
-        
-        if (slope > tan_talus)
-        {
-            float dist = GetDistance(pos, neighbor);
-            float targetHeight = neighborHeight + tan_talus * dist;
-            totalChange += (targetHeight - height);
-            activeCount++;
-        }
+
+        const float hq = GetHeight(q);
+        const float d = (next8[k].x == 0 || next8[k].y == 0) ? dOrtho : dDiag;
+
+        const float sp_to_q = (hp - hq) / d; 
+
+        if (sp_to_q > s0)
+            alpha++; 
+        if (sp_to_q < -s0)
+            beta++; 
     }
-    
-    if (activeCount > 0)
-    {
-        float avgChange = totalChange / (float) activeCount;
-        height += _ThermalDT * avgChange * 0.1;
-    }
-    
-    _TempRT[pos] = height / _MaxHeight;
+
+
+    const float kThermal = 0.02; 
+    const float hp_new = hp + _ThermalDT * kThermal * float(beta - alpha);
+
+    _TempRT[p] = hp_new / _MaxHeight; 
 }
+
 
 bool CheckPit(int2 p)
 {
@@ -387,8 +388,8 @@ void DepositStep(uint3 id : SV_DispatchThreadID)
 }
 
 float _A0; // drainage threshold to pick constraints (ridges/peaks)
-int _RetargetIters; // e.g., 200-500 (paper uses ~500)
-float _DiffusionLambda; // e.g., 0.25 (stable for 4-neighbor laplacian)
+int _RetargetIters;
+float _DiffusionLambda; 
 
 static const int2 N4[4] = { int2(1, 0), int2(-1, 0), int2(0, 1), int2(0, -1) };
 
@@ -399,22 +400,15 @@ void Retargeting(uint3 id : SV_DispatchThreadID)
     if (!IsInBounds(p))
         return;
 
-    // 1) Build constraint mask m(p) and target error δ(p) = h0 - hA at those points.
     const float hA = _InHeightRT[p];
     const float h0 = _OrigHeightRT[p];
     const float a = _StreamRT[p];
 
-    const bool isConstraint = (a < _A0); // ridge/peak proxy
-    const float delta = h0 - hA; // δ(p)
+    const bool isConstraint = (a < _A0); 
+    const float delta = h0 - hA; 
     
-    // 2) Jacobi diffusion of the error field E with pinned constraints:
-    //    E_{t+1}(p) = m*δ + (1-m) * ( E_t(p) + λ * (Σ_nb E_t(nb) - 4*E_t(p)) )
-    // We do it locally by keeping two rolling scalars: Et and EtNext.
-    // (A full ping-pong texture isn’t necessary since the update is per-pixel; we approximate
-    //  Jacobi by lagging neighbor reads using Et from previous sub-iteration kept in registers.)
     float Et = isConstraint ? delta : 0.0;
 
-    // Do a small gather of neighbors every iteration. To avoid diverging, clamp λ <= 0.25.
     [loop]
     for (int it = 0; it < _RetargetIters; ++it)
     {
@@ -426,9 +420,7 @@ void Retargeting(uint3 id : SV_DispatchThreadID)
 
         float lap = 0.0;
         float center = Et;
-        // Read neighbors' Et from last sub-iteration by re-sampling current values.
-        // To keep it consistent per iteration without extra textures, we approximate by
-        // recomputing neighbors' Et using the same rule but single substep lag:
+
         float sumN = 0.0;
         int countN = 0;
         [unroll]
@@ -438,36 +430,32 @@ void Retargeting(uint3 id : SV_DispatchThreadID)
             if (!IsInBounds(q))
                 continue;
 
-            // Neighbor constraint & neighbor delta
             const float aN = _StreamRT[q];
             const bool mN = (aN < _A0);
             const float hAN = _InHeightRT[q];
             const float h0N = _OrigHeightRT[q];
             const float dN = h0N - hAN;
 
-            // Neighbor's Et (pinned if constraint)
-            float EtN = mN ? dN : Et; // lagged approximation; good in practice for many iters
+            float EtN = mN ? dN : Et; 
             sumN += EtN;
             countN++;
         }
         if (countN > 0)
         {
-            lap = (sumN - countN * center); // discrete 4-neigh Laplacian (no division by h^2 since we just need smooth)
+            lap = (sumN - countN * center);
         }
 
         float EtNext = center + _DiffusionLambda * lap;
         Et = EtNext;
     }
 
-    // 3) Apply correction: h_R = h_A + E
     _TempRT[p] = hA + Et;
 }
 
-// Parameters
-int _BreachIters; // small number (e.g., 8-16) for inner fast pit-fill relaxation
-float _CarveEps; // small epsilon (e.g., 1e-3f)
-int _Radius; // current partial scale radius r  (e.g., 8, 4, 2, 1)
-int _BlurPass; // 0 = horizontal blur, 1 = vertical blur, 2 = apply (see below)
+int _BreachIters; 
+float _CarveEps; 
+int _Radius; 
+int _BlurPass; 
 
 SamplerState sampLinearClamp
 {
@@ -485,13 +473,10 @@ void Breaching(uint3 id : SV_DispatchThreadID)
     if (!IsInBounds(p))
         return;
 
-    // --- Step A: Fast approximate full-breach proxy B(T) via local pit-filling relaxation ---
-    // Initialize with current height
     float h = _InHeightRT[p];
     float hFill = h;
 
-    // Jacobi-style "raise-to-spill" (pit-fill). This *fills* pits; we'll turn that into a carve signal.
-    // Few iterations are enough to capture local basins for our multi-scale strategy.
+
     [loop]
     for (int it = 0; it < _BreachIters; ++it)
     {
@@ -502,29 +487,22 @@ void Breaching(uint3 id : SV_DispatchThreadID)
             int2 q = p + next8[k];
             if (!IsInBounds(q))
                 continue;
-            float hq = _InHeightRT[q]; // neighbor height reference
-            // Spill elevation along the edge toward a neighbor cannot be lower than neighbor
+            float hq = _InHeightRT[q]; 
             minNbr = min(minNbr, hq);
         }
-        // If closed lower than all neighbors, raise toward minNbr; otherwise unchanged.
-        // Smooth step: hFill <- max(hFill, minNbr - eps), accumulated over a few iterations.
+
         float target = minNbr - _CarveEps;
         if (hFill < target)
             hFill = target;
     }
 
-    // B(T) proxy: the pit-filled surface
     float hB = hFill;
 
-    // --- Step B: Δ = T - B(T) >= 0 where carving is needed
     float delta = max(0.0, h - hB);
 
-    // We now run a *separable blur* of delta with radius = _Radius,
-    // using two dispatches from C#: first _BlurPass=0 (horiz), then _BlurPass=1 (vert),
-    // then _BlurPass=2 (apply subtraction).
     if (_BlurPass == 0)
     {
-        // Horizontal box blur of Δ into _TempRT
+
         int r = _Radius;
         float sum = 0.0;
         int cnt = 0;
@@ -535,11 +513,10 @@ void Breaching(uint3 id : SV_DispatchThreadID)
             if (!IsInBounds(q))
                 continue;
 
-            // recompute delta at q (cheap; avoids extra textures)
             float hq = _InHeightRT[q];
             float hFq = hq;
             [unroll]
-            for (int it = 0; it < 2; ++it) // tiny pit-fill taps for neighbors, keeps it fast
+            for (int it = 0; it < 2; ++it) 
             {
                 float mn = 1e30;
                 [unroll]
@@ -563,7 +540,6 @@ void Breaching(uint3 id : SV_DispatchThreadID)
     }
     else if (_BlurPass == 1)
     {
-        // Vertical box blur: read the horizontal-blurred Δ from _TempRT, write back
         int r = _Radius;
         float sum = 0.0;
         int cnt = 0;
@@ -579,9 +555,8 @@ void Breaching(uint3 id : SV_DispatchThreadID)
         _TempRT[p] = (cnt > 0) ? (sum / cnt) : _TempRT[p];
         return;
     }
-    else // _BlurPass == 2
+    else 
     {
-        // Final apply: T' = T - Δ_blurred (partial breach at this scale)
         float dBlur = _TempRT[p];
         _TempRT[p] = h - dBlur;
         return;

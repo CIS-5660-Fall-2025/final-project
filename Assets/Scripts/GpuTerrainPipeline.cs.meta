@@ -3,7 +3,10 @@ guid: a166c6a28620ea94483897667564e6ef
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - inputHeight: {fileID: 2800000, guid: ea01fb95a90db2540a8b3e73af8c365e, type: 3}
+  - targetTerrain: {instanceID: 0}
+  - erosionCS: {fileID: 7200000, guid: f03bb276a36b8dc47909477c28e5996a, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
