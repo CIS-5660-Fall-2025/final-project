@@ -2,10 +2,11 @@
 
 
 #include "MusicAnalyzer.h"
-//#include "JsonUtilities/Public/JsonObjectConverter.h"
 #include "Misc/FileHelper.h"
+#include "HAL/PlatformFilemanager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Dom/JsonObject.h"
 #include "Misc/CoreMisc.h"
 #include "Misc/Paths.h"
 
@@ -49,4 +50,36 @@ void MusicAnalyzer::Analyze(const FString& filepath, const FString& name)
 }
 
 // TODO: this
-float MusicAnalyzer::GetBPM(const FString& name) { return 0.0; }
+float MusicAnalyzer::GetBPM(const FString& name) {
+    FString Path = FPaths::GetPath(FPaths::GetProjectFilePath());
+    FString filePath = Path + "/SongData/" + name + ".json";
+
+    FString FileContent;
+    if (!FFileHelper::LoadFileToString(FileContent, *filePath))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load file: %s"), *filePath);
+        return 0.0f;
+    }
+
+    // Simple text search for BPM
+    TArray<FString> Lines;
+    FileContent.ParseIntoArrayLines(Lines);
+
+    for (const FString& Line : Lines)
+    {
+        if (Line.Contains("bpm:"))
+        {
+            FString BPMString = Line;
+            BPMString = BPMString.Replace(TEXT("bpm:"), TEXT(""));
+            BPMString = BPMString.TrimStartAndEnd();
+
+            float BPM = FCString::Atof(*BPMString);
+            UE_LOG(LogTemp, Log, TEXT("Found BPM: %.2f"), BPM);
+            return BPM;
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("BPM not found in file"));
+
+    return 0.0;
+}
