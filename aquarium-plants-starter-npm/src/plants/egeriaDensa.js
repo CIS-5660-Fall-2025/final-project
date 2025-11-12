@@ -199,6 +199,10 @@ export function createEgeriaLayer(gl) {
   // Just add:  `uniform float u_leafWidthScale;` and after computing width0 do `float width0 = ... * u_leafWidthScale;`
   const u_leafWidthScale = U("u_leafWidthScale");
 
+  const u_fogColor = U("u_fogColor");
+  const u_fogNear = U("u_fogNear");
+  const u_fogFar = U("u_fogFar");
+
   const state = {
     stems: 120,
     nodes: 12,
@@ -349,6 +353,14 @@ export function createEgeriaLayer(gl) {
       gl.uniform2f(u_currentDir, shared.currentDir[0], shared.currentDir[1]);
       gl.uniform2f(u_res, shared.res[0], shared.res[1]);
       gl.uniform1f(u_leafWidthScale, state.leafWidthScale);
+      gl.uniform3f(
+        u_fogColor,
+        shared.fogColor[0],
+        shared.fogColor[1],
+        shared.fogColor[2]
+      );
+      gl.uniform1f(u_fogNear, shared.fogNear);
+      gl.uniform1f(u_fogFar, shared.fogFar);
       gl.drawElementsInstanced(
         gl.TRIANGLES,
         ribbon.count,

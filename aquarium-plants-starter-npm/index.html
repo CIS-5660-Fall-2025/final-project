@@ -75,6 +75,7 @@
     <div id="wrap">
       <canvas id="gl"></canvas>
       <aside>
+        <button class="btn" id="resetCam">Reset camera</button>
         <h1>Plants Controls</h1>
         <div class="stat">FPS: <span id="fps">–</span></div>
         <label>Plant count: <span id="plantCountLabel"></span></label>
@@ -118,25 +119,6 @@
 
         <hr style="opacity: 0.15" />
         <h2 style="font-size: 13px; margin: 10px 0 6px; opacity: 0.9">Grass</h2>
-
-        <label>Current strength</label>
-        <input
-          id="currentStrength"
-          type="range"
-          min="0"
-          max="2"
-          step="0.01"
-          value="0.6"
-        />
-        <label>Current swirl (rotation)</label>
-        <input
-          id="currentAngle"
-          type="range"
-          min="-3.14"
-          max="3.14"
-          step="0.01"
-          value="0.0"
-        />
         <label>Tip flexibility</label>
         <input
           id="flex"
