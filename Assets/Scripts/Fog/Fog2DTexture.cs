@@ -3,44 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class RippleEffect : MonoBehaviour
+public class Fog2DTexture : MonoBehaviour
 {
     public int TextureSize = 768;
     public RenderTexture ObjectsRT;
-    private RenderTexture CurrRT, PrevRT, TempRT;
-    public Shader RippleShader, AddShader, ScrollShader;
-    private Material RippleMat, AddMat, ScrollMat;
+    private RenderTexture CurrRT, TempRT;
+    public Shader DissipationShader, AddShader, ScrollShader;
+    private Material DissipationMat, AddMat, ScrollMat;
+
+    private float rippleWorldSize = 200f;
+
 
     private Vector3 prevLocation;
-    private float rippleWorldSize = 275f;
 
-
-    [SerializeField] Transform targetTranform;
-    private Vector3 offset;
     // Start is called before the first frame update
     void Start()
     {
         //Creating render textures and materials
         CurrRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
-        PrevRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
         TempRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
-        RippleMat = new Material(RippleShader);
+        DissipationMat = new Material(DissipationShader);
         AddMat = new Material(AddShader);
         ScrollMat = new Material(ScrollShader);
 
-        //Change the texture in the material of this object to the render texture calculated by the ripple shader.
-        GetComponent<Renderer>().material.SetTexture("_RippleTex", CurrRT);
+        //GetComponent<Renderer>().material.SetTexture("_MainTex", CurrRT);
 
         prevLocation = transform.position;
-        offset = transform.position - targetTranform.position;
-        StartCoroutine(ripples());
-    }
-    void Update() {
-        transform.position = targetTranform.position + offset;
+        StartCoroutine(Dissipate());
     }
 
     // Update is called once per frame
-    IEnumerator ripples()
+    IEnumerator Dissipate()
     {
         Vector3 playerOffset;
         while (true) {
@@ -60,12 +53,7 @@ public class RippleEffect : MonoBehaviour
                 // Scroll CurrRT
                 ScrollMat.SetTexture("_MainTex", CurrRT);
                 Graphics.Blit(CurrRT, TempRT, ScrollMat);
-                Graphics.Blit(TempRT, CurrRT);
-
-                // Scroll PrevRT
-                ScrollMat.SetTexture("_MainTex", PrevRT);
-                Graphics.Blit(PrevRT, TempRT, ScrollMat);
-                Graphics.Blit(TempRT, PrevRT);
+                SwapRTs(ref TempRT, ref CurrRT);
             }
 
 
@@ -74,29 +62,29 @@ public class RippleEffect : MonoBehaviour
             AddMat.SetTexture("_CurrentRT", CurrRT);
             Graphics.Blit(null, TempRT, AddMat);
 
-            RenderTexture rt0 = TempRT;
-            TempRT = CurrRT;
-            CurrRT = rt0;
+            SwapRTs(ref TempRT, ref CurrRT);
             //CurrRT holds the new blended one, 
-            //TempRT holds original CurrRT, texture is reused in next step
+            //TempRT is reused in next step
 
             yield return new WaitForSeconds(0.00625f);
 
-            //Calculate the ripple animation using ripple shader.
-            RippleMat.SetTexture("_PrevRT", PrevRT);
-            RippleMat.SetTexture("_CurrentRT", CurrRT);
-            Graphics.Blit(null, TempRT, RippleMat);
-            Graphics.Blit(TempRT, PrevRT);
-            //PrevRT now holds the most recent ver
+            //Calculate the dissipation, put in TempRT
+            DissipationMat.SetTexture("_MainTex", CurrRT);
+            Graphics.Blit(null, TempRT, DissipationMat);
 
-            //Swap PrevRT and CurrentRT to calculate the result for the next frame.
-            RenderTexture rt = PrevRT;
-            PrevRT = CurrRT;
-            CurrRT = rt;
+            //Swap TempRT and CurrentRT
+            SwapRTs(ref TempRT, ref CurrRT);
 
             prevLocation = transform.position;
             //Wait for two frames and then execute again.
-            yield return new WaitForSeconds(0.018f);
+            yield return new WaitForSeconds(0.00625f);
         }
+    }
+
+    void SwapRTs(ref RenderTexture a, ref RenderTexture b)
+    {
+        var temp = a;
+        a = b;
+        b = temp;
     }
 }
