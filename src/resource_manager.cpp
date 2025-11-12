@@ -16,12 +16,14 @@ ShaderModule ResourceManager::LoadShaderModule(const std::filesystem::path &path
     file.seekg(0, std::ios::end);
     size_t size = file.tellg();
     string shaderSource(size, ' ');
+    file.seekg(0, std::ios::beg);
     file.read(shaderSource.data(), size);
 
     ShaderModuleWGSLDescriptor shaderCodeDesc = {};
     shaderCodeDesc.chain.next = nullptr;
     shaderCodeDesc.chain.sType = SType::ShaderModuleWGSLDescriptor;
     shaderCodeDesc.code = shaderSource.c_str(); // !
+    std::cout << shaderCodeDesc.code << std::endl;
 
     ShaderModuleDescriptor shaderDesc = {};
     #ifdef WEBGPU_BACKEND_WGPU
@@ -29,6 +31,6 @@ ShaderModule ResourceManager::LoadShaderModule(const std::filesystem::path &path
         shaderDesc.hints = nullptr;
     #endif
     shaderDesc.nextInChain = &shaderCodeDesc.chain;
-    
+
     return device.createShaderModule(shaderDesc);
 }
