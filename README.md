@@ -1,5 +1,14 @@
 # Final Project!
 
+## Project Planning Design Doc [HERE](https://docs.google.com/document/d/1ffv00gQvbQnZJRKyFoVGXLVfNMM5tjUuZfobjac_3EM/edit?usp=sharing)
+
+## Milestone 1 
+I completed the basic functionality in Unity where audio input is parsed into 8 bands and passed to the shader. The shader takes these Uniforms and outputs a simple visual. 
+
+https://github.com/user-attachments/assets/8d5c1a9b-f814-4c02-ba53-44478c2336b7
+
+
+
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
 
 ## Project planning: Design Doc (due 11/5)
