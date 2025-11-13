@@ -6,13 +6,26 @@ public class FogVariables : MonoBehaviour
 {
     public Material FullScreenMat;
     public Transform FogBox;
+    private Vector3 savedScale;
 
     // Start is called before the first frame update
     void Start()
     {
-        FullScreenMat.SetVector("_BoundsMin", FogBox.position - FogBox.localScale / 2);
-        FullScreenMat.SetVector("_BoundsMax", FogBox.position + FogBox.localScale / 2);
+        savedScale = FogBox.lossyScale;
+        FullScreenMat.SetVector("_BoundsMin", FogBox.position - savedScale / 2);
+        FullScreenMat.SetVector("_BoundsMax", FogBox.position + savedScale / 2);
+
+        StartCoroutine(UpdateOffset());
     }
+
+    private IEnumerator UpdateOffset() {
+        while (true) {
+            yield return null;
+            FullScreenMat.SetVector("_BoundsMin", FogBox.position - savedScale / 2);
+            FullScreenMat.SetVector("_BoundsMax", FogBox.position + savedScale / 2);
+        }
+    }
+
     void OnDestroy() {
         
     }

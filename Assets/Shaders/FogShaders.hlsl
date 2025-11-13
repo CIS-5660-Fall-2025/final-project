@@ -1,3 +1,7 @@
+static const float STEP_SIZE = 0.05;
+static const int MAX_STEPS = 64;
+
+
 float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 RayDirection)
 {
     float3 t0 = (BoundsMin - RayOrigin) / RayDirection;
@@ -12,6 +16,10 @@ float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 R
     float distInsideBox = max(0, distB - distToBox);
     return float2(distToBox, distInsideBox);
 }
+float sampleDensity(float3 Position)
+{
+    return 0.5;
+}
 
 void RayMarcher_float(
     float4 SceneColor,
@@ -19,16 +27,25 @@ void RayMarcher_float(
     float3 RayDirection,
     float3 BoundsMin,
     float3 BoundsMax,
+    float Depth,
+    float3 RayDirectionVew,
     out float4 outValue
 )
 {
-    float2 RayBoxInfo = rayBoxDist(BoundsMin, BoundsMax, RayOrigin, RayDirection);
-
+    float2 RayBoxInfo = rayBoxDist(BoundsMin, BoundsMax, RayOrigin, normalize(RayDirection));
+    
+    
     float4 finalCol = SceneColor;
-    if (RayBoxInfo.y > 0)
+    
+    float distToPoint = Depth / abs(RayDirectionVew.z);
+    
+    if (RayBoxInfo.y > 0 && RayBoxInfo.x < distToPoint)
     {
         finalCol = 0;
     }
-
+    float distTravelled = 0;
+    
+    
     outValue = finalCol;
+
 }
