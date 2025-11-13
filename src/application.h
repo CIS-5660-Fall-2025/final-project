@@ -10,8 +10,10 @@
 #include <emscripten.h>
 #endif
 #include <utility>
+#include <glm/glm.hpp>
 
 using namespace wgpu;
+using namespace glm;
 
 class Application {
     public:
@@ -23,6 +25,13 @@ class Application {
     bool IsRunning(); // Returns true as long as main loop should keep going
 
     private:
+
+    struct MyUniforms {
+        vec4 color;
+        float time;
+        float _pad[3];
+    };
+    static_assert(sizeof(MyUniforms) % 16 == 0);
     
     std::pair<SurfaceTexture, TextureView> GetNextSurfaceViewData();
     void InitializeRenderPipeline();

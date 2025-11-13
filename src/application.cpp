@@ -6,6 +6,7 @@
 #include "webgpu_utils.h"
 #include "resource_manager.h"
 
+using namespace glm;
 using namespace wgpu;
 using namespace std;
 
@@ -417,9 +418,9 @@ void Application::InitializeRenderPipeline() {
     // [...]
     BindGroupLayoutEntry bindingLayout = Default;
     bindingLayout.binding = 0; // @binding attrib in shader
-    bindingLayout.visibility = ShaderStage::Vertex;
+    bindingLayout.visibility = ShaderStage::Vertex | ShaderStage::Fragment;
     bindingLayout.buffer.type = BufferBindingType::Uniform; // sampler, texture, and storageTexture are set to Undefined but this one set to Uniform cuz we use buffer for uniform
-    bindingLayout.buffer.minBindingSize = 4 * sizeof(float);
+    bindingLayout.buffer.minBindingSize = sizeof(MyUniforms);
 
     BindGroupLayoutDescriptor bindGroupLayoutDesc = {};
     bindGroupLayoutDesc.entryCount = 1;
@@ -468,7 +469,7 @@ void Application::MainLoop() {
 
     // Update uniforms
     float t = static_cast<float>(glfwGetTime());
-    queue.writeBuffer(uniformBuffer, 0, &t, sizeof(float));
+    queue.writeBuffer(uniformBuffer, offsetof(MyUniforms, time), &t, sizeof(float));
 
     auto [surfaceTexture, targetView] = GetNextSurfaceViewData();
     if(!targetView) return;
@@ -616,12 +617,12 @@ void Application::InitializeBuffers() {
     
     // Uniform Buffer
     BufferDescriptor uniformBufferDesc;
-    uniformBufferDesc.size = sizeof(float) * 4; // Aligned with 4 float
+    uniformBufferDesc.size = sizeof(MyUniforms); // Aligned with 4 float
     uniformBufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Uniform;
     bufferDesc.mappedAtCreation = false;
     uniformBuffer = device.createBuffer(uniformBufferDesc);
-    float time = 1.0f;
-    queue.writeBuffer(uniformBuffer, 0, &time, sizeof(float));
+    MyUniforms uniforms = {vec4(1.0,0.4,0.0, 1.0), 1.0f};
+    queue.writeBuffer(uniformBuffer, 0, &uniforms, sizeof(MyUniforms));
 
     // !!! Buffers must be multiple of 4 bytes
     // So make sure your data AND buffer is a good size
@@ -633,7 +634,7 @@ void Application::InitializeBindGroups() {
     binding.binding = 0; // Index of binding
     binding.buffer = uniformBuffer; // Must come after creating buffer
     binding.offset = 0;
-    binding.size = 4*sizeof(float);
+    binding.size = sizeof(MyUniforms);
 
     BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;
