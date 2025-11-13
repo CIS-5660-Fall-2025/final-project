@@ -1,5 +1,4 @@
 static const float STEP_SIZE = 0.05;
-static const int MAX_STEPS = 64;
 
 
 float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 RayDirection)
@@ -18,7 +17,7 @@ float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 R
 }
 float sampleDensity(float3 Position)
 {
-    return 0.5;
+    return 0.1;
 }
 
 void RayMarcher_float(
@@ -39,13 +38,26 @@ void RayMarcher_float(
     
     float distToPoint = Depth / abs(RayDirectionVew.z);
     
+    /* // box raytrace test
     if (RayBoxInfo.y > 0 && RayBoxInfo.x < distToPoint)
     {
         finalCol = 0;
     }
+    */
     float distTravelled = 0;
+    float distLimit = min(distToPoint - RayBoxInfo.x, RayBoxInfo.y);
+    
+    float totalDensity = 0;
+    while (distTravelled < distLimit)
+    {
+        float3 marchPos = RayOrigin + RayDirection * (RayBoxInfo.x + distTravelled);
+        totalDensity += sampleDensity(marchPos) * STEP_SIZE;
+        distTravelled += STEP_SIZE;
+
+    }
+    float transmittance = exp(-totalDensity);
     
     
-    outValue = finalCol;
+    outValue = lerp(float4(0.7, 0.7, 0.7, 1.0), finalCol, transmittance);
 
 }
