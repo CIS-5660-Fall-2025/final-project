@@ -51,4 +51,14 @@ The plan
    - Create the leaves, the strawberries, and the flowers procedurally, and make sure they attach and orient correctly onto the plant. Make sure that the amount of strawberries, leaves, and flowers are easily adjustable 
 - 11/26 - 12/1
    - Finishing touches - anything that needs to be fixed, make a demo-reel and also applying materials and lighting to a custom scene with the strawberries, last-minute UI changes
+
+ ### Milestone 1
+ I have created a couple of stems for the strawberry which includes a subnetwork that takes a geometry as input to put at the very top. The geometry is oriented with respect to the normal at the very end of the stem, and points along the trajectory of itself:
+<img width="1080" height="730" alt="Screenshot 2025-11-12 at 9 13 47 PM" src="https://github.com/user-attachments/assets/93cc0ea4-de7c-4d27-97c3-e73859a4fcba" />
+
+Furthermore, I added some sliders for each branch that allows the user to decide the angle at which the stem is bending and in what direction. These two attributes I believe will eb essential to randomizing stem generations for the strawberry plant. Furthermore, I also created a sub network that allows the user to generate a stem with more stems branching off of it following a noise function. However, I still have to work on orienting the normals correctly for which the sub-stems branches off of the main branch. I'm also considerign writing an l-system for this to make a shape easier to generate for the stem, although the main issue is querying the end-points of the L system to attach strawberries, leaves, and whatever other geometry there are since I wasn't able to search up a way to query these points.
+
+<img width="1000" height="738" alt="Screenshot 2025-11-12 at 9 14 06 PM" src="https://github.com/user-attachments/assets/d0a4fa4a-0d43-4684-8ae9-d98ca521dce1" />
+
+ 
  
