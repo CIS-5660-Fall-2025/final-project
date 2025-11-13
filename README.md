@@ -3,34 +3,48 @@
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
 
 ## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
-
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
-
 #### Introduction
-- What motivates your project?
+- We are motivated to make an immersive experience within a surreal procedural city.
 
 #### Goal
-- What do you intend to achieve with this project?
+- We intend to build a stylized Unity driving game featuring real-time procedural city generation, procedural cars, etc.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+- Some of our reference projects include slowroads.io & the game easy delivery co.
+- Our reference artwork (for style inspiration) is as follows: & our Pinterest board: https://pin.it/70blAtfEj 
+
+| ![](https://i.pinimg.com/1200x/81/8c/7a/818c7ab620b90c0baac188f36f340555.jpg) | ![](https://i.pinimg.com/736x/2a/40/cc/2a40ccb6b418b46fdc386d659d0ab234.jpg) | ![](https://i.pinimg.com/1200x/2b/64/4e/2b644eac0a6301fad5ffb033d5666c2a.jpg) |
+| :--: | :--: | :--: | 
 
 #### Specification:
-- Outline the main features of your project.
+- The main features of our project is the procedural city with weirdness parameter, procedural cards, driving, post-process effects
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+- We will be using Unity & Houdini. 
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+- Simple free-body diagram illustrating how our program will fit together:
+
+[![fbm-overview.png](https://i.postimg.cc/gc5gC4w3/fbm-overview.png)](https://postimg.cc/Rq71f7L0)
 
 #### Timeline:
 - Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
 
-Submit your Design doc as usual via pull request against this repository.
+##### Milestone 1: 
+- Alice: City Assets (building, benches, trees, sheep)
+- Jimin: City Assets (building, poles, lights, traffic stuff)
+- Christopher: Procedural Car Exterior
+##### Milestone 2:
+- Alice: Putting city together + weirdness & porting to unity
+- Jimin: Putting city together + weirdness & porting to unity
+- Christopher: Procedural Car Interior + porting to unity
+##### Final Milestone:
+- Alice: Driving/Game logic
+- Jimin: UI / HUD
+- Christopher: shaders + put everything together
+
+
 ## Milestone 1: Implementation part 1 (due 11/12)
 Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
 
