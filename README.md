@@ -1,3 +1,16 @@
+# Milestone 1
+
+## Wave Function Collapse
+
+Implemented a basic Wave Function Collapse algorithm in Unity, with a flat 2D map. Two main types of components are used: tiles, which store lists of possible adjacent tiles, and the generator itself, which has parameters for the map dimensions, grid cell size, and a list of possible tile types to appear in the map. Currently tiles only check orthogonally-adjacent tiles (i.e. tiles within the von Neumann neighborhood of that tile) but this could be easily expanded (e.g. to a Moore neighborhood) depending on the needs of the tileset by adding additional arrays to the tile class and additional steps to the propogation function used in the generator.
+
+<img width="460" height="542" alt="Screen Shot 2025-11-12 at 10 09 06 PM" src="https://github.com/user-attachments/assets/a8bb2c02-7b34-46da-a1a5-e41d0dc738f3" />
+<img width="460" height="538" alt="Screen Shot 2025-11-12 at 10 09 14 PM" src="https://github.com/user-attachments/assets/6bb32c3e-677a-408a-b64b-a9eb0af09f32" />
+<img width="460" height="538" alt="Screen Shot 2025-11-12 at 10 09 20 PM" src="https://github.com/user-attachments/assets/315dceed-b235-4c40-8cfd-14ebfc704a24" />
+<img width="460" height="537" alt="Screen Shot 2025-11-12 at 10 09 28 PM" src="https://github.com/user-attachments/assets/6b340cf6-fb98-47b2-9b2e-03f5eebac9ad" />
+
+The above images show example outputs using a set of castle parts made in Maya. 
+
 # Design Document
 
 ## Introduction
