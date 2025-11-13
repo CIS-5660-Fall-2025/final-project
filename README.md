@@ -49,17 +49,19 @@ There are many tutorials online, and here's some of them that might be useful:
 
 Submit your Design doc as usual via pull request against this repository.
 
-## Milestone 1: Implementation part 1 (due 11/12)
+## Milestone 1
 ### General:
 - Created a basic Unreal game level
-- Set up Houdini to Unreal pipeline through Houdini Engine
 
-### Fluid sim:
+### Fluid sim (Joanne):
 - Created a basic Niagara system
 - Implemented an emitter with grid2D, with simple simulation and rendering - writes the updated color at each frame to a render rarget and renders on screen.
 - Can update the grid cell's velocity based on a texture input
 
   ![](img/milestone1-1.gif)
+
+### Procedural generation (McKenna):
+Got Houdini Engine pipeline set up on laptop, tried dragging in .hda file from procedural building and it seemed to work because the Houdini logo showed up as a placeholder but when the file is open, no building shows up. I'll have to look more into this for the next checkpoint. For now, I am working on creating assets for the procedural wasteland city. Pictured below is a building made with the current procedural setup I have in Houdini, based off of [this tutorial](https://www.youtube.com/watch?v=PfcbekTodWw) on the Houdini YouTube channel.
 
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
