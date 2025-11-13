@@ -11,6 +11,12 @@ Implemented a basic Wave Function Collapse algorithm in Unity, with a flat 2D ma
 
 The above images show example outputs using a set of castle parts made in Maya. 
 
+## Terrain Generation
+
+Implemented basic Perlin-noise based terrain generation. I followed [this tutorial](https://www.youtube.com/watch?v=hNRFosb_3Tc) to set up the base of the terrain generation and it worked really well. To add onto it, I implemented chunking for infinite terrain. So, I added a basic player capsule and depending on the location of the player, chunks will be spawned (or destroyed) within a certain distance. As part of the tutorial I followed, I also added a basic gradient shader that colors the terrain based on height.
+
+![Untitledvideo-MadewithClipchamp8-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/30da67fa-9746-44f6-9dee-a9ce3c5dadc4)
+
 # Design Document
 
 ## Introduction
