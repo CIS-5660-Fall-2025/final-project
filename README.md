@@ -2,14 +2,19 @@
 
 ## Wave Function Collapse
 
-Implemented a basic Wave Function Collapse algorithm in Unity, with a flat 2D map. Two main types of components are used: tiles, which store lists of possible adjacent tiles, and the generator itself, which has parameters for the map dimensions, grid cell size, and a list of possible tile types to appear in the map. Currently tiles only check orthogonally-adjacent tiles (i.e. tiles within the von Neumann neighborhood of that tile) but this could be easily expanded (e.g. to a Moore neighborhood) depending on the needs of the tileset by adding additional arrays to the tile class and additional steps to the propogation function used in the generator.
+Implemented a basic Wave Function Collapse algorithm in Unity, with a flat 2D map. Two main types of components are used: tiles, which store lists of possible adjacent tiles, and the generator itself, which has parameters for the map dimensions, grid cell size, and a list of possible tile types to appear in the map. Currently tiles only check orthogonally-adjacent tiles (i.e. tiles within the von Neumann neighborhood of that tile) but this could be easily expanded (e.g. to a Moore neighborhood) depending on the needs of the tileset by adding additional arrays to the tile class and additional steps to the propogation function used in the generator. Another potential feature which is not currently included is varied tile weights, as each possible tile currently has an equal chance of being selected in a given step (though their effective frequency of appearance varies depending on how their connections occur within the grid).
 
-<img width="400" height="542" alt="Screen Shot 2025-11-12 at 10 09 06 PM" src="https://github.com/user-attachments/assets/a8bb2c02-7b34-46da-a1a5-e41d0dc738f3" />
-<img width="400" height="538" alt="Screen Shot 2025-11-12 at 10 09 14 PM" src="https://github.com/user-attachments/assets/6bb32c3e-677a-408a-b64b-a9eb0af09f32" />
-<img width="400" height="538" alt="Screen Shot 2025-11-12 at 10 09 20 PM" src="https://github.com/user-attachments/assets/315dceed-b235-4c40-8cfd-14ebfc704a24" />
-<img width="400" height="537" alt="Screen Shot 2025-11-12 at 10 09 28 PM" src="https://github.com/user-attachments/assets/6b340cf6-fb98-47b2-9b2e-03f5eebac9ad" />
+<img width="410" height="537" alt="Screen Shot 2025-11-13 at 12 01 07 AM" src="https://github.com/user-attachments/assets/f034fcfc-8b3c-4e49-9c23-c1d2bcbe4ed6" />
+<img width="410" height="539" alt="Screen Shot 2025-11-13 at 12 00 06 AM" src="https://github.com/user-attachments/assets/05a71e4a-be3f-497d-934d-6f1c8fb6e0a0" />
+<img width="410" height="535" alt="Screen Shot 2025-11-12 at 11 58 54 PM" src="https://github.com/user-attachments/assets/76926983-0907-4d84-a17c-bca175f9bfff" />
+<img width="410" height="537" alt="Screen Shot 2025-11-13 at 12 00 43 AM" src="https://github.com/user-attachments/assets/4d70ce51-203f-414f-a9c1-b1f3c28627ee" />
 
 The above images show example outputs using a set of castle parts made in Maya. 
+
+<img width="992" height="762" alt="Screen Shot 2025-11-13 at 12 05 43 AM" src="https://github.com/user-attachments/assets/5e7e9bc3-da3b-47ce-bf04-08c48cb68e39" />
+
+<img width="1178" height="641" alt="Screen Shot 2025-11-13 at 12 00 20 AM" src="https://github.com/user-attachments/assets/16c3ad75-1788-4c98-ad0b-e79f17c0c59d" />
+
 
 ## Terrain Generation
 
