@@ -1,4 +1,4 @@
-# Realtime Fracture in Unity
+Better Unity Fracture
 
 ## Planning and Design Doc
 
@@ -31,4 +31,20 @@ In this final project, I want to implement the real-time interactive fracture wi
 - Week 2: Advanced fracture
 - Week 3: Interactions and effects
 - Week 4: Stylization and optimization
+
+## Milestone 1
+
+In this week, I mainly focused on the basic implementation of initial fracture.
+
+At first, I was learning some basic fracture mechanics to understand theoretical methods and searching for practical implementations in Unity.
+
+After that, I tried to use [Blast](https://docs.omniverse.nvidia.com/kit/docs/blast-sdk/latest/index.html#blast-sdk-documentation) in PhysX by Nvidia. But because it is a C++ library, so I need to compile it to .dlls and import them in Unity. But after some attempts, it seems to be more difficult than I thought because when I was writing some wrappers I found that some core functions I need have no API interfaces in Blast, and I cannot compile more extra Dlls because of outdated environmental issues.
+
+Therefore, I utilized some wrapper logics from [Unity Fracture](https://github.com/ElasticSea/unity-fracture) and a [Blast Forum](https://discussions.unity.com/t/nvidia-blast/665733). 
+
+By the way, actually I do considered about writing my own version of 3D voronoi but I'm afraid it will cost my many times and Blast have done many optimizations to make it run rany fast on CPUs.
+
+At the end of the stage, I am able to fracture any objects in my Unity project into designated pieces.
+
+<img width="1111" height="715" alt="image" src="https://github.com/user-attachments/assets/b7a1a1c9-0973-422f-b8ca-a27deae0e3da" />
 
