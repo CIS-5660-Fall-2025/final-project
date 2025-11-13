@@ -50,14 +50,17 @@ There are many tutorials online, and here's some of them that might be useful:
 Submit your Design doc as usual via pull request against this repository.
 
 ## Milestone 1: Implementation part 1 (due 11/12)
-Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
+### General:
+- Created a basic Unreal game level
+- Set up Houdini to Unreal pipeline through Houdini Engine
 
-Put all your code in your forked repository.
+### Fluid sim:
+- Created a basic Niagara system
+- Implemented an emitter with grid2D, with simple simulation and rendering - writes the updated color at each frame to a render rarget and renders on screen.
+- Can update the grid cell's velocity based on a texture input
 
-Submission: Add a new section to your README titled: Milestone #1, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
-- Examples of your generators output so far
-We'll check your repository for updates. No need to create a new pull request.
+  ![](img/milestone1-1.gif)
+
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
 
