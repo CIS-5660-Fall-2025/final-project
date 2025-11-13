@@ -1,117 +1,64 @@
-# Final Project!
-
-This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
-
-## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
-
+# Houdini Strawberry Plant Tool
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
-
 #### Introduction
-- What motivates your project?
+
+I want to take this project as an opportunity to make artist-facing tools in Houdini - adjusting parameters to make an asset or a part of a scene appear naturalistic yet easily controllable without the artist having to make a model from scratch and duplicating and varying the object multiple times. Thus, I choose to make procedural strawberry plants in Houdini that allow artists to tweak parameters like strawberry size, ratio of strawberry to flowering to leaves, amount of growth, etc.
+
 
 #### Goal
-- What do you intend to achieve with this project?
+
+The goal of this project is to create a way to procedurally generate strawberry plants with artist-friendly tweakable parameters within Houdini. Perhaps there is a scene that takes place in a garden store, or a scene that takes place in a field of strawberries, and where the character is peering between the bushes - then a 3D artist might need a way to place many strawberry plants that all look different in terms of the placement of leaves, number of flowers and strawberries, yet all strawberry plants are in the same stage of ripeness in the early summer - the perfect time for strawberry picking. Being able to reduce the number of ways to create a strawberry plant to its bare essential attributes for production, such as amount of growth, number of strawberries, etc, will allow artists to easily generate lots of strawberry plants as needed, as teh game or film sees fit.
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+- Here are some reference photos:
+![A strawberry plant with fruit](https://github.com/user-attachments/assets/9d17e283-43bd-40cb-b8db-8c48b5fa30c2)
+![s-l1600](https://github.com/user-attachments/assets/7f9ba88f-1034-4659-b1fb-9bfa3ea11673)
+![8338a51a986d27bfb4457e28b5d3c6ac](https://github.com/user-attachments/assets/f5ffcbcc-6892-40de-8b2b-f20649cf48c4)
+
+
+- Here are some reeadings I came across that break down the structure of strawberry plants:
+  - [Strawberry Plant Structure and Growth Habit ](http://www.hort.cornell.edu/expo/proceedings/2012/Berries/Berry%20Plant%20Structure%20Poling.pdf)
+  - [How Strawberry Plants Grow](https://extension.umn.edu/strawberry-farming/how-strawberry-plants-grow)
 
 #### Specification:
-- Outline the main features of your project.
-
+- The user can generate a strawberry plant with the following parameters:
+    - How much/how little growth of plant (small, sparse plant, or large, bushy plant)
+    - Number of strawberries in the plant
+    - Number of leaf nodes
+    - Number of flowers
+    - Ripeness of strawberries scale
+  
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+- We will use L systems to create the stem structure of the strawberries
+- Follow this tutorial to make the strawberry leaves : https://www.youtube.com/watch?v=s5RwLhmLzHM
+  - The strawberry leaves will also contain adjustable parameters for leaf size/age
+- Use four models of strawberries in various stages of their lives temporarily, then procedurally generate strawberries later on
+  - Tutorial to potentially follow : https://www.youtube.com/watch?v=o2lqjgt4RwU
+- Procedurally generate flowers in Houdini as well, following a similar workflow as the Jellyfish lab
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img width="1380" height="672" alt="Screenshot 2025-11-07 at 10 03 11 PM" src="https://github.com/user-attachments/assets/1faf5e89-1ccc-48e9-834a-3145365c2cc6" />
+
+(Please imagine an actual procedurally generated strawberry is in its place)
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+The plan
+- 11/5 - 11/12:
+   - Create a workable L-system node for the stems, with dummy leaves and strawberry models that can populate on the tip of the stems by adjusting the UI parameters
+   - Create the UI
+- 11/12 - 11/24:
+   - Create the leaves, the strawberries, and the flowers procedurally, and make sure they attach and orient correctly onto the plant. Make sure that the amount of strawberries, leaves, and flowers are easily adjustable 
+- 11/26 - 12/1
+   - Finishing touches - anything that needs to be fixed, make a demo-reel and also applying materials and lighting to a custom scene with the strawberries, last-minute UI changes
 
-Submit your Design doc as usual via pull request against this repository.
-## Milestone 1: Implementation part 1 (due 11/12)
-Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
+ ### Milestone 1
+ I have created a couple of stems for the strawberry which includes a subnetwork that takes a geometry as input to put at the very top. The geometry is oriented with respect to the normal at the very end of the stem, and points along the trajectory of itself:
+<img width="1080" height="730" alt="Screenshot 2025-11-12 at 9 13 47 PM" src="https://github.com/user-attachments/assets/93cc0ea4-de7c-4d27-97c3-e73859a4fcba" />
 
-Put all your code in your forked repository.
+Furthermore, I added some sliders for each branch that allows the user to decide the angle at which the stem is bending and in what direction. These two attributes I believe will eb essential to randomizing stem generations for the strawberry plant. Furthermore, I also created a sub network that allows the user to generate a stem with more stems branching off of it following a noise function. However, I still have to work on orienting the normals correctly for which the sub-stems branches off of the main branch. I'm also considerign writing an l-system for this to make a shape easier to generate for the stem, although the main issue is querying the end-points of the L system to attach strawberries, leaves, and whatever other geometry there are since I wasn't able to search up a way to query these points.
 
-Submission: Add a new section to your README titled: Milestone #1, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
-- Examples of your generators output so far
-We'll check your repository for updates. No need to create a new pull request.
-## Milestone 2: Implementation part 2 (due 11/24)
-We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
+<img width="1000" height="738" alt="Screenshot 2025-11-12 at 9 14 06 PM" src="https://github.com/user-attachments/assets/d0a4fa4a-0d43-4684-8ae9-d98ca521dce1" />
 
-Put all your code in your forked repository.
-
-Submission: Add a new section to your README titled: Milestone #3, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what did you have to cut and why? 
-- Detailed output from your generator, images, video, etc.
-We'll check your repository for updates. No need to create a new pull request.
-
-Come to class on the due date with a WORKING COPY of your project. We'll be spending time in class critiquing and reviewing your work so far.
-
-## Final submission (due 12/1)
-Time to polish! Spen this last week of your project using your generator to produce beautiful output. Add textures, tune parameters, play with colors, play with camera animation. Take the feedback from class critques and use it to take your project to the next level.
-
-Submission:
-- Push all your code / files to your repository
-- Come to class ready to present your finished project
-- Update your README with two sections 
-  - final results with images and a live demo if possible
-  - post mortem: how did your project go overall? Did you accomplish your goals? Did you have to pivot?
-
-## Topic Suggestions
-
-### Create a generator in Houdini
-
-### A CLASSIC 4K DEMO
-- In the spirit of the demo scene, create an animation that fits into a 4k executable that runs in real-time. Feel free to take inspiration from the many existing demos. Focus on efficiency and elegance in your implementation.
-- Example: 
-  - [cdak by Quite & orange](https://www.youtube.com/watch?v=RCh3Q08HMfs&list=PLA5E2FF8E143DA58C)
-
-### A RE-IMPLEMENTATION
-- Take an academic paper or other pre-existing project and implement it, or a portion of it.
-- Examples:
-  - [2D Wavefunction Collapse Pokémon Town](https://gurtd.github.io/566-final-project/)
-  - [3D Wavefunction Collapse Dungeon Generator](https://github.com/whaoran0718/3dDungeonGeneration)
-  - [Reaction Diffusion](https://github.com/charlesliwang/Reaction-Diffusion)
-  - [WebGL Erosion](https://github.com/LanLou123/Webgl-Erosion)
-  - [Particle Waterfall](https://github.com/chloele33/particle-waterfall)
-  - [Voxelized Bread](https://github.com/ChiantiYZY/566-final)
-
-### A FORGERY
-Taking inspiration from a particular natural phenomenon or distinctive set of visuals, implement a detailed, procedural recreation of that aesthetic. This includes modeling, texturing and object placement within your scene. Does not need to be real-time. Focus on detail and visual accuracy in your implementation.
-- Examples:
-  - [The Shrines](https://github.com/byumjin/The-Shrines)
-  - [Watercolor Shader](https://github.com/gracelgilbert/watercolor-stylization)
-  - [Sunset Beach](https://github.com/HanmingZhang/homework-final)
-  - [Sky Whales](https://github.com/WanruZhao/CIS566FinalProject)
-  - [Snail](https://www.shadertoy.com/view/ld3Gz2)
-  - [Journey](https://www.shadertoy.com/view/ldlcRf)
-  - [Big Hero 6 Wormhole](https://2.bp.blogspot.com/-R-6AN2cWjwg/VTyIzIQSQfI/AAAAAAAABLA/GC0yzzz4wHw/s1600/big-hero-6-disneyscreencaps.com-10092.jpg)
-
-### A GAME LEVEL
-- Like generations of game makers before us, create a game which generates an navigable environment (eg. a roguelike dungeon, platforms) and some sort of goal or conflict (eg. enemy agents to avoid or items to collect). Aim to create an experience that will challenge players and vary noticeably in different playthroughs, whether that means procedural dungeon generation, careful resource management or an interesting AI model. Focus on designing a system that is capable of generating complex challenges and goals.
-- Examples:
-  - [Rhythm-based Mario Platformer](https://github.com/sgalban/platformer-gen-2D)
-  - [Pokémon Ice Puzzle Generator](https://github.com/jwang5675/Ice-Puzzle-Generator)
-  - [Abstract Exploratory Game](https://github.com/MauKMu/procedural-final-project)
-  - [Tiny Wings](https://github.com/irovira/TinyWings)
-  - Spore
-  - Dwarf Fortress
-  - Minecraft
-  - Rogue
-
-### AN ANIMATED ENVIRONMENT / MUSIC VISUALIZER
-- Create an environment full of interactive procedural animation. The goal of this project is to create an environment that feels responsive and alive. Whether or not animations are musically-driven, sound should be an important component. Focus on user interactions, motion design and experimental interfaces.
-- Examples:
-  - [The Darkside](https://github.com/morganherrmann/thedarkside)
-  - [Music Visualizer](https://yuruwang.github.io/MusicVisualizer/)
-  - [Abstract Mesh Animation](https://github.com/mgriley/cis566_finalproj)
-  - [Panoramical](https://www.youtube.com/watch?v=gBTTMNFXHTk)
-  - [Bound](https://www.youtube.com/watch?v=aE37l6RvF-c)
-
-### YOUR OWN PROPOSAL
-- You are of course welcome to propose your own topic . Regardless of what you choose, you and your team must research your topic and relevant techniques and come up with a detailed plan of execution. You will meet with some subset of the procedural staff before starting implementation for approval.
+ 
+ 
