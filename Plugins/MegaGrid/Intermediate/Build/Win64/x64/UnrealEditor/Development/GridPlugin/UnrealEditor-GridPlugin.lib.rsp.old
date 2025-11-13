@@ -1,0 +1,12 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-GridPlugin.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:/Users/mpjiw/Desktop/pm/Intermediate/Build/Win64/x64/UnrealEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"C:/Users/mpjiw/Desktop/pm/Plugins/MegaGrid/Intermediate/Build/Win64/x64/UnrealEditor/Development/GridPlugin/Module.GridPlugin.cpp.obj"
+"C:/Users/mpjiw/Desktop/pm/Plugins/MegaGrid/Intermediate/Build/Win64/x64/UnrealEditor/Development/GridPlugin/Default.rc2.res"
+/OUT:"C:/Users/mpjiw/Desktop/pm/Plugins/MegaGrid/Intermediate/Build/Win64/x64/UnrealEditor/Development/GridPlugin/UnrealEditor-GridPlugin.lib"

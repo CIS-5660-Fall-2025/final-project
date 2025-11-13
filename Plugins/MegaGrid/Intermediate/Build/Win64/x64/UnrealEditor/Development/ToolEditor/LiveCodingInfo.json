@@ -1,0 +1,12 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.ToolEditor.cpp.obj": [
+			"PerModuleInline.gen.cpp.obj",
+			"CustomEdMode.cpp.obj",
+			"EdModeTool.cpp.obj",
+			"SEdModeWidget.cpp.obj",
+			"ToolEditor.cpp.obj"
+		]
+	}
+}

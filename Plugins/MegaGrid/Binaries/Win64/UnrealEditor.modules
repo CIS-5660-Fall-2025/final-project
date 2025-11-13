@@ -1,0 +1,8 @@
+{
+	"BuildId": "43139311",
+	"Modules": 
+	{
+		"GridPlugin": "UnrealEditor-GridPlugin.dll",
+		"ToolEditor": "UnrealEditor-ToolEditor.dll"
+	}
+}

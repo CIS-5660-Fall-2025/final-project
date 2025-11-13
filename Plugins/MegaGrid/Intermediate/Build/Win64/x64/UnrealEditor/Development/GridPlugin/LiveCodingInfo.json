@@ -1,0 +1,26 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.GridPlugin.cpp.obj": [
+			"GridDataStructures.gen.cpp.obj",
+			"GridManager.gen.cpp.obj",
+			"GridPlugin.init.gen.cpp.obj",
+			"GridPluginSave.gen.cpp.obj",
+			"GridSaveHandler.gen.cpp.obj",
+			"GridSubsystem.gen.cpp.obj",
+			"GridUtils.gen.cpp.obj",
+			"GridVisuals.gen.cpp.obj",
+			"PathFindingComponent.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"GridPluginSave.cpp.obj",
+			"GridSaveHandler.cpp.obj",
+			"PathFindingComponent.cpp.obj",
+			"GridManager.cpp.obj",
+			"GridPlugin.cpp.obj",
+			"GridSubsystem.cpp.obj",
+			"ThreadObject.cpp.obj",
+			"GridUtils.cpp.obj",
+			"GridVisuals.cpp.obj"
+		]
+	}
+}

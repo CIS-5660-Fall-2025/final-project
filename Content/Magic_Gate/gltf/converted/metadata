@@ -1,0 +1,102 @@
+{
+	"assetNamespace": "fab",
+	"listing":
+	{
+		"averageRating": 0,
+		"createdAt": "",
+		"description": "<p>one step.. will transport you away from here..</p>",
+		"isAiForbidden": true,
+		"isAiGenerated": false,
+		"lastUpdatedAt": "2025-02-24T12:00:56.517815Z",
+		"listingType": "3d-model",
+		"media": "https://media.fab.com/image_previews/gallery_images/1fafdeb6-4dbc-4782-8fc8-6c2695f0ef58/714e248a-c24b-446d-9404-76b51a842596.jpeg",
+		"publishedAt": "2024-11-10T10:19:43.203934Z",
+		"reviewCount": 0,
+		"thumbnail": "https://media.fab.com/image_previews/gallery_images/0d24f088-891f-4d8a-aa72-e72bc327b5ce/55c0dda5-5a04-4410-8403-d3a50004aa6b.jpeg",
+		"title": "SculptJanuary2021 - Day 05 - Magic Gate",
+		"uid": "86a4b9c9-031f-4f8b-87f5-226f54740d32",
+		"updatedAt": "",
+		"user":
+		{
+			"coverImageUrl": "https://cdn1.epicgames.com/fab/seller/o-zjppk9vgnpw32c8bu449j48war7l34/backgroundImage/blob-1920x540-6f9335d365b93ca69ebb6229db95e923.jpg",
+			"profileImageUrl": "https://cdn1.epicgames.com/fab/seller/o-zjppk9vgnpw32c8bu449j48war7l34/profileImage/blob-500x500-a41870a7a5f0240c26ab8ff3b0dc26b9.jpg",
+			"sellerName": "Chaitanya Krishnan",
+			"uid": "7701e110-7474-4fb1-86c2-5a406c7cd9d5"
+		},
+		"tags": [
+			{
+				"name": "Gate",
+				"slug": "gate",
+				"uid": "02085043-de0d-43fa-8aa0-1c0cd7c68932"
+			},
+			{
+				"name": "Gateway",
+				"slug": "gateway",
+				"uid": "24666e4c-9379-4187-af16-2abd85085c89"
+			},
+			{
+				"name": "Portal",
+				"slug": "portal",
+				"uid": "a0f3755d-5472-4c4f-90b3-4b20409a6039"
+			},
+			{
+				"name": "Magic",
+				"slug": "magic",
+				"uid": "ccf14f06-e025-438c-9e78-6901186fc317"
+			}
+		],
+		"category":
+		{
+			"name": "Buildings & Architecture",
+			"path": "buildings-architecture",
+			"slug": "buildings-architecture",
+			"uid": "eec3bdd5-ba7a-45a8-b15d-67462b9630f6"
+		},
+		"assetFormats": [
+			{
+				"assetFormatType":
+				{
+					"name": "GLB",
+					"groupName": "3D Exchange Formats",
+					"code": "glb",
+					"icon": "cube",
+					"extensions": [
+						"glb"
+					]
+				}
+			},
+			{
+				"assetFormatType":
+				{
+					"name": "Converted Files",
+					"groupName": "",
+					"code": "converted-files",
+					"icon": "cube",
+					"extensions": [
+						"gltf",
+						"glb",
+						"usdz"
+					]
+				}
+			}
+		],
+		"_PluginMetas":
+		{
+			"apiDataVersion": "0.0.1",
+			"entitlementUid": "2f2c5e13-f6d7-4487-b16d-a6d56ccc86aa",
+			"cacheSize": 0,
+			"downloaded": []
+		}
+	},
+	"target": "UE",
+	"quality": "",
+	"format": "gltf",
+	"fileId": "26e4e1a5-c03e-44d1-ae79-00796d3d2c20",
+	"platformIncluded": "",
+	"distributionPointBaseUrls": [],
+	"distributionMethod": "",
+	"entitlementUid": "2f2c5e13-f6d7-4487-b16d-a6d56ccc86aa",
+	"invertedNormal": false,
+	"isConverted": true,
+	"isQuixel": false
+}
