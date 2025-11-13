@@ -39,6 +39,7 @@ else()
 	)
 endif()
 
+target_include_directories(App PRIVATE .)
 
 target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu)
 
@@ -68,4 +69,10 @@ if (EMSCRIPTEN)
 	)
 
 endif()
+
+# Ignore a warning that GLM requires to bypass
+if (MSVC)
+	# Disable warning C4201: nonstandard extension used: nameless struct/union
+	target_compile_options(App PUBLIC /wd4201)
+endif (MSVC)
 
