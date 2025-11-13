@@ -80,6 +80,12 @@ Submission: Add a new section to your README titled: Milestone #1, which should 
 - written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
 - Examples of your generators output so far
 We'll check your repository for updates. No need to create a new pull request.
+
+<img width="1064" height="802" alt="image" src="https://github.com/user-attachments/assets/b7c7d751-1494-4e73-8337-838ce500f877" />
+1. Brushstroke/curve taper generation - Implementation of Catmull-Rom curve with a variable radius and preloaded brush texture is done, not procedural for the time being
+2. Basic/small-scale optimization logic - Not implemented, short on time + involves implementation of multiple parts such as image difference, deciding where to place a brushstroke, gradient descent
+3. 2D image upload - Implemented but not integrated with brushstroke engine
+
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
 
