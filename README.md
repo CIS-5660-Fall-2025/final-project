@@ -36,7 +36,7 @@ Outline the main features of your project
  
     
 #### Design:
-<img height="350" src="/0.png">
+<img height="350" src="/Image/0.png">
 
 #### Timeline:
 - Week 1
@@ -48,15 +48,21 @@ Outline the main features of your project
 - Week 4
   - Final polish for the visual output.
 
-## Milestone 1: Implementation part 1 (due 11/12)
-Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
+## Milestone 1 
+Created the blueprint framework that reads the current map size and generate a map with randomized tile type. The current version is simply assigning types with a random number generator, but final version will be implemented with algorithms that generates map that make sense to the game mechanics.
 
-Put all your code in your forked repository.
+Original hand-crafted map:
 
-Submission: Add a new section to your README titled: Milestone #1, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
-- Examples of your generators output so far
-We'll check your repository for updates. No need to create a new pull request.
+<img width="700" src="./Image/original_map.png"> 
+
+Sample randomly generated maps:
+
+<img width="700" src="./Image/random_map_1.png"> 
+
+<img width="700" src="./Image/random_map_2.png"> 
+
+<img width="700" src="./Image/random_map_3.png"> 
+
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
 
