@@ -16,7 +16,7 @@ using namespace wgpu;
 class Application {
     public:
     
-    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr), vertexBuffer(nullptr), indexBuffer(nullptr) {}
+    inline Application() : device(nullptr), queue(nullptr), surface(nullptr), pipeline(nullptr), vertexBuffer(nullptr), indexBuffer(nullptr), pipelineLayout(nullptr) {}
     bool Initialize(); // Was initialization succesful?
     void Terminate();
     void MainLoop(); // Draw frame and handle events
@@ -33,11 +33,17 @@ class Application {
     Queue queue;
     Surface surface;
     TextureFormat surfaceFormat = TextureFormat::Undefined;
+
     RenderPipeline pipeline;
+    PipelineLayout pipelineLayout;
+    void InitializeBindGroups();
+    BindGroupLayout bindGroupLayout = nullptr;
+    BindGroup bindGroup = nullptr; // Bind Group mirrors the Layout, contains actual bindings
 
     void InitializeBuffers();
     Buffer vertexBuffer;
     Buffer indexBuffer;
+    Buffer uniformBuffer = nullptr;
     uint32_t vertexCount;
     uint32_t indexCount;
 };

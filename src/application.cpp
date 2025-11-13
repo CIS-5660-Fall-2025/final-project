@@ -321,69 +321,21 @@ bool Application::Initialize() {
 
     InitializeRenderPipeline();
 
-    // [...] Create a first buffer
-    BufferDescriptor bufferDesc;
-    bufferDesc.label = "GPU Side Data Buffer";
-    // CopyDst is copying to GPU, CopySrc is copying to CPU
-    bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::CopySrc;
-    bufferDesc.size = 16;
-    bufferDesc.mappedAtCreation = false; // Buffer also stored on CPU and synced with GPU
-    Buffer buf1 = device.createBuffer(bufferDesc);
-    // [...] Create a second buffer
-    // Reuse Desc
-    bufferDesc.label = "Output buffer";
-    bufferDesc.usage = BufferUsage::CopyDst | BufferUsage::MapRead;
-    Buffer buf2 = device.createBuffer(bufferDesc);
-    // [...] Write input data
-    std::vector<uint8_t> numbers(16); // 16 1-byte integers, 16 bytes
-    for(uint8_t i=0; i<16; ++i) numbers[i] = i;
-    queue.writeBuffer(buf1, 0, numbers.data(), numbers.size()); // Write into buf1
-    // When this func returns, writing may not be complete but we'll have already created a CPU-side copy
-    //   of the numbers data so we can free up the memory from the address we passed
-    // Commands in the queue after writeBuffer op won't execute before data transfer finishes
-    // [...] Encode and submit the buffer to buffer copy
-    CommandEncoder encoder = device.createCommandEncoder(Default);
-    encoder.copyBufferToBuffer(buf1, 0, buf2, 0, 16); // the 0 after each buf is the byte offset
-    CommandBuffer cmd = encoder.finish(Default);
-    encoder.release();
-    queue.submit(1, &cmd);
-    cmd.release();
-    // [...] Read buffer data back
-    
-    auto onBuf2Mapped = [](WGPUBufferMapAsyncStatus status, void *userData) {
-        auto *context = static_cast<std::pair<Buffer, bool>*>(userData);
-        context->second = true;
-        std::cout << "Buffer 2 mapped with status" << status << std::endl;
-        if(status != BufferMapAsyncStatus::Success) return;
-
-        uint8_t *bufferData = (uint8_t*) context->first.getConstMappedRange(0, 16);
-
-        std::cout << "bufferData = [";
-        for (int i = 0; i < 16; ++i) {
-            if (i > 0) std::cout << ", ";
-            std::cout << (int)bufferData[i];
-        }
-        std::cout << "]" << std::endl;
-
-        context->first.unmap();
-    };
-    std::pair<Buffer, bool> context = {buf2, false};
-    wgpuBufferMapAsync(buf2, MapMode::Read, 0, 16, onBuf2Mapped, &context);
-    while(!context.second) {
-        wgpuPollEvents(device, true);
-    }
-
-    // [...] Release buffers
-    buf1.release(); buf2.release();
-
     InitializeBuffers();
+    InitializeBindGroups();
 
     return true;
 }
 
 void Application::Terminate() {
+    bindGroup.release();
+
     vertexBuffer.release();
     indexBuffer.release();
+    uniformBuffer.release();
+
+    pipelineLayout.release();
+    bindGroupLayout.release();
 
     pipeline.release();
 
@@ -401,7 +353,12 @@ void Application::InitializeRenderPipeline() {
 
     RenderPipelineDescriptor pipelineDesc;
 
+    #ifdef RESOURCE_DIR
     ShaderModule shaderModule = ResourceManager::LoadShaderModule(RESOURCE_DIR "/test_shader.wgsl", device);
+    #else
+    ShaderModule shaderModule = nullptr;
+    std::cerr << "Resource Directory Undefined by CMake!" << std::endl;
+    #endif
     if(shaderModule == nullptr) {
         std::cerr << "Couldn't load shader!" << std::endl;
         exit(1);
@@ -456,9 +413,25 @@ void Application::InitializeRenderPipeline() {
     pipelineDesc.multisample.count = 1; // But we won't do multisampling
     pipelineDesc.multisample.mask = ~0u; // All bits on
     pipelineDesc.multisample.alphaToCoverageEnabled = false; // Irrelevant for now
+
+    // [...]
+    BindGroupLayoutEntry bindingLayout = Default;
+    bindingLayout.binding = 0; // @binding attrib in shader
+    bindingLayout.visibility = ShaderStage::Vertex;
+    bindingLayout.buffer.type = BufferBindingType::Uniform; // sampler, texture, and storageTexture are set to Undefined but this one set to Uniform cuz we use buffer for uniform
+    bindingLayout.buffer.minBindingSize = 4 * sizeof(float);
+
+    BindGroupLayoutDescriptor bindGroupLayoutDesc = {};
+    bindGroupLayoutDesc.entryCount = 1;
+    bindGroupLayoutDesc.entries = &bindingLayout;
+    bindGroupLayout = device.createBindGroupLayout(bindGroupLayoutDesc);
+
+    PipelineLayoutDescriptor pipelineLayoutDesc = {};
+    pipelineLayoutDesc.bindGroupLayoutCount = 1;
+    pipelineLayoutDesc.bindGroupLayouts = (WGPUBindGroupLayout*) &bindGroupLayout;
+    pipelineLayout = device.createPipelineLayout(pipelineLayoutDesc);
     // [...] Describe pipeline layout
-    pipelineDesc.layout = nullptr; // Would be important for accessing input and output resources (buffers/textures)
-        // nullptr asks backend to figure out layout
+    pipelineDesc.layout = pipelineLayout;
 
 
     // [...] Describe Vertex Layout
@@ -493,6 +466,10 @@ void Application::InitializeRenderPipeline() {
 void Application::MainLoop() {
     glfwPollEvents(); // Process input events
 
+    // Update uniforms
+    float t = static_cast<float>(glfwGetTime());
+    queue.writeBuffer(uniformBuffer, 0, &t, sizeof(float));
+
     auto [surfaceTexture, targetView] = GetNextSurfaceViewData();
     if(!targetView) return;
 
@@ -524,6 +501,7 @@ void Application::MainLoop() {
     renderPass.setPipeline(pipeline);
     renderPass.setVertexBuffer(0, vertexBuffer, 0, vertexBuffer.getSize()); // Could change geo here
     renderPass.setIndexBuffer(indexBuffer, IndexFormat::Uint32, 0, indexBuffer.getSize());
+    renderPass.setBindGroup(0, bindGroup, 0, nullptr);
     renderPass.drawIndexed(indexCount, 1, 0, 0, 0);
 
     renderPass.end();
@@ -636,7 +614,30 @@ void Application::InitializeBuffers() {
     indexBuffer = device.createBuffer(indexBufferDesc);
     queue.writeBuffer(indexBuffer, 0, indices.data(), indexBufferDesc.size);
     
+    // Uniform Buffer
+    BufferDescriptor uniformBufferDesc;
+    uniformBufferDesc.size = sizeof(float) * 4; // Aligned with 4 float
+    uniformBufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Uniform;
+    bufferDesc.mappedAtCreation = false;
+    uniformBuffer = device.createBuffer(uniformBufferDesc);
+    float time = 1.0f;
+    queue.writeBuffer(uniformBuffer, 0, &time, sizeof(float));
+
     // !!! Buffers must be multiple of 4 bytes
     // So make sure your data AND buffer is a good size
     // Could be arbitrary data just avoid trash data
+}
+
+void Application::InitializeBindGroups() {
+    BindGroupEntry binding = {};
+    binding.binding = 0; // Index of binding
+    binding.buffer = uniformBuffer; // Must come after creating buffer
+    binding.offset = 0;
+    binding.size = 4*sizeof(float);
+
+    BindGroupDescriptor bindGroupDesc = {};
+    bindGroupDesc.layout = bindGroupLayout;
+    bindGroupDesc.entryCount = 1; // Same as layout
+    bindGroupDesc.entries = &binding;
+    bindGroup = device.createBindGroup(bindGroupDesc);
 }
