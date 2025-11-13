@@ -1,14 +1,14 @@
 Unity-specific files and folders
 
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Mm]emoryCaptures/
-/[Aa]ssets/AssetStoreTools/
-/[Aa]ssets/AddressableAssetsData/._data*/
+Building_Generation/New Unity Project/[Ll]ibrary/
+Building_Generation/New Unity Project/[Tt]emp/
+Building_Generation/New Unity Project/[Oo]bj/
+Building_Generation/New Unity Project/[Bb]uild/
+Building_Generation/New Unity Project/[Bb]uilds/
+Building_Generation/New Unity Project/[Ll]ogs/
+Building_Generation/New Unity Project/[Mm]emoryCaptures/
+Building_Generation/New Unity Project/[Aa]ssets/AssetStoreTools/
+Building_Generation/New Unity Project/[Aa]ssets/AddressableAssetsData/._data*/
 
 Visual Studio / Rider / IDE project files
 
