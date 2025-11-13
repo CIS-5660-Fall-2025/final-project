@@ -1,117 +1,78 @@
-# Final Project!
+CIS 5660 Fall 2025 Final Project - Avi Serebrenik and Daniel Gerhardt
 
-This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
+### Progress Updates
 
-## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
+#### Milestone 1
+
+**Music Analysis:**
+It turns out that the Essentia audio analysis program is not fully supported in Windows, even though it is C++.
+After trying various methods, we found an executable that we can simply run from within UE5, which is what we currently use.
+With the .exe method, we have added music analysis of any music file as a load step, and we currently read BPM at runtime.
+
+**Level Generation:**
+
+Currently, we are spawning terrain tiles progressively in front of the player, and collapse behind them. They are linked to the BPM via color, so they flash green on the beat of the song. Also, the player has been set up with no camera controls and only left/right movement with jumping. This is to emulate the controls of games like run. We are also playing the song so you can hear the beats as the terrain changes with them. Piping has been set up using the Geometry Scripting plugin to have real time Boolean operations on the terrain, so we can punch holes in the ground in time with the song or relate their shape to attributes of the music.
 
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
 #### Introduction
-- What motivates your project?
+
+As fans of music, cool math games, and procedural terrain generation, we decided on this project to merge these together. At its core, this Unreal Engine game is a modern-day procedural music-based version of the classic cool math game, [Run 3](https://www.coolmathgames.com/0-run-3). For those unfamiliar, this is an infinite runner platformer, where players run in a tube with holes in it. For our version, the gameplay speed and hole generation are procedurally generated based on the played music.
 
 #### Goal
-- What do you intend to achieve with this project?
+
+* Integrate music into the game in a fun way
+* Drive procedural generation with music input
+* Get visuals that are related to the music
+* Allow users to input their own music
+* Make a fun game
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+
+* [Run 3](https://www.coolmathgames.com/0-run-3)
+* [Bullets Per Minute](https://store.steampowered.com/app/1286350/BPM_BULLETS_PER_MINUTE/)
+* [Crypt of the Necrodancer](https://store.steampowered.com/app/247080/Crypt_of_the_NecroDancer/)
+* [Danny DeVito](https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FDanny_DeVito&psig=AOvVaw1gr3XL6LeD3Bhxd9edU2f6&ust=1762273564648000&source=images&cd=vfe&opi=89978449&ved=0CBYQjRxqFwoTCKjN_N-y1pADFQAAAAAdAAAAABAE)
+* [Weezer](https://www.walmart.com/ip/Van-Camp-s-Pork-and-Beans-Canned-Beans-114-oz/10307919)
+* Bill Evans, who once said, “Jazz is the art of spontaneous creation in the moment.”
 
 #### Specification:
-- Outline the main features of your project.
+
+* An infinite tunnel with holes to run and jump in.
+* Player character who runs and jumps.
+* Unreal Engine
+* Linking audio analysis library, [Essentia](https://essentia.upf.edu/documentation.html)
+* Connecting all these assets.
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+
+* Unreal Engine, which is the main engine that will drive the actual gameplay.
+* [Essentia](https://essentia.upf.edu/documentation.html), which is an open source C++ audio analysis library. It will help us get information out of audio files.
+* Procedural 3D noise to generate the holes - probably using Perlin noise.
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+
+* The high-level view of our program is quite linear.
+* First, we have Unreal Engine, where we have the player behavior, play the music, and place the terrain.
+* Next, we have the terrain generator, which plugs into Unreal directly to tell it what terrain to place/the form of it.
+* Next, we have the audio analysis code, which plugs into the terrain generator code to influence its behavior.
+* Finally, Unreal Game logic also connects a little to the audio analysis, so they can communicate about what song is played, the current time, etc.
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
 
-Submit your Design doc as usual via pull request against this repository.
-## Milestone 1: Implementation part 1 (due 11/12)
-Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
+* **Milestone 1 (11/12):** A basic MVP, which is an infinite runner with randomized holes, and possibly the background color changing by the music, so we have some basic logic connected to the analysis.
 
-Put all your code in your forked repository.
+  * Setting up base Unreal Engine game logic (Dan).
+  * Setting up base music analysis with outputs (Avi).
 
-Submission: Add a new section to your README titled: Milestone #1, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
-- Examples of your generators output so far
-We'll check your repository for updates. No need to create a new pull request.
-## Milestone 2: Implementation part 2 (due 11/24)
-We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
+* **Milestone 2 (11/24):** Adding the music to the level generation, which is the hardest part. Polishing everything. Adding UI features to load songs, change music, etc.
 
-Put all your code in your forked repository.
+  * Music driven noise (Avi)
+  * Unreal UI with added logic (Dan)
+  * Polish (Avi and Dan)
 
-Submission: Add a new section to your README titled: Milestone #3, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what did you have to cut and why? 
-- Detailed output from your generator, images, video, etc.
-We'll check your repository for updates. No need to create a new pull request.
+* **Final Submissions (12/1):** Full polished game with powerups that influence music behavior.
 
-Come to class on the due date with a WORKING COPY of your project. We'll be spending time in class critiquing and reviewing your work so far.
-
-## Final submission (due 12/1)
-Time to polish! Spen this last week of your project using your generator to produce beautiful output. Add textures, tune parameters, play with colors, play with camera animation. Take the feedback from class critques and use it to take your project to the next level.
-
-Submission:
-- Push all your code / files to your repository
-- Come to class ready to present your finished project
-- Update your README with two sections 
-  - final results with images and a live demo if possible
-  - post mortem: how did your project go overall? Did you accomplish your goals? Did you have to pivot?
-
-## Topic Suggestions
-
-### Create a generator in Houdini
-
-### A CLASSIC 4K DEMO
-- In the spirit of the demo scene, create an animation that fits into a 4k executable that runs in real-time. Feel free to take inspiration from the many existing demos. Focus on efficiency and elegance in your implementation.
-- Example: 
-  - [cdak by Quite & orange](https://www.youtube.com/watch?v=RCh3Q08HMfs&list=PLA5E2FF8E143DA58C)
-
-### A RE-IMPLEMENTATION
-- Take an academic paper or other pre-existing project and implement it, or a portion of it.
-- Examples:
-  - [2D Wavefunction Collapse Pokémon Town](https://gurtd.github.io/566-final-project/)
-  - [3D Wavefunction Collapse Dungeon Generator](https://github.com/whaoran0718/3dDungeonGeneration)
-  - [Reaction Diffusion](https://github.com/charlesliwang/Reaction-Diffusion)
-  - [WebGL Erosion](https://github.com/LanLou123/Webgl-Erosion)
-  - [Particle Waterfall](https://github.com/chloele33/particle-waterfall)
-  - [Voxelized Bread](https://github.com/ChiantiYZY/566-final)
-
-### A FORGERY
-Taking inspiration from a particular natural phenomenon or distinctive set of visuals, implement a detailed, procedural recreation of that aesthetic. This includes modeling, texturing and object placement within your scene. Does not need to be real-time. Focus on detail and visual accuracy in your implementation.
-- Examples:
-  - [The Shrines](https://github.com/byumjin/The-Shrines)
-  - [Watercolor Shader](https://github.com/gracelgilbert/watercolor-stylization)
-  - [Sunset Beach](https://github.com/HanmingZhang/homework-final)
-  - [Sky Whales](https://github.com/WanruZhao/CIS566FinalProject)
-  - [Snail](https://www.shadertoy.com/view/ld3Gz2)
-  - [Journey](https://www.shadertoy.com/view/ldlcRf)
-  - [Big Hero 6 Wormhole](https://2.bp.blogspot.com/-R-6AN2cWjwg/VTyIzIQSQfI/AAAAAAAABLA/GC0yzzz4wHw/s1600/big-hero-6-disneyscreencaps.com-10092.jpg)
-
-### A GAME LEVEL
-- Like generations of game makers before us, create a game which generates an navigable environment (eg. a roguelike dungeon, platforms) and some sort of goal or conflict (eg. enemy agents to avoid or items to collect). Aim to create an experience that will challenge players and vary noticeably in different playthroughs, whether that means procedural dungeon generation, careful resource management or an interesting AI model. Focus on designing a system that is capable of generating complex challenges and goals.
-- Examples:
-  - [Rhythm-based Mario Platformer](https://github.com/sgalban/platformer-gen-2D)
-  - [Pokémon Ice Puzzle Generator](https://github.com/jwang5675/Ice-Puzzle-Generator)
-  - [Abstract Exploratory Game](https://github.com/MauKMu/procedural-final-project)
-  - [Tiny Wings](https://github.com/irovira/TinyWings)
-  - Spore
-  - Dwarf Fortress
-  - Minecraft
-  - Rogue
-
-### AN ANIMATED ENVIRONMENT / MUSIC VISUALIZER
-- Create an environment full of interactive procedural animation. The goal of this project is to create an environment that feels responsive and alive. Whether or not animations are musically-driven, sound should be an important component. Focus on user interactions, motion design and experimental interfaces.
-- Examples:
-  - [The Darkside](https://github.com/morganherrmann/thedarkside)
-  - [Music Visualizer](https://yuruwang.github.io/MusicVisualizer/)
-  - [Abstract Mesh Animation](https://github.com/mgriley/cis566_finalproj)
-  - [Panoramical](https://www.youtube.com/watch?v=gBTTMNFXHTk)
-  - [Bound](https://www.youtube.com/watch?v=aE37l6RvF-c)
-
-### YOUR OWN PROPOSAL
-- You are of course welcome to propose your own topic . Regardless of what you choose, you and your team must research your topic and relevant techniques and come up with a detailed plan of execution. You will meet with some subset of the procedural staff before starting implementation for approval.
+  * Powerups (Dan and Avi)
+  * Polish (Avi and Dan)
+  * Funkier ideas (Dan and Avi and Dan)
