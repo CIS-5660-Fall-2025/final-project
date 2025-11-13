@@ -1,3 +1,79 @@
+# Milestone 1
+
+## Wave Function Collapse
+
+Implemented a basic Wave Function Collapse algorithm in Unity, with a flat 2D map. Two main types of components are used: tiles, which store lists of possible adjacent tiles, and the generator itself, which has parameters for the map dimensions, grid cell size, and a list of possible tile types to appear in the map. Currently tiles only check orthogonally-adjacent tiles (i.e. tiles within the von Neumann neighborhood of that tile) but this could be easily expanded (e.g. to a Moore neighborhood) depending on the needs of the tileset by adding additional arrays to the tile class and additional steps to the propogation function used in the generator.
+
+<img width="400" height="542" alt="Screen Shot 2025-11-12 at 10 09 06 PM" src="https://github.com/user-attachments/assets/a8bb2c02-7b34-46da-a1a5-e41d0dc738f3" />
+<img width="400" height="538" alt="Screen Shot 2025-11-12 at 10 09 14 PM" src="https://github.com/user-attachments/assets/6bb32c3e-677a-408a-b64b-a9eb0af09f32" />
+<img width="400" height="538" alt="Screen Shot 2025-11-12 at 10 09 20 PM" src="https://github.com/user-attachments/assets/315dceed-b235-4c40-8cfd-14ebfc704a24" />
+<img width="400" height="537" alt="Screen Shot 2025-11-12 at 10 09 28 PM" src="https://github.com/user-attachments/assets/6b340cf6-fb98-47b2-9b2e-03f5eebac9ad" />
+
+The above images show example outputs using a set of castle parts made in Maya. 
+
+## Terrain Generation
+
+Implemented basic Perlin-noise based terrain generation. I followed [this tutorial](https://www.youtube.com/watch?v=hNRFosb_3Tc) to set up the base of the terrain generation and it worked really well. To add onto it, I implemented chunking for infinite terrain. So, I added a basic player capsule and depending on the location of the player, chunks will be spawned (or destroyed) within a certain distance. As part of the tutorial I followed, I also added a basic gradient shader that colors the terrain based on height.
+
+![Untitledvideo-MadewithClipchamp8-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/30da67fa-9746-44f6-9dee-a9ce3c5dadc4)
+![Recording2025-11-12232842-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/93e1ca3f-a6f2-4d7b-8691-ee0b569e2c1d)
+
+# Design Document
+
+## Introduction
+We were inspired by the game Townscaper to create a procedurally generated, stylized environment where a player can explore and walk around in.
+
+## Goal
+The goal of this project is to procedurally generate a beautiful, explorable environment that combines algorithmic generation with aesthetic design. We want to use procedural rules to not only build geometry, but also be visually appealing and cohesive.
+
+Specifically, we will:
+- Generate a stylized terrain with water and elevation variation
+- Populate it with procedurally generated buildings using wave function collapse 
+- Allow the player to explore the scene in first person
+
+## Inspiration/Reference
+- Townscaper
+<img width="1005" height="1007" alt="Screen Shot 2025-03-23 at 5 16 27 PM" src="https://github.com/user-attachments/assets/9d601148-04c8-40ec-992c-75c783f7448d" />
+- [Infinite procedurally generated city with the Wave Function Collapse algorithm | Marian's Blog](https://marian42.de/article/wfc/)
+
+
+## Specification
+- Engine: Unity
+- Camera: First-person exploration
+- Programming Languages: C#
+- Features:
+  - Procedural terrain and water generation
+  - Procedural building generation
+  - Stylization
+  - First-Person Controls
+
+## Techniques
+- Perlin Noise
+- Wave Function Collapse
+  - https://www.boristhebrave.com/2020/04/13/wave-function-collapse-explained/
+  - https://www.boristhebrave.com/2021/06/06/driven-wavefunctioncollapse/
+  - https://www.boristhebrave.com/2021/10/26/model-synthesis-and-modifying-in-blocks/ 
+  - https://www.boristhebrave.com/2021/10/31/constraint-based-tile-generators/ 
+- Stylization
+  - https://github.com/jyguan18/hw02-stylization
+
+## Design
+<img width="1379" height="755" alt="Screen Shot 2025-11-05 at 2 52 37 PM" src="https://github.com/user-attachments/assets/089118cc-045f-4f36-b161-b7bf1e022c20" />
+
+
+## Timeline
+
+| |Griffin|Jackie|Deadline|
+|--|--|--|--|
+|**Milestone 1**|- Gather assets<br>- Wave Function Collapse for a flat plane|- Setup Github<br>- Gather assets<br>- Terrain Generation|Nov 12, 2025|
+|**Milestone 2**|- First-Person Camera<br>- Adapt wave function collapse to the generated terrain|- Stylization (Post-Process Effects)<br>- Water Shading|Nov 24, 2025|
+|**Final**|- Final Tweaks<br>- Tune movement + collision|- Final Tweaks<br>- Tune colors, textures, etc.|Dec 1, 2025|
+
+
+<br>
+
+
+
 # Final Project!
 
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
