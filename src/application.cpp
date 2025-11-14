@@ -443,15 +443,24 @@ void Application::InitializeRenderPipeline() {
     pipelineDesc.multisample.alphaToCoverageEnabled = false; // Irrelevant for now
 
     // [...]
-    BindGroupLayoutEntry bindingLayout = Default;
+    vector<BindGroupLayoutEntry> bindingLayoutEntries(2, Default);
+
+    // Binding Entry 1
+    BindGroupLayoutEntry &bindingLayout = bindingLayoutEntries[0];
     bindingLayout.binding = 0; // @binding attrib in shader
     bindingLayout.visibility = ShaderStage::Vertex | ShaderStage::Fragment;
     bindingLayout.buffer.type = BufferBindingType::Uniform; // sampler, texture, and storageTexture are set to Undefined but this one set to Uniform cuz we use buffer for uniform
     bindingLayout.buffer.minBindingSize = sizeof(MyUniforms);
 
+    BindGroupLayoutEntry &textureBindingLayout = bindingLayoutEntries[1];
+    textureBindingLayout.binding = 1;
+    textureBindingLayout.visibility = ShaderStage::Fragment;
+    textureBindingLayout.texture.sampleType = TextureSampleType::Float; // This one we set the texture type instead of buffer
+    textureBindingLayout.texture.viewDimension = TextureViewDimension::_2D;
+
     BindGroupLayoutDescriptor bindGroupLayoutDesc = {};
-    bindGroupLayoutDesc.entryCount = 1;
-    bindGroupLayoutDesc.entries = &bindingLayout;
+    bindGroupLayoutDesc.entryCount = 2;
+    bindGroupLayoutDesc.entries = bindingLayoutEntries.data();
     bindGroupLayout = device.createBindGroupLayout(bindGroupLayoutDesc);
 
     PipelineLayoutDescriptor pipelineLayoutDesc = {};
@@ -488,6 +497,20 @@ void Application::InitializeRenderPipeline() {
     pipeline = device.createRenderPipeline(pipelineDesc);
 
     shaderModule.release();
+
+    testTexture.Initialize(device);
+    uint32_t dim = 256;
+    vector<uint8_t> pixels(4 * dim * dim);
+    for(uint32_t i = 0; i < dim; ++i) {
+        for(uint32_t j = 0; j<dim; ++j) {
+            uint8_t *p = &pixels[4 * (j + i * dim)];
+            p[0] = (uint8_t) i;
+            p[1] = 0;//(uint8_t) j;
+            p[2] = 0;
+            p[3] = 255;
+        }
+    }
+    testTexture.WriteToTexture(queue, pixels);
 
 }
 
@@ -690,15 +713,19 @@ void Application::InitializeBuffers() {
 }
 
 void Application::InitializeBindGroups() {
-    BindGroupEntry binding = {};
-    binding.binding = 0; // Index of binding
-    binding.buffer = uniformBuffer; // Must come after creating buffer
-    binding.offset = 0;
-    binding.size = sizeof(MyUniforms);
+    vector<BindGroupEntry> bindings(2);
+
+    bindings[0].binding = 0; // Index of binding
+    bindings[0].buffer = uniformBuffer; // Must come after creating buffer
+    bindings[0].offset = 0;
+    bindings[0].size = sizeof(MyUniforms);
+
+    bindings[1].binding = 1;
+    bindings[1].textureView = testTexture.textureView;
 
     BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;
-    bindGroupDesc.entryCount = 1; // Same as layout
-    bindGroupDesc.entries = &binding;
+    bindGroupDesc.entryCount = static_cast<uint32_t>(bindings.size()); // Same as layout
+    bindGroupDesc.entries = bindings.data();
     bindGroup = device.createBindGroup(bindGroupDesc);
 }

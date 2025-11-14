@@ -25,7 +25,8 @@ set(SOURCE_FILES
 	application.cpp
 	webgpu_utils.cpp
 	resource_manager.cpp
-	camera.cpp)
+	camera.cpp
+	texture_holder.cpp)
 
 add_executable(App ${SOURCE_FILES})
 

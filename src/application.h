@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 
 #include "camera.h"
+#include "texture_holder.h"
 
 using namespace wgpu;
 using namespace glm;
@@ -63,4 +64,6 @@ class Application {
     Buffer uniformBuffer = nullptr;
     uint32_t vertexCount;
     uint32_t indexCount;
+
+    TextureHolder testTexture;
 };

@@ -13,10 +13,12 @@ struct VertexInput {
 
 struct VertexOutput {
 	@builtin(position) position: vec4f,
-	@location(0) color: vec3f
+	@location(0) color: vec3f,
+	@location(1) uv: vec2f
 };
 
 @group(0) @binding(0) var<uniform> u_Uniforms: MyUniforms;
+@group(0) @binding(1) var testTexture: texture_2d<f32>;
 
 fn rot(v: vec2f, o: f32) -> vec2f {
 	return mat2x2f(cos(o), sin(o), -sin(o), cos(o)) * v;
@@ -30,11 +32,13 @@ fn vs_main(vIn: VertexInput) -> VertexOutput {
 
 	out.position = pos;
 	out.color = vIn.color;
+	out.uv = vIn.position.xy*0.5+0.5;
 	return out;
 }
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-	var col = pow(in.color*u_Uniforms.color.rgb, vec3f(2.2));
-	return vec4(col, 1.0);
+	var col = textureLoad(testTexture, vec2i(in.uv*240.), 0).rgb;//vec3f(in.uv, 0.0);
+	var correctedCol = pow(col, vec3f(2.2));
+	return vec4(correctedCol, 1.0);
 }
