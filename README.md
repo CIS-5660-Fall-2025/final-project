@@ -11,24 +11,64 @@ Start off by forking this repository. In your README, write a design doc to outl
 #### Introduction
 - What motivates your project?
 
+Convenient, fast texturing/stylization (since texturing in e.g. Blender isn't that good) 
+
 #### Goal
 - What do you intend to achieve with this project?
+
+2D (+ 3D?) to brushstroke engine
 
 #### Inspiration/reference:
 - You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
 - Include in your design doc links to and images of your reference material.
 
+https://download.blender.org/archive/gallery/blender-splash-screens/blender-2-90/
+
+<img width="1004" height="502" alt="blender-2-90-picture" src="https://github.com/user-attachments/assets/85f3b1f9-e501-4647-9036-9003644c1ef1" />
+
+https://www.furaffinity.net/view/62291064/
+
+![495478413-a63eeb38-4575-4685-9c02-b2c9ece77e7e](https://github.com/user-attachments/assets/902f654d-a3af-48c0-867b-6ab5297a5bdf)
+
 #### Specification:
 - Outline the main features of your project.
+
+1. Import of a 2D image ->
+  1. Edge detection, outline generation
+  1. Color quantization or mimic a paint palette
+  1. Gaussian splat-style optimization
+  1. Brush dashing animation
+  2. Guidelines to dictate flows/dams
+1. Import of a 3D image ->
+  1. Similar but using curve placement in 3D space
+  1. (Maybe) porting of certain material properties to variable brushstroke colors
 
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
 
+Gaussian splatting optimization https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/
+
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
 
+<img width="1230" height="738" alt="image" src="https://github.com/user-attachments/assets/e54ce621-9834-4693-a05c-85c101a71fa2" />
+
+
 #### Timeline:
 - Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+
+Milestone 1
+1. Brushstroke/curve taper generation
+2. Basic/small-scale optimization logic
+3. 2D image upload
+
+Milestone 2
+1. Larger-scale optimization (more brushstrokes)
+2. Larger-scale edge detection settingss
+3. 3D scene upload
+
+Final
+1. Demo images/scenes
 
 Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/12)
@@ -40,6 +80,13 @@ Submission: Add a new section to your README titled: Milestone #1, which should 
 - written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
 - Examples of your generators output so far
 We'll check your repository for updates. No need to create a new pull request.
+
+<img width="1064" height="802" alt="image" src="https://github.com/user-attachments/assets/b7c7d751-1494-4e73-8337-838ce500f877" />
+
+1. Brushstroke/curve taper generation - Implementation of Catmull-Rom curve with a variable radius and preloaded brush texture is done, not procedural for the time being
+1. Basic/small-scale optimization logic - Not implemented, short on time + involves implementation of multiple parts such as image difference, deciding where to place a brushstroke, gradient descent
+1. 2D image upload - Implemented but not integrated with brushstroke engine
+
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
 
