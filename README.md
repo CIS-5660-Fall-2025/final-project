@@ -3,43 +3,73 @@
 This is it! The culmination of your procedural graphics experience this semester. For your final project, we'd like to give you the time and space to explore a topic of your choosing. You may choose any topic you please, so long as you vet the topic and scope with an instructor or TA. We've provided some suggestions below. The scope of your project should be roughly 1.5 homework assignments). To help structure your time, we're breaking down the project into 4 milestones:
 
 ## Project planning: Design Doc (due 11/5)
-Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
-
 ### Design Doc
-Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
-
 #### Introduction
-- What motivates your project?
+We’re excited by the idea of procedurally generating assets that can amplify the visual impact of our GPU final project, real time cloud generation. Because a big focus of that final project is collisions, we’d like to make assets here that can highlight that functionality. We think that floating cloud rocks and foliage, and procedurally animated fauna flying between those assets and the GPU clouds, would look incredible!
 
 #### Goal
-- What do you intend to achieve with this project?
+We aim to create high-quality floating island assets with procedurally animated birds that react to them. These assets, along with supporting elements like a skybox, will be assembled into a cohesive demo scene. By juxtaposing the islands and the birds, we hope to convey a strong sense of scale and enhance the visual impact of our scene. 
 
 #### Inspiration/reference:
-- You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
-- Include in your design doc links to and images of your reference material.
+- Avatar
+  - https://www.youtube.com/watch?v=YfK6CNTAG7o
+- RIVEN architecture
+  - https://www.youtube.com/watch?v=JumtB_YY2I4
 
 #### Specification:
-- Outline the main features of your project.
+- Houdini Floating Terrain Generation
+  - Rock architecture
+  - Vines
+  - Foliage, Trees
+- Basic Architecture
+  - Homes
+  - Bridges
+- Birds
+  - Extra Credit: Custom Bird Generation
+  - Procedural Animation:
+    - Flocking
+    - Obstacle Avoidance
+    - Triangle Leader Following
 
 #### Techniques:
-- What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
+- [Ivy Tool](https://www.sidefx.com/tutorials/project-titan-ivy-tool/) 
+- [Vines Generation](https://www.youtube.com/watch?v=3u6UNNJQ_cM)
+- [Procedural Rock Generation](https://www.sidefx.com/tutorials/proc-rocks-using-vops/)
+- [Bird Flight Modeling](https://grail.cs.washington.edu/projects/flight/wu2003realistic.pdf)
+- Boids, Leader Following, Obstacle Avoidance
 
 #### Design:
-- How will your program fit together? Make a simple free-body diagram illustrating the pieces.
+<img width="405" height="416" alt="image" src="https://github.com/user-attachments/assets/a7aa48b4-8126-4e35-9e97-08cc9878c9d3" />
 
 #### Timeline:
-- Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+- Week 1
+  - Floating islands base and procedural ivies 
+  - Basic Birds Modeling
+- Week 2 
+  - Vines between floating islands 
+  - Bird Flying Animations
+- Week 3 
+  - Riven style architecture on islands
+  - Bird Behavioral Animations
+- Week 4
+  - Polish architecture and add more foliage 
+  - Birds in engine with terrain
 
-Submit your Design doc as usual via pull request against this repository.
-## Milestone 1: Implementation part 1 (due 11/12)
-Begin implementing your engine! Don't worry too much about polish or parameter tuning -- this week is about getting together the bulk of your generator implemented. By the end of the week, even if your visuals are crude, the majority of your generator's functionality should be done.
+## Milestone 1
 
-Put all your code in your forked repository.
 
-Submission: Add a new section to your README titled: Milestone #1, which should include
-- written description of progress on your project goals. If you haven't hit all your goals, what's giving you trouble?
-- Examples of your generators output so far
-We'll check your repository for updates. No need to create a new pull request.
+
+https://github.com/user-attachments/assets/ba4b1430-0102-4c41-aac1-231499145be9
+
+Progress:
+
+Programmed some flocking behavior into houdini, using several POP forces!
+Next step there will be to tie bird animation to the particle state and to add obstacle avoidance.
+
+
+
+
+
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
 
