@@ -408,7 +408,34 @@ void Application::InitializeRenderPipeline() {
 
     pipelineDesc.fragment = &fragmentState; // Nullable since fragment state is optional
     // [...] Describe stencil/depth pipeline state
-    pipelineDesc.depthStencil = nullptr; // Configure ZBuffer test
+    DepthStencilState depthStencilState = Default;
+    depthStencilState.depthCompare = CompareFunction::Less;
+    depthStencilState.depthWriteEnabled = true;
+    // [...] Create depth texture & depth tex view
+    TextureFormat depthTextureFormat = TextureFormat::Depth24Plus;
+    depthStencilState.format = depthTextureFormat;
+    depthStencilState.stencilReadMask = 0;
+    depthStencilState.stencilWriteMask = 0;
+    TextureDescriptor depthTextureDesc;
+    depthTextureDesc.dimension = TextureDimension::_2D;
+    depthTextureDesc.format = depthTextureFormat;
+    depthTextureDesc.mipLevelCount = 1;
+    depthTextureDesc.sampleCount = 1;
+    depthTextureDesc.size = {640, 480, 1};
+    depthTextureDesc.usage = TextureUsage::RenderAttachment;
+    depthTextureDesc.viewFormatCount = 1;
+    depthTextureDesc.viewFormats = (WGPUTextureFormat*) &depthTextureFormat;
+    depthTexture = device.createTexture(depthTextureDesc);
+    TextureViewDescriptor depthTextureViewDesc;
+    depthTextureViewDesc.aspect = TextureAspect::DepthOnly;
+    depthTextureViewDesc.baseArrayLayer = 0;
+    depthTextureViewDesc.arrayLayerCount = 1;
+    depthTextureViewDesc.baseMipLevel = 0;
+    depthTextureViewDesc.mipLevelCount = 1;
+    depthTextureViewDesc.dimension = TextureViewDimension::_2D;
+    depthTextureViewDesc.format = depthTextureFormat;
+    depthTextureView = depthTexture.createView(depthTextureViewDesc);
+    pipelineDesc.depthStencil = &depthStencilState; // Configure ZBuffer test
     // [...] Describe multi-sampling state
     // You can have multiple fragments per pixel and avg the result into a pixel
     pipelineDesc.multisample.count = 1; // But we won't do multisampling
@@ -441,18 +468,18 @@ void Application::InitializeRenderPipeline() {
     vector<VertexAttribute> vertexAttribs(2);
 
     vertexAttribs[0].shaderLocation = 0;
-    vertexAttribs[0].format = VertexFormat::Float32x2;
+    vertexAttribs[0].format = VertexFormat::Float32x3;
     vertexAttribs[0].offset = 0;
 
     vertexAttribs[1].shaderLocation = 1;
     vertexAttribs[1].format = VertexFormat::Float32x3;
-    vertexAttribs[1].offset = 2 * sizeof(float);
+    vertexAttribs[1].offset = 3 * sizeof(float);
     
 
     vertexBufferLayout.attributeCount = 2;
     vertexBufferLayout.attributes = vertexAttribs.data();
 
-    vertexBufferLayout.arrayStride = 5 * sizeof(float);
+    vertexBufferLayout.arrayStride = 6 * sizeof(float);
     vertexBufferLayout.stepMode = VertexStepMode::Vertex; // Each new val is a new vertex
 
     pipelineDesc.vertex.bufferCount = 1;
@@ -495,6 +522,34 @@ void Application::MainLoop() {
     renderPassDesc.timestampWrites = nullptr;
     renderPassDesc.colorAttachmentCount = 1;
     renderPassDesc.colorAttachments = &renderPassColorAttachment; // Array
+
+    // Create render pass depth attachment
+    RenderPassDepthStencilAttachment depthStencilAttachment;
+    // The view of the depth texture
+    depthStencilAttachment.view = depthTextureView;
+
+    // 1 is far
+    depthStencilAttachment.depthClearValue = 1.0f;
+    #ifdef WEBGPU_BACKEND_DAWN
+    depthStencilAttachment.clearDepth = std::numeric_limits<float>::quiet_NaN();
+    #endif
+    // Operation settings comparable to the color attachment
+    depthStencilAttachment.depthLoadOp = LoadOp::Clear;
+    depthStencilAttachment.depthStoreOp = StoreOp::Store;
+    // we could turn off writing to the depth buffer globally here
+    depthStencilAttachment.depthReadOnly = false;
+
+    // Stencil setup, mandatory but unused
+    depthStencilAttachment.stencilClearValue = 0;
+    #ifndef WEBGPU_BACKEND_DAWN
+    depthStencilAttachment.stencilLoadOp = LoadOp::Clear;
+    depthStencilAttachment.stencilStoreOp = StoreOp::Store;
+    #else
+    depthStencilAttachment.stencilLoadOp = LoadOp::Undefined;
+    depthStencilAttachment.stencilStoreOp = StoreOp::Undefined;
+    #endif
+    depthStencilAttachment.stencilReadOnly = true;
+    renderPassDesc.depthStencilAttachment = &depthStencilAttachment;
 
     RenderPassEncoder renderPass = encoder.beginRenderPass(renderPassDesc);
 
@@ -571,7 +626,7 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
     requiredLimits.limits.minStorageBufferOffsetAlignment = 32;
     requiredLimits.limits.maxVertexAttributes = 2; // Require a max of 1
     requiredLimits.limits.maxVertexBuffers = 1;
-    requiredLimits.limits.maxBufferSize = 6 * 5 * sizeof(float);
+    requiredLimits.limits.maxBufferSize = 6 * 6 * sizeof(float);
     requiredLimits.limits.maxVertexBufferArrayStride = 5 * sizeof(float);
     requiredLimits.limits.maxInterStageShaderComponents = 3;
     // We can only draw 2 triangles with these limits..
@@ -581,21 +636,20 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
 
 void Application::InitializeBuffers() {
     vector<float> positions = {
-        -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-        0.0f, 0.5f,  0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f,  1.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.5f,  1.0f, 0.0f, 0.0f,
         
-        -0.9f, -0.9f,  1.0f, 0.0f, 0.0f,
-        -0.7f, -0.9f,  0.0f, 1.0f, 0.0f,
-        -0.85f,-0.7f,  0.0f, 0.0f, 1.0f
+        -0.9f, -0.9f, 0.4f,  1.0f, 1.0f, 0.0f,
+        -0.7f, -0.9f, 0.4f,  0.0f, 1.0f, 0.0f,
+        0.1f, 0.1f, 0.4f,  0.0f, 1.0f, 1.0f
     };
-    vertexCount = static_cast<uint32_t>(positions.size())/5;
+    vertexCount = static_cast<uint32_t>(positions.size())/6;
 
     // indices must be uint16_t or uint32_t
     vector<uint32_t> indices = {
         0, 1, 2,
         3, 4, 5,
-        0, 1, 5
     };
     indexCount = static_cast<uint32_t>(indices.size());
 

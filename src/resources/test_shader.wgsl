@@ -4,7 +4,7 @@ struct MyUniforms {
 };
 
 struct VertexInput {
-	@location(0) position: vec2f,
+	@location(0) position: vec3f,
 	@location(1) color: vec3f
 };
 
@@ -22,7 +22,7 @@ fn rot(v: vec2f, o: f32) -> vec2f {
 @vertex
 fn vs_main(vIn: VertexInput) -> VertexOutput {
 	var out: VertexOutput;
-	out.position = vec4f(rot(vIn.position, u_Uniforms.time), 0.0, 1.0);
+	out.position = vec4f(rot(vIn.position.xy, u_Uniforms.time), vIn.position.z, 1.0);
 	out.color = vIn.color;
 	return out;
 }
