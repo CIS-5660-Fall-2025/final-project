@@ -17,6 +17,9 @@
         },
         {
             "m_Id": "1fb65e481f114ca08b9481ab624b2158"
+        },
+        {
+            "m_Id": "de42d87d18964c758fc68edc81ae19fe"
         }
     ],
     "m_Keywords": [],
@@ -92,6 +95,9 @@
         },
         {
             "m_Id": "db32e40e477d4697ad23b6b81234fa4b"
+        },
+        {
+            "m_Id": "2010fee06528409998248aa4c6ea12c2"
         }
     ],
     "m_GroupDatas": [
@@ -127,6 +133,20 @@
                     "m_Id": "963b60f86ba84a4986ff49b654739e23"
                 },
                 "m_SlotId": 9
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "2010fee06528409998248aa4c6ea12c2"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "963b60f86ba84a4986ff49b654739e23"
+                },
+                "m_SlotId": 13
             }
         },
         {
@@ -661,7 +681,7 @@
     "m_Title": "ViewDir",
     "m_Position": {
         "x": -2300.5,
-        "y": 50.5
+        "y": 50.50006103515625
     }
 }
 
@@ -774,6 +794,42 @@
     "useTilingAndOffset": false,
     "m_Modifiable": true,
     "m_DefaultType": 1
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "2010fee06528409998248aa4c6ea12c2",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -586.5,
+            "y": 436.0,
+            "width": 162.5,
+            "height": 34.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "63639b9322ff4cd0add2dbd9eea96447"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "de42d87d18964c758fc68edc81ae19fe"
+    }
 }
 
 {
@@ -1432,6 +1488,29 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector3MaterialSlot",
+    "m_ObjectId": "63639b9322ff4cd0add2dbd9eea96447",
+    "m_Id": 0,
+    "m_DisplayName": "TexWorldCenter",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "6384db23bf9342b49f37f9e046ad2d2a",
     "m_Id": 1,
@@ -1757,6 +1836,29 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector3MaterialSlot",
+    "m_ObjectId": "8167ab621a2b456e89c6b8306441a570",
+    "m_Id": 13,
+    "m_DisplayName": "TexWorldCenter",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "TexWorldCenter",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
     "m_ObjectId": "8598e0364a754e138ee830276b68d8ee",
     "m_Id": 1,
@@ -1932,6 +2034,9 @@
         },
         {
             "m_Id": "1fb65e481f114ca08b9481ab624b2158"
+        },
+        {
+            "m_Id": "de42d87d18964c758fc68edc81ae19fe"
         }
     ]
 }
@@ -1984,6 +2089,9 @@
         },
         {
             "m_Id": "644c52b1d4374fdb888727a9eae4b7a5"
+        },
+        {
+            "m_Id": "8167ab621a2b456e89c6b8306441a570"
         },
         {
             "m_Id": "c1c29354edac4e959ab6bb6b36eccea8"
@@ -2793,6 +2901,34 @@
     "m_filter": 0,
     "m_wrap": 1,
     "m_aniso": 0
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector3ShaderProperty",
+    "m_ObjectId": "de42d87d18964c758fc68edc81ae19fe",
+    "m_Guid": {
+        "m_GuidSerialized": "99306eba-4973-47cd-8a91-667b67d8b8a1"
+    },
+    "m_Name": "TexWorldCenter",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "TexWorldCenter",
+    "m_DefaultReferenceName": "_TexWorldCenter",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    }
 }
 
 {

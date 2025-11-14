@@ -1,4 +1,4 @@
-Shader "Custom/DissipationShader"
+Shader "Unlit/AddClamp"
 {
     Properties
     {
@@ -7,7 +7,6 @@ Shader "Custom/DissipationShader"
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        Cull Off ZWrite Off ZTest Always
         LOD 100
 
         Pass
@@ -18,9 +17,6 @@ Shader "Custom/DissipationShader"
 
             #include "UnityCG.cginc"
 
-            sampler2D _MainTex;
-            float4 _MainTex_TexelSize;
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -29,24 +25,28 @@ Shader "Custom/DissipationShader"
 
             struct v2f
             {
-                float4 pos : SV_POSITION;
-                float2 uv  : TEXCOORD0;
+                float2 uv : TEXCOORD0;
+                float4 vertex : SV_POSITION;
             };
+
+            sampler2D _ObjectsRT;
+            sampler2D _CurrentRT;
+            float4 _ObjectsRT_ST;
 
             v2f vert (appdata v)
             {
                 v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _ObjectsRT);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float3 color = tex2D(_MainTex, i.uv).rgb;
-                color *= 0.996;
-
-                return float4(color, 1.0);
+                // sample the texture
+                fixed4 tex1 = tex2D(_ObjectsRT, i.uv);
+                fixed4 tex2 = tex2D(_CurrentRT, i.uv);
+                return saturate(tex1 + tex2);
             }
             ENDCG
         }

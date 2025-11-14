@@ -28,27 +28,17 @@ float sampleDensity(float3 Position)
 float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float texWorldSize, UnityTexture2D DissipationTex,
     UnitySamplerState DissipationSampler)
 {
-    /*
-    float baseDensity = 0.04;
+    
+    float baseDensity = 0.1;
 
     float2 localPos = (textWorldCenter.xz - Position.xz) / texWorldSize + 0.5;
     
-    float dissipation = SAMPLE_TEXTURE2D(DissipationTex, DissipationSampler, localPos).r;
+    float dissipation = max(0, SAMPLE_TEXTURE2D(DissipationTex, DissipationSampler, localPos).r);
 
     if (any(localPos < 0.0) || any(localPos > 1.0))
         return baseDensity;
-    */
     
-    if (frac(Position.x / 10) > 0.8 || frac(Position.z / 10) > 0.8)
-    {
-        return 0.04;
-    }
-    else
-    {
-        return 0;
-    }
-
-    //return baseDensity * dissipation;
+    return lerp(baseDensity, 0.01, clamp(dissipation, 0, 1));
 }
 
 float lightmarch(float3 Position, float3 BoundsMin, float3 BoundsMax)
@@ -80,6 +70,7 @@ void RayMarcher_float(
     float texWorldSize,
     UnityTexture2D DissipationTex,
     UnitySamplerState DissipationSampler,
+    float3 texCenter,
     out float4 outValue
 )
 {
@@ -97,8 +88,6 @@ void RayMarcher_float(
     float transmittance = 1;
     float lightEnergy = 0;
     
-    float texWorldCenter = (BoundsMin + BoundsMax) / 2.0;
-
     [loop]
     for (int i = 0; i < 64; i++)
     {
@@ -109,7 +98,7 @@ void RayMarcher_float(
 
         float density = sampleDensityDissipation(
             marchPos,
-            texWorldCenter,
+            texCenter,
             texWorldSize,
             DissipationTex,
             DissipationSampler
@@ -119,7 +108,7 @@ void RayMarcher_float(
         {
             //float lightTransmittance = lightmarch(marchPos, BoundsMin, BoundsMax);
 
-            lightEnergy += density * STEP_SIZE * transmittance;// * lightTransmittance;
+            lightEnergy += density * STEP_SIZE * transmittance; // * lightTransmittance;
             transmittance *= exp(-density * STEP_SIZE);
 
             if (transmittance < 0.01)

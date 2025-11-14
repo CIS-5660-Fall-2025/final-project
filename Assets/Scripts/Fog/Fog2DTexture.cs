@@ -17,11 +17,15 @@ public class Fog2DTexture : MonoBehaviour
 
     //temp
     private Material testMat;
+    private bool enableTestMat;
+
     private Vector3 prevLocation;
 
     // Start is called before the first frame update
     void Start()
     {
+        enableTestMat = false;
+
         //Creating render textures and materials
         CurrRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
         TempRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);
@@ -32,8 +36,10 @@ public class Fog2DTexture : MonoBehaviour
         FullScreenMat.SetTexture("_DissipationTexture", CurrRT);
 
         //temp
-        testMat = GetComponent<Renderer>().material;
-        testMat.SetTexture("_MainTex", CurrRT);
+        if (enableTestMat) {
+            testMat = GetComponent<Renderer>().material;
+            testMat.SetTexture("_MainTex", CurrRT);
+        }
 
         prevLocation = transform.position;
         StartCoroutine(Dissipate());
@@ -45,7 +51,9 @@ public class Fog2DTexture : MonoBehaviour
         Vector3 playerOffset;
         while (true) {
 
-            testMat.SetVector("_TexPosition", transform.position);
+            if (enableTestMat) {
+                testMat.SetVector("_TexPosition", transform.position);
+            }
 
             playerOffset = transform.position - prevLocation;
             if (playerOffset != Vector3.zero)
@@ -82,7 +90,9 @@ public class Fog2DTexture : MonoBehaviour
             DissipationMat.SetTexture("_MainTex", CurrRT);
             Graphics.Blit(null, TempRT, DissipationMat);
 
-            testMat.SetVector("_TexPosition", transform.position);
+            if (enableTestMat) {
+                testMat.SetVector("_TexPosition", transform.position);
+            }
 
             //Swap TempRT and CurrentRT
             SwapRTs(ref TempRT, ref CurrRT);

@@ -28,6 +28,7 @@ public class FogVariables : MonoBehaviour
             yield return null;
             FullScreenMat.SetVector("_BoundsMin", FogBox.position - savedScale / 2);
             FullScreenMat.SetVector("_BoundsMax", FogBox.position + savedScale / 2);
+            FullScreenMat.SetVector("_TexWorldCenter", transform.position);
             yield return null;
         }
     }
