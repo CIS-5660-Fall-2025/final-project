@@ -67,8 +67,11 @@ Programmed some flocking behavior into houdini, using several POP forces!
 Next step there will be to tie bird animation to the particle state and to add obstacle avoidance.
 
 
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/f416693e-6145-4759-a5c8-610ae4503def" />
 
+Progress: 
 
+Created base for procedural floating islands. The next step would be adding vegeatation, structures, etc. to enrich the island's visuals. 
 
 ## Milestone 2: Implementation part 2 (due 11/24)
 We're over halfway there! This week should be about fixing bugs and extending the core of your generator. Make sure by the end of this week _your generator works and is feature complete._ Any core engine features that don't make it in this week should be cut! Don't worry if you haven't managed to exactly hit your goals. We're more interested in seeing proof of your development effort than knowing your planned everything perfectly. 
