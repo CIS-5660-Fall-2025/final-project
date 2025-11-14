@@ -28,6 +28,7 @@ float sampleDensity(float3 Position)
 float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float texWorldSize, UnityTexture2D DissipationTex,
     UnitySamplerState DissipationSampler)
 {
+    /*
     float baseDensity = 0.04;
 
     float2 localPos = (textWorldCenter.xz - Position.xz) / texWorldSize + 0.5;
@@ -36,8 +37,18 @@ float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float te
 
     if (any(localPos < 0.0) || any(localPos > 1.0))
         return baseDensity;
+    */
+    
+    if (frac(Position.x / 10) > 0.8 || frac(Position.z / 10) > 0.8)
+    {
+        return 0.04;
+    }
+    else
+    {
+        return 0;
+    }
 
-    return baseDensity * dissipation;
+    //return baseDensity * dissipation;
 }
 
 float lightmarch(float3 Position, float3 BoundsMin, float3 BoundsMax)
@@ -106,7 +117,7 @@ void RayMarcher_float(
 
         if (density > 0.0)
         {
-            float lightTransmittance = lightmarch(marchPos, BoundsMin, BoundsMax);
+            //float lightTransmittance = lightmarch(marchPos, BoundsMin, BoundsMax);
 
             lightEnergy += density * STEP_SIZE * transmittance;// * lightTransmittance;
             transmittance *= exp(-density * STEP_SIZE);
