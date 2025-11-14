@@ -1,10 +1,12 @@
-static const float STEP_SIZE = 0.05;
-
+static const float STEP_SIZE = 0.1;
+static const float3 LIGHT_DIR = float3(1, 0.6, 0);
+static const float3 LIGHT_COLOR = float3(0.7, 0.65, 0.65);
 
 float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 RayDirection)
 {
     float3 t0 = (BoundsMin - RayOrigin) / RayDirection;
     float3 t1 = (BoundsMax - RayOrigin) / RayDirection;
+
     float3 tmin = min(t0, t1);
     float3 tmax = max(t0, t1);
 
@@ -13,11 +15,31 @@ float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 R
 
     float distToBox = max(0, distA);
     float distInsideBox = max(0, distB - distToBox);
+
     return float2(distToBox, distInsideBox);
 }
+
 float sampleDensity(float3 Position)
 {
     return 0.1;
+}
+
+float lightmarch(float3 Position, float3 BoundsMin, float3 BoundsMax)
+{
+    float3 dirToLight = normalize(LIGHT_DIR);
+    float distInsideBox = rayBoxDist(BoundsMin, BoundsMax, Position, dirToLight).y;
+
+    float totalDensity = 0;
+    int steps = (int) (distInsideBox / STEP_SIZE);
+
+    for (int i = 0; i < steps; i++)
+    {
+        Position += dirToLight * STEP_SIZE;
+        totalDensity += max(0, sampleDensity(Position) * STEP_SIZE);
+    }
+
+    float transmittance = exp(-totalDensity);
+    return transmittance;
 }
 
 void RayMarcher_float(
@@ -27,37 +49,43 @@ void RayMarcher_float(
     float3 BoundsMin,
     float3 BoundsMax,
     float Depth,
-    float3 RayDirectionVew,
+    float3 RayDirectionView,
     out float4 outValue
 )
 {
-    float2 RayBoxInfo = rayBoxDist(BoundsMin, BoundsMax, RayOrigin, normalize(RayDirection));
-    
-    
-    float4 finalCol = SceneColor;
-    
-    float distToPoint = Depth / abs(RayDirectionVew.z);
-    
-    /* // box raytrace test
-    if (RayBoxInfo.y > 0 && RayBoxInfo.x < distToPoint)
-    {
-        finalCol = 0;
-    }
-    */
+    float3 dirNorm = normalize(RayDirection);
+
+    float2 RayBoxInfo = rayBoxDist(BoundsMin, BoundsMax, RayOrigin, dirNorm);
+
+    float4 sceneCol = SceneColor;
+
+    float distToPoint = Depth / abs(RayDirectionView.z);
+
     float distTravelled = 0;
     float distLimit = min(distToPoint - RayBoxInfo.x, RayBoxInfo.y);
-    
-    float totalDensity = 0;
+
+    float transmittance = 1;
+    float lightEnergy = 0;
+
     while (distTravelled < distLimit)
     {
-        float3 marchPos = RayOrigin + RayDirection * (RayBoxInfo.x + distTravelled);
-        totalDensity += sampleDensity(marchPos) * STEP_SIZE;
+        float3 marchPos = RayOrigin + dirNorm * (RayBoxInfo.x + distTravelled);
+        float density = sampleDensity(marchPos);
+
+        if (density > 0)
+        {
+            float lightTransmittance = lightmarch(marchPos, BoundsMin, BoundsMax);
+            lightEnergy += density * STEP_SIZE * transmittance * lightTransmittance;
+
+            transmittance *= exp(-density * STEP_SIZE);
+
+            if (transmittance < 0.01)
+                break;
+        }
+
         distTravelled += STEP_SIZE;
-
     }
-    float transmittance = exp(-totalDensity);
-    
-    
-    outValue = lerp(float4(0.7, 0.7, 0.7, 1.0), finalCol, transmittance);
 
+    float3 finalCol = sceneCol.rgb * transmittance + lightEnergy * LIGHT_COLOR;
+    outValue = float4(finalCol, 0);
 }

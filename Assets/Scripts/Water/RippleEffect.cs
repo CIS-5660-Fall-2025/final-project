@@ -30,6 +30,7 @@ public class RippleEffect : MonoBehaviour
 
         //Change the texture in the material of this object to the render texture calculated by the ripple shader.
         GetComponent<Renderer>().material.SetTexture("_RippleTex", CurrRT);
+        //GetComponent<Renderer>().material.SetTexture("_MainTex", ObjectsRT);
 
         prevLocation = transform.position;
         offset = transform.position - targetTranform.position;
