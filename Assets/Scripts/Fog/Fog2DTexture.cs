@@ -11,9 +11,12 @@ public class Fog2DTexture : MonoBehaviour
     public Shader DissipationShader, AddShader, ScrollShader;
     private Material DissipationMat, AddMat, ScrollMat;
 
-    private float rippleWorldSize = 200f;
+    public Material FullScreenMat;
 
+    private float rippleWorldSize = 400f;
 
+    //temp
+    private Material testMat;
     private Vector3 prevLocation;
 
     // Start is called before the first frame update
@@ -25,8 +28,12 @@ public class Fog2DTexture : MonoBehaviour
         DissipationMat = new Material(DissipationShader);
         AddMat = new Material(AddShader);
         ScrollMat = new Material(ScrollShader);
+        
+        FullScreenMat.SetTexture("_DissipationTexture", CurrRT);
 
-        //GetComponent<Renderer>().material.SetTexture("_MainTex", CurrRT);
+        //temp
+        testMat = GetComponent<Renderer>().material;
+        testMat.SetTexture("_MainTex", CurrRT);
 
         prevLocation = transform.position;
         StartCoroutine(Dissipate());
@@ -37,6 +44,9 @@ public class Fog2DTexture : MonoBehaviour
     {
         Vector3 playerOffset;
         while (true) {
+
+            testMat.SetVector("_TexPosition", transform.position);
+
             playerOffset = transform.position - prevLocation;
             if (playerOffset != Vector3.zero)
             {
@@ -66,18 +76,20 @@ public class Fog2DTexture : MonoBehaviour
             //CurrRT holds the new blended one, 
             //TempRT is reused in next step
 
-            yield return new WaitForSeconds(0.00625f);
+            yield return new WaitForSeconds(0.004f);
 
             //Calculate the dissipation, put in TempRT
             DissipationMat.SetTexture("_MainTex", CurrRT);
             Graphics.Blit(null, TempRT, DissipationMat);
+
+            testMat.SetVector("_TexPosition", transform.position);
 
             //Swap TempRT and CurrentRT
             SwapRTs(ref TempRT, ref CurrRT);
 
             prevLocation = transform.position;
             //Wait for two frames and then execute again.
-            yield return new WaitForSeconds(0.00625f);
+            yield return new WaitForSeconds(0.004f);
         }
     }
 

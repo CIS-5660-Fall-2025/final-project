@@ -1,3 +1,4 @@
+
 static const float STEP_SIZE = 0.1;
 static const float3 LIGHT_DIR = float3(1, 0.6, 0);
 static const float3 LIGHT_COLOR = float3(0.7, 0.65, 0.65);
@@ -21,7 +22,22 @@ float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 R
 
 float sampleDensity(float3 Position)
 {
-    return 0.1;
+    return 0.04;
+}
+
+float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float texWorldSize, UnityTexture2D DissipationTex,
+    UnitySamplerState DissipationSampler)
+{
+    float baseDensity = 0.04;
+
+    float2 localPos = (textWorldCenter.xz - Position.xz) / texWorldSize + 0.5;
+    
+    float dissipation = SAMPLE_TEXTURE2D(DissipationTex, DissipationSampler, localPos).r;
+
+    if (any(localPos < 0.0) || any(localPos > 1.0))
+        return baseDensity;
+
+    return baseDensity * dissipation;
 }
 
 float lightmarch(float3 Position, float3 BoundsMin, float3 BoundsMax)
@@ -50,6 +66,9 @@ void RayMarcher_float(
     float3 BoundsMax,
     float Depth,
     float3 RayDirectionView,
+    float texWorldSize,
+    UnityTexture2D DissipationTex,
+    UnitySamplerState DissipationSampler,
     out float4 outValue
 )
 {
@@ -66,17 +85,30 @@ void RayMarcher_float(
 
     float transmittance = 1;
     float lightEnergy = 0;
+    
+    float texWorldCenter = (BoundsMin + BoundsMax) / 2.0;
 
-    while (distTravelled < distLimit)
+    [loop]
+    for (int i = 0; i < 64; i++)
     {
-        float3 marchPos = RayOrigin + dirNorm * (RayBoxInfo.x + distTravelled);
-        float density = sampleDensity(marchPos);
+        if (distTravelled >= distLimit)
+            break;
 
-        if (density > 0)
+        float3 marchPos = RayOrigin + dirNorm * (RayBoxInfo.x + distTravelled);
+
+        float density = sampleDensityDissipation(
+            marchPos,
+            texWorldCenter,
+            texWorldSize,
+            DissipationTex,
+            DissipationSampler
+        );
+
+        if (density > 0.0)
         {
             float lightTransmittance = lightmarch(marchPos, BoundsMin, BoundsMax);
-            lightEnergy += density * STEP_SIZE * transmittance * lightTransmittance;
 
+            lightEnergy += density * STEP_SIZE * transmittance;// * lightTransmittance;
             transmittance *= exp(-density * STEP_SIZE);
 
             if (transmittance < 0.01)

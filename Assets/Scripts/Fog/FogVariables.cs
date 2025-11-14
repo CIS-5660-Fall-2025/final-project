@@ -8,7 +8,6 @@ public class FogVariables : MonoBehaviour
     public Transform FogBox;
     private Vector3 savedScale;
 
-    public RenderTexture dissipationTex;
     public float renderTexWorldSize;
 
 
@@ -19,8 +18,7 @@ public class FogVariables : MonoBehaviour
         FullScreenMat.SetVector("_BoundsMin", FogBox.position - savedScale / 2);
         FullScreenMat.SetVector("_BoundsMax", FogBox.position + savedScale / 2);
 
-        //FullScreenMat.SetTexture("_DissipationTexture", dissipationTex);
-        //FullScreenMat.SetFloat("_TexWorldSize", renderTexWorldSize);
+        FullScreenMat.SetFloat("_TexWorldSize", renderTexWorldSize);
 
         StartCoroutine(UpdateOffset());
     }
