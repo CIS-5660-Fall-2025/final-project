@@ -12,6 +12,8 @@
 #include <utility>
 #include <glm/glm.hpp>
 
+#include "camera.h"
+
 using namespace wgpu;
 using namespace glm;
 
@@ -25,8 +27,12 @@ class Application {
     bool IsRunning(); // Returns true as long as main loop should keep going
 
     private:
+    Camera camera;
 
     struct MyUniforms {
+        mat4x4 projectionMatrix;
+        mat4x4 viewMatrix;
+        mat4x4 modelMatrix;
         vec4 color;
         float time;
         float _pad[3];

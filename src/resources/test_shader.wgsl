@@ -1,4 +1,7 @@
 struct MyUniforms {
+	projectionMatrix: mat4x4f,
+	viewMatrix: mat4x4f,
+	modelMatrix: mat4x4f,
 	color: vec4f,
 	time: f32
 };
@@ -22,7 +25,10 @@ fn rot(v: vec2f, o: f32) -> vec2f {
 @vertex
 fn vs_main(vIn: VertexInput) -> VertexOutput {
 	var out: VertexOutput;
-	out.position = vec4f(rot(vIn.position.xy, u_Uniforms.time), vIn.position.z, 1.0);
+	var worldPos = (modelMatrix * vec4f(vIn.position, 1.0)).xyz;
+	var pos = projectionMatrix * viewMatrix * vec4(worldPos, 1.);
+	
+	out.position = pos;
 	out.color = vIn.color;
 	return out;
 }

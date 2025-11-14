@@ -675,7 +675,12 @@ void Application::InitializeBuffers() {
     uniformBufferDesc.usage = BufferUsage::CopyDst | BufferUsage::Uniform;
     bufferDesc.mappedAtCreation = false;
     uniformBuffer = device.createBuffer(uniformBufferDesc);
-    MyUniforms uniforms = {vec4(1.0,0.4,0.0, 1.0), 1.0f};
+    MyUniforms uniforms;
+    uniforms.time = 1.0f;
+    uniforms.color = vec4(1.0,0.0,0.0,1.0);
+    uniforms.modelMatrix = mat4(1.0f);
+    uniforms.projectionMatrix = camera.GetProjectionMatrix();
+    uniforms.viewMatrix = camera.GetViewMatrix();
     queue.writeBuffer(uniformBuffer, 0, &uniforms, sizeof(MyUniforms));
 
     // !!! Buffers must be multiple of 4 bytes
