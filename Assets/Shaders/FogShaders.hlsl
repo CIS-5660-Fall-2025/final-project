@@ -1,7 +1,10 @@
 
 static const float STEP_SIZE = 0.1;
-static const float3 LIGHT_DIR = float3(1, 0.6, 0);
-static const float3 LIGHT_COLOR = float3(0.7, 0.65, 0.65);
+static const float3 LIGHT_DIR = float3(0.8, 0.5, 0.2);
+static const float3 LIGHT_COLOR = float3(0.2, 0.22, 0.33);
+static const float NOISE_SCALE = 0.005;
+static const float NOISE_STRENGTH = 0.9;
+
 
 float2 rayBoxDist(float3 BoundsMin, float3 BoundsMax, float3 RayOrigin, float3 RayDirection)
 {
@@ -26,10 +29,16 @@ float sampleDensity(float3 Position)
 }
 
 float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float texWorldSize, UnityTexture2D DissipationTex,
-    UnitySamplerState DissipationSampler)
+    UnitySamplerState DissipationSampler, UnityTexture3D NoiseTex, UnitySamplerState NoiseSampler, float time)
 {
+        
+    float3 noiseUV = Position * NOISE_SCALE;
+    noiseUV.y += time;
+
+    float noiseValue = SAMPLE_TEXTURE3D(NoiseTex, NoiseSampler, noiseUV).r;
     
-    float baseDensity = 0.1;
+    float noiseFactor = lerp(1.0 - NOISE_STRENGTH, 1.0 + NOISE_STRENGTH, noiseValue);
+    float baseDensity = saturate(0.6 * noiseFactor);
 
     float2 localPos = (textWorldCenter.xz - Position.xz) / texWorldSize + 0.5;
     
@@ -38,7 +47,7 @@ float sampleDensityDissipation(float3 Position, float3 textWorldCenter, float te
     if (any(localPos < 0.0) || any(localPos > 1.0))
         return baseDensity;
     
-    return lerp(baseDensity, 0.01, clamp(dissipation, 0, 1));
+    return lerp(baseDensity, baseDensity * 0.05, clamp(dissipation, 0, 1));
 }
 
 float lightmarch(float3 Position, float3 BoundsMin, float3 BoundsMax)
@@ -71,6 +80,9 @@ void RayMarcher_float(
     UnityTexture2D DissipationTex,
     UnitySamplerState DissipationSampler,
     float3 texCenter,
+    UnityTexture3D NoiseTex,
+    UnitySamplerState NoiseSampler,
+    float time,
     out float4 outValue
 )
 {
@@ -101,7 +113,10 @@ void RayMarcher_float(
             texCenter,
             texWorldSize,
             DissipationTex,
-            DissipationSampler
+            DissipationSampler,
+            NoiseTex,
+            NoiseSampler,
+            time
         );
 
         if (density > 0.0)

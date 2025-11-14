@@ -265,8 +265,8 @@ Transform:
   m_GameObject: {fileID: 123774544}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02, z: 0}
-  m_LocalScale: {x: 10, y: 0.1, z: 10}
+  m_LocalPosition: {x: 0, y: 0.033, z: 0}
+  m_LocalScale: {x: 10, y: 0.13, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 207288160}
@@ -491,6 +491,7 @@ MonoBehaviour:
   FullScreenMat: {fileID: -876546973899608171, guid: d48d36724396dca4a844cce7ec82857c,
     type: 3}
   FogBox: {fileID: 123774545}
+  noise3D: {fileID: 11700000, guid: 85b3666c38483d4419c17e1f33f7a1c4, type: 2}
   renderTexWorldSize: 400
 --- !u!1 &264169406
 GameObject:
@@ -795,7 +796,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -838,7 +839,7 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 5000
+  m_ColorTemperature: 7157
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
