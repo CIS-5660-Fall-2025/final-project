@@ -5,6 +5,9 @@ This is it! The culmination of your procedural graphics experience this semester
 ## Project planning: Design Doc (due 11/5)
 Before submitting your first milestone, _you must get your project idea and scope approved by Rachel, Adam or a TA._
 
+My Design Doc: 
+https://docs.google.com/document/d/1HD5-_L-pCF_eC4lvgOmJ6otgNM5OX93LYyv_ONMpe5w/edit?usp=sharing
+
 ### Design Doc
 Start off by forking this repository. In your README, write a design doc to outline your project goals and implementation plan. It must include the following sections:
 
