@@ -497,6 +497,10 @@ void Application::MainLoop() {
     // Update uniforms
     float t = static_cast<float>(glfwGetTime());
     queue.writeBuffer(uniformBuffer, offsetof(MyUniforms, time), &t, sizeof(float));
+    mat4x4 viewMat = camera.GetViewMatrix();
+    mat4x4 modelMat = glm::rotate(mat4(1.0f), t, vec3(0.0f, 1.0f, 0.0f));
+    queue.writeBuffer(uniformBuffer, offsetof(MyUniforms, modelMatrix), &modelMat, sizeof(mat4x4));
+    queue.writeBuffer(uniformBuffer, offsetof(MyUniforms, viewMatrix), &viewMat, sizeof(mat4x4));
 
     auto [surfaceTexture, targetView] = GetNextSurfaceViewData();
     if(!targetView) return;
@@ -636,20 +640,17 @@ RequiredLimits Application::GetRequiredLimits(Adapter adapter) const {
 
 void Application::InitializeBuffers() {
     vector<float> positions = {
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f,  1.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.5f,  1.0f, 0.0f, 0.0f,
-        
-        -0.9f, -0.9f, 0.4f,  1.0f, 1.0f, 0.0f,
-        -0.7f, -0.9f, 0.4f,  0.0f, 1.0f, 0.0f,
-        0.1f, 0.1f, 0.4f,  0.0f, 1.0f, 1.0f
+        -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f
     };
     vertexCount = static_cast<uint32_t>(positions.size())/6;
 
     // indices must be uint16_t or uint32_t
     vector<uint32_t> indices = {
-        0, 1, 2,
-        3, 4, 5,
+        0, 1, 3,
+        0, 3, 2
     };
     indexCount = static_cast<uint32_t>(indices.size());
 

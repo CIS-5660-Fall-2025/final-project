@@ -12,10 +12,10 @@ class Camera {
     vec3 ri, up, fo;
     float fovY;
     float nearClip, farClip;
-    Camera();
-
+    
     public:
 
     mat4 GetViewMatrix();
     mat4 GetProjectionMatrix();
+    Camera();
 };

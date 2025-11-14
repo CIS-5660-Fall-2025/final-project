@@ -25,9 +25,9 @@ fn rot(v: vec2f, o: f32) -> vec2f {
 @vertex
 fn vs_main(vIn: VertexInput) -> VertexOutput {
 	var out: VertexOutput;
-	var worldPos = (modelMatrix * vec4f(vIn.position, 1.0)).xyz;
-	var pos = projectionMatrix * viewMatrix * vec4(worldPos, 1.);
-	
+	var worldPos = (u_Uniforms.modelMatrix * vec4f(vIn.position, 1.0)).xyz;
+	var pos: vec4f = u_Uniforms.projectionMatrix * u_Uniforms.viewMatrix * vec4(worldPos, 1.);
+
 	out.position = pos;
 	out.color = vIn.color;
 	return out;
