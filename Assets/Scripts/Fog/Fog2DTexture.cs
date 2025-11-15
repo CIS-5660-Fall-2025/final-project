@@ -36,10 +36,10 @@ public class Fog2DTexture : MonoBehaviour
         FullScreenMat.SetTexture("_DissipationTexture", CurrRT);
 
         //temp
-        if (enableTestMat) {
-            testMat = GetComponent<Renderer>().material;
-            testMat.SetTexture("_MainTex", CurrRT);
-        }
+        // if (enableTestMat) {
+        //     testMat = GetComponent<Renderer>().material;
+        //     testMat.SetTexture("_MainTex", CurrRT);
+        // }
 
         prevLocation = transform.position;
         StartCoroutine(Dissipate());
@@ -51,9 +51,9 @@ public class Fog2DTexture : MonoBehaviour
         Vector3 playerOffset;
         while (true) {
 
-            if (enableTestMat) {
-                testMat.SetVector("_TexPosition", transform.position);
-            }
+            // if (enableTestMat) {
+            //     testMat.SetVector("_TexPosition", transform.position);
+            // }
 
             playerOffset = transform.position - prevLocation;
             if (playerOffset != Vector3.zero)
@@ -84,22 +84,22 @@ public class Fog2DTexture : MonoBehaviour
             //CurrRT holds the new blended one, 
             //TempRT is reused in next step
 
-            yield return new WaitForSeconds(0.004f);
+            //yield return null;
 
             //Calculate the dissipation, put in TempRT
             DissipationMat.SetTexture("_MainTex", CurrRT);
             Graphics.Blit(null, TempRT, DissipationMat);
 
-            if (enableTestMat) {
-                testMat.SetVector("_TexPosition", transform.position);
-            }
+            // if (enableTestMat) {
+            //     testMat.SetVector("_TexPosition", transform.position);
+            // }
 
             //Swap TempRT and CurrentRT
             SwapRTs(ref TempRT, ref CurrRT);
 
             prevLocation = transform.position;
             //Wait for two frames and then execute again.
-            yield return new WaitForSeconds(0.004f);
+            yield return null;
         }
     }
 
