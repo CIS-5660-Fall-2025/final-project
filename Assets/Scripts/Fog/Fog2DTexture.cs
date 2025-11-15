@@ -13,7 +13,7 @@ public class Fog2DTexture : MonoBehaviour
 
     public Material FullScreenMat;
 
-    private float rippleWorldSize = 200f;
+    private float rippleWorldSize = 400f;
 
     //temp
     private Material testMat;
