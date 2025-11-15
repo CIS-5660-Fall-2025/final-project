@@ -25,10 +25,16 @@ public class ObjectColor : MonoBehaviour
         mr = GetComponent<MeshRenderer>();
         mpb = new MaterialPropertyBlock();
     }
+
+    void Start() {
+        if (!despawnable) {
+            Reset();
+        }
+    }
     
     public void Reset() {
         Color c;
-        if (positionAware){
+        if (positionAware && Random.value < 0.8f){
             if (transform.position.x > 0) {
                 if (transform.position.z > 0) {
                     c = Color.red;
@@ -59,10 +65,11 @@ public class ObjectColor : MonoBehaviour
     }
 
     IEnumerator Despawn() {
+        yield return new WaitForSeconds(75);
         while (true) {
-            yield return new WaitForSeconds (10 + 5 * Random.value);
+            yield return new WaitForSeconds(15 + 5 * Random.value);
 
-            if (Vector3.Distance(transform.position, EnemyManager.Instance.playerTransform.position) > 320) {
+            if (Vector3.Distance(transform.position, EnemyManager.Instance.playerTransform.position) > 700) {
                 //despawn
                 BulletPool.ballPool.Release(this.gameObject);
                 break;

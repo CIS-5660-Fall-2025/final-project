@@ -47,8 +47,8 @@ public class BulletPool
     }
 
     private static void ActionOnGetBall(GameObject ball) {
-        ball.GetComponent<ObjectColor>().Reset();
         ball.SetActive(true);
+        ball.GetComponent<ObjectColor>().Reset();
     }
 
     private static void ActionOnReleaseBall(GameObject ball) {

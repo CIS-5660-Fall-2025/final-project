@@ -4,38 +4,51 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject prefabA;
-    public GameObject prefabB;
 
-    public Transform player;
+    public float innerRadius = 250f;
+    public float outerRadius = 600f;
 
-    public float innerRadius = 30f;   // No spawns inside this
-    public float outerRadius = 200f;  // Spawns only inside this
+    public int spawnCount = 40;
 
-    public int spawnCount = 50;       // How many to spawn per call
+    [SerializeField] private bool playerInRange;
 
-    [ContextMenu("Spawn Now")]
-    public void Spawn()
-    {
-        for (int i = 0; i < spawnCount; i++)
-        {
-            Vector2 offset;
+    void Start() {
+        StartCoroutine(SpawnCor());
+    }
 
-            // Generate a random point until it's within the valid ring
-            do
+    IEnumerator SpawnCor() {
+        while (true) {
+            yield return new WaitForSeconds(8 + 4 * Random.value);
+
+            bool prevPlayerInRange = playerInRange;
+
+            playerInRange = Vector3.Distance(EnemyManager.Instance.playerTransform.position, transform.position) < outerRadius;
+
+            if (!playerInRange || prevPlayerInRange) continue;
+
+            for (int i = 0; i < spawnCount; i++)
             {
-                offset = Random.insideUnitCircle * outerRadius;
+                Vector2 offset;
+                Vector3 spawnPos;
+
+
+                do
+                {
+                    offset = Random.insideUnitCircle * outerRadius;
+                    spawnPos = transform.position + new Vector3(offset.x, 0, offset.y);
+                }
+                while (Vector3.Distance(EnemyManager.Instance.playerTransform.position, spawnPos) < innerRadius);
+
+                GameObject ball = BulletPool.ballPool.Get();
+                ball.transform.position = spawnPos;
             }
-            while (offset.magnitude < innerRadius);
-
-            Vector3 pos = new Vector3(
-                player.position.x + offset.x,
-                0f,
-                player.position.z + offset.y
-            );
-
-            GameObject prefab = (Random.value < 0.5f ? prefabA : prefabB);
-            Instantiate(prefab, pos, Quaternion.identity);
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1f, 0f, 0f, 0.8f);
+        Gizmos.DrawWireSphere(transform.position, outerRadius);
+    }
+
 }
