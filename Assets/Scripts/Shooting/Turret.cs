@@ -98,18 +98,19 @@ public abstract class Turret : MonoBehaviour
         freezeRotation = false;
     }
 
-    protected bool Fire(bool offset, float offsetAmount = 1f) {
+    protected bool Fire(bool offset, float offsetAmount = 0.05f) {
         if (reloadTimer > 0.01f || !CheckAngle() || !CheckAim() || getDist() < 3f) return false;
         reloadTimer = ReloadTime;
 
         if (firePoints.Length > 1) offset = true;
 
         Vector3 targetPos = targetTransform.position;
+        float dist = Vector3.Distance(targetPos, turret.position);
 
         for (int i = 0; i < firePoints.Length; i++) {
             Vector3 newPos = targetPos;
             if (offset) {
-                Vector3 offsetPos = Random.insideUnitSphere * offsetAmount;
+                Vector3 offsetPos = Random.insideUnitSphere * (2 + offsetAmount * Mathf.Max(0, dist - 40));
                 offsetPos.y = 0;
                 newPos += offsetPos;
             }

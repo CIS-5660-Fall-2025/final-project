@@ -16,7 +16,7 @@ public class Projectile : MonoBehaviour
         model.forward = rb.velocity.normalized;
 
         lifetime += Time.deltaTime;
-        if (lifetime > 5) {
+        if (lifetime > 10) {
             BulletPool.bulletPool.Release(this);
         }
     }
