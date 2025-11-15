@@ -17,14 +17,12 @@ public class Fog2DTexture : MonoBehaviour
 
     //temp
     private Material testMat;
-    private bool enableTestMat;
 
     private Vector3 prevLocation;
 
     // Start is called before the first frame update
     void Start()
     {
-        enableTestMat = false;
 
         //Creating render textures and materials
         CurrRT = new RenderTexture(TextureSize, TextureSize, 0, RenderTextureFormat.RFloat);

@@ -5,6 +5,12 @@ using UnityEngine.Pool;
 
 public class BulletPool
 {
+    private static readonly int maxSizeBallPool = 100;
+    private static readonly int defaultSizeBallPool = 20;
+
+    private static GameObject ballPrefab = Resources.Load<GameObject>("PlasticBall");
+    public static IObjectPool<GameObject> ballPool = new ObjectPool<GameObject>(CreateBall, ActionOnGetBall, ActionOnReleaseBall, ActionOnDestroyBall, true, defaultSizeBallPool, maxSizeBallPool);
+
     private static readonly int maxSizeBulletPool = 120;
     private static readonly int defaultSizeBulletPool = 20;
 
@@ -24,12 +30,33 @@ public class BulletPool
     private static void ActionOnReleaseBullet(Projectile bullet) {
         bullet.ResetValues();
 
-        //discard the trail
         bullet.gameObject.SetActive(false);
     }
 
     private static void ActionOnDestroyBullet(Projectile bullet) {
         GameObject.Destroy(bullet.gameObject);
     }
+
+
     
+    ///// Balls
+    private static GameObject CreateBall() {
+        GameObject ball = Object.Instantiate(ballPrefab);
+        ball.SetActive(false);
+        return ball;
+    }
+
+    private static void ActionOnGetBall(GameObject ball) {
+        ball.GetComponent<ObjectColor>().Reset();
+        ball.SetActive(true);
+    }
+
+    private static void ActionOnReleaseBall(GameObject ball) {
+
+        ball.SetActive(false);
+    }
+
+    private static void ActionOnDestroyBall(GameObject ball) {
+        GameObject.Destroy(ball);
+    }
 }
