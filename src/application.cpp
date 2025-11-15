@@ -443,7 +443,7 @@ void Application::InitializeRenderPipeline() {
     pipelineDesc.multisample.alphaToCoverageEnabled = false; // Irrelevant for now
 
     // [...]
-    vector<BindGroupLayoutEntry> bindingLayoutEntries(2, Default);
+    vector<BindGroupLayoutEntry> bindingLayoutEntries(3, Default);
 
     // Binding Entry 1
     BindGroupLayoutEntry &bindingLayout = bindingLayoutEntries[0];
@@ -456,10 +456,15 @@ void Application::InitializeRenderPipeline() {
     textureBindingLayout.binding = 1;
     textureBindingLayout.visibility = ShaderStage::Fragment;
     textureBindingLayout.texture.sampleType = TextureSampleType::Float; // This one we set the texture type instead of buffer
-    textureBindingLayout.texture.viewDimension = TextureViewDimension::_2D;
+    textureBindingLayout.texture.viewDimension = TextureViewDimension::_3D;
+
+    BindGroupLayoutEntry &samplerBindingLayout = bindingLayoutEntries[2];
+    samplerBindingLayout.binding =2 ;
+    samplerBindingLayout.visibility = ShaderStage::Fragment;
+    samplerBindingLayout.sampler.type = SamplerBindingType::Filtering;
 
     BindGroupLayoutDescriptor bindGroupLayoutDesc = {};
-    bindGroupLayoutDesc.entryCount = 2;
+    bindGroupLayoutDesc.entryCount = 3;
     bindGroupLayoutDesc.entries = bindingLayoutEntries.data();
     bindGroupLayout = device.createBindGroupLayout(bindGroupLayoutDesc);
 
@@ -498,16 +503,18 @@ void Application::InitializeRenderPipeline() {
 
     shaderModule.release();
 
-    testTexture.Initialize(device);
+    testTexture.Initialize(device, uvec3(256), true, true);
     uint32_t dim = 256;
-    vector<uint8_t> pixels(4 * dim * dim);
+    vector<uint8_t> pixels(4 * dim * dim * dim);
     for(uint32_t i = 0; i < dim; ++i) {
         for(uint32_t j = 0; j<dim; ++j) {
-            uint8_t *p = &pixels[4 * (j + i * dim)];
-            p[0] = (uint8_t) i;
-            p[1] = 0;//(uint8_t) j;
-            p[2] = 0;
-            p[3] = 255;
+            for(uint32_t k=0; k<dim; ++k) {
+                uint8_t *p = &pixels[4 * (j + i * dim + k * dim * dim)];
+                p[0] = (uint8_t) i;
+                p[1] = (uint8_t) j;
+                p[2] = (uint8_t) k;
+                p[3] = 255;
+            }
         }
     }
     testTexture.WriteToTexture(queue, pixels);
@@ -713,7 +720,7 @@ void Application::InitializeBuffers() {
 }
 
 void Application::InitializeBindGroups() {
-    vector<BindGroupEntry> bindings(2);
+    vector<BindGroupEntry> bindings(3);
 
     bindings[0].binding = 0; // Index of binding
     bindings[0].buffer = uniformBuffer; // Must come after creating buffer
@@ -722,6 +729,9 @@ void Application::InitializeBindGroups() {
 
     bindings[1].binding = 1;
     bindings[1].textureView = testTexture.textureView;
+
+    bindings[2].binding = 2;
+    bindings[2].sampler = testTexture.sampler;
 
     BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;

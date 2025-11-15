@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 
 using namespace wgpu;
+using namespace glm;
 
 class TextureHolder {
     public:
@@ -17,8 +18,9 @@ class TextureHolder {
     Texture texture = nullptr;
     TextureDescriptor textureDesc;
     TextureView textureView = nullptr;
+    Sampler sampler = nullptr;
 
-    void Initialize(Device &device);
+    void Initialize(Device &device, glm::uvec3 size, bool is3D, bool shaderWrite);
     // 8-BIT NEEDS TO CHANGE if format changes
     void WriteToTexture(Queue&, const std::vector<uint8_t> &pixels);
     void Destroy();

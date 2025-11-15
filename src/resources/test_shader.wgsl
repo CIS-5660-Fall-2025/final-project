@@ -18,7 +18,8 @@ struct VertexOutput {
 };
 
 @group(0) @binding(0) var<uniform> u_Uniforms: MyUniforms;
-@group(0) @binding(1) var testTexture: texture_2d<f32>;
+@group(0) @binding(1) var testTexture: texture_3d<f32>;
+@group(0) @binding(2) var testSampler: sampler;
 
 fn rot(v: vec2f, o: f32) -> vec2f {
 	return mat2x2f(cos(o), sin(o), -sin(o), cos(o)) * v;
@@ -38,7 +39,7 @@ fn vs_main(vIn: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-	var col = textureLoad(testTexture, vec2i(in.uv*240.), 0).rgb;//vec3f(in.uv, 0.0);
+	var col = textureSample(testTexture, testSampler, vec3f(in.uv, sin(u_Uniforms.time)*0.5+0.5)).rgb;//textureLoad(testTexture, vec2i(in.uv*240.), 0).rgb;//vec3f(in.uv, 0.0);
 	var correctedCol = pow(col, vec3f(2.2));
 	return vec4(correctedCol, 1.0);
 }
